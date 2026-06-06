@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Colors */
+  --bg-deep: #03000a;
+  --bg-canvas: #000000;
+  --bg-card: #0c0717;
+  --bg-panel: #080410;
+
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-muted: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(99, 102, 241, 0.4);
+
+  --text-primary: #f3f1f7;
+  --text-secondary: #9e99a8;
+  --text-muted: #625d6b;
+  --text-accent: #a78bfa;
+
+  --aurora-indigo: #312e81;
+  --aurora-violet: #6d28d9;
+  --aurora-purple: #8b5cf6;
+  --aurora-teal: #0d9488;
+  --aurora-mint: #34d399;
+
+  /* Fonts */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* Premium Aurora Glass Card style */
+  .aurora-card {
+    background: linear-gradient(135deg, rgba(12, 7, 23, 0.8) 0%, rgba(8, 4, 16, 0.9) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-muted);
+    border-radius: 0.75rem;
+    transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .aurora-card:hover {
+    border-color: rgba(139, 92, 246, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(109, 40, 217, 0.05);
+  }
+
+  .aurora-card-active {
+    border-color: rgba(52, 211, 153, 0.3) !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(20, 185, 129, 0.08);
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--aurora-violet) 0%, var(--aurora-indigo) 100%);
+    color: var(--text-primary);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-family: var(--font-display);
+    padding: 0.5rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.15);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--aurora-purple) 0%, var(--aurora-violet) 100%);
+    border-color: rgba(167, 139, 250, 0.5);
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.25), 0 0 8px rgba(52, 211, 153, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-muted);
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-family: var(--font-display);
+    padding: 0.5rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-deep);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Background Aurora Ambient Glow */
+.aurora-bg-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  filter: blur(140px);
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-indigo {
+  background: var(--aurora-indigo);
+  top: -10%;
+  left: 10%;
+  animation: floatGlow 20s infinite alternate;
+}
+
+.glow-violet {
+  background: var(--aurora-violet);
+  bottom: -10%;
+  right: 10%;
+  animation: floatGlow 25s infinite alternate-reverse;
+}
+
+@keyframes floatGlow {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(80px, 50px) scale(1.1);
+  }
+}
