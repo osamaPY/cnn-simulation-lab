@@ -119,7 +119,7 @@ export const ConvolutionStage: React.FC = () => {
       ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
     }
     lastDrawnStepRef.current = stepIndex;
-  }, [stepIndex, outputMap, outMin, outMax]);
+  }, [stepIndex, outputMap, outMin, outMax, outputDim]);
 
   if (!preprocessedData) return null;
 

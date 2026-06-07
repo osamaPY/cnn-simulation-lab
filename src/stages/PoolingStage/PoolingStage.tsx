@@ -41,7 +41,7 @@ export const PoolingStage: React.FC = () => {
 
   const { inMin, inMax } = useMemo(() => {
     let min = Infinity, max = -Infinity;
-    for (let v of inputMap) {
+    for (const v of inputMap) {
       if (v < min) min = v;
       if (v > max) max = v;
     }
@@ -50,7 +50,7 @@ export const PoolingStage: React.FC = () => {
 
   const { outMin, outMax } = useMemo(() => {
     let min = Infinity, max = -Infinity;
-    for (let v of outputMap) {
+    for (const v of outputMap) {
       if (v < min) min = v;
       if (v > max) max = v;
     }

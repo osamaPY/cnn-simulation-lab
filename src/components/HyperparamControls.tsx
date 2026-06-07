@@ -5,7 +5,7 @@ export const HyperparamControls: React.FC = () => {
   const hyperparams = useLabStore(state => state.hyperparams);
   const updateHyperparams = useLabStore(state => state.updateHyperparams);
 
-  const controls = [
+  const controls: { key: keyof typeof hyperparams; label: string; min: number; max: number; step: number; icon: string }[] = [
     { key: 'kernelSize', label: 'Kernel Size', min: 1, max: 7, step: 2, icon: '⧉' },
     { key: 'stride', label: 'Stride', min: 1, max: 3, step: 1, icon: '↠' },
     { key: 'padding', label: 'Padding', min: 0, max: 3, step: 1, icon: '□' },
@@ -29,7 +29,7 @@ export const HyperparamControls: React.FC = () => {
                 <span className="text-[11px] font-mono text-white/70 uppercase tracking-wider">{ctrl.label}</span>
               </div>
               <span className="text-[11px] font-mono font-bold text-aurora-purple bg-aurora-purple/10 px-2 py-0.5 rounded">
-                {(hyperparams as any)[ctrl.key]}
+                {hyperparams[ctrl.key]}
               </span>
             </div>
             
@@ -38,7 +38,7 @@ export const HyperparamControls: React.FC = () => {
               min={ctrl.min}
               max={ctrl.max}
               step={ctrl.step}
-              value={(hyperparams as any)[ctrl.key]}
+              value={hyperparams[ctrl.key]}
               onChange={(e) => updateHyperparams({ [ctrl.key]: parseInt(e.target.value) })}
               className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-aurora-purple hover:accent-aurora-mint transition-all"
             />

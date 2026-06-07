@@ -94,7 +94,7 @@ export function ReluStage() {
       context.stroke()
       context.restore()
     }
-  }, [shouldReduceMotion, stats.maxMagnitude, stepIndex, values])
+  }, [shouldReduceMotion, stats.maxMagnitude, stepIndex, values, outputDim])
 
   // Pick a sample value for the probe line on the graph (~middle of scan)
   const sampleRawValue = values[Math.floor(sweepProgress * outputDim) * outputDim + Math.floor(outputDim/2)] ?? 0
