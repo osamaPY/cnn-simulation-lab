@@ -32,6 +32,9 @@ const SoftmaxStage = lazy(() =>
 const PredictionStage = lazy(() =>
   import('./PredictionStage/PredictionStage').then((module) => ({ default: module.PredictionStage })),
 )
+const BackpropStage = lazy(() =>
+  import('./BackpropStage/BackpropStage').then((module) => ({ default: module.BackpropStage })),
+)
 
 function StageLoadingState() {
   return <div className="flex h-full w-full items-center justify-center text-lg font-mono text-white/50">Loading simulation frame...</div>
@@ -81,7 +84,7 @@ export function StageViewer() {
     ? 'Draw a digit and click Run Simulation to generate the real preprocessing data.'
     : (currentStageId === 4 || (currentStageId >= 6 && currentStageId <= 8)) && activations.length === 0
       ? 'This stage requires intermediate activations from the exported TensorFlow.js model. Add the model under public/model and run the simulation again.'
-      : currentStageId >= 9 && !prediction
+      : currentStageId >= 9 && currentStageId !== 11 && !prediction
         ? 'This stage requires a successful model prediction. Add the exported model, then draw a digit and run the simulation again.'
         : null
 
@@ -109,6 +112,8 @@ export function StageViewer() {
         return <div className="flex w-full h-full items-center justify-center"><SoftmaxStage /></div>
       case 10:
         return <div className="flex w-full h-full items-center justify-center"><PredictionStage /></div>
+      case 11:
+        return <div className="flex w-full h-full items-center justify-center"><BackpropStage /></div>
       default:
         return null
     }
@@ -120,10 +125,10 @@ export function StageViewer() {
   }
 
   return (
-    <div className="relative w-full min-h-full flex flex-col items-center justify-center p-4 sm:p-6 pointer-events-auto" id="stage-viewer">
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 pointer-events-auto" id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          className="w-full flex flex-col items-center justify-center"
+          className="w-full h-full flex flex-col items-center justify-center"
           key={`${currentStageId}-${Boolean(preprocessedData)}-${activations.length}-${Boolean(prediction)}`}
           initial={shouldReduceMotion ? false : { opacity: 0, x: direction * 60, scale: 0.98 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}

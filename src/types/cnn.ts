@@ -83,5 +83,12 @@ export const CNN_STAGES: StageInfo[] = [
     shortName: "Output",
     description: "Yields predicted digit and model confidence.",
     shapeLabel: "1"
+  },
+  {
+    id: 11,
+    name: "Backpropagation Learning",
+    shortName: "Learning",
+    description: "Visualizes how error gradients flow backward to adjust weights and learn.",
+    shapeLabel: "1"
   }
 ];

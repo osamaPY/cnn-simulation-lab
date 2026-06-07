@@ -70,5 +70,12 @@ export const mathExplanations: Record<number, ExplanationContent> = {
     focusFormula: "\\hat{y} = \\arg\\max_{i} \\sigma(z)_i",
     interactiveGoal: "Observe final index classification.",
     keyTakeaway: "Identifies the highest confidence prediction."
+  },
+  11: {
+    headline: "Backpropagation Learning",
+    body: "Calculates error gradients at the output and propagates them backward using the Chain Rule, adjusting all weights and filter kernels to learn from mistakes.",
+    focusFormula: "W_{new} = W_{old} - \\eta \\cdot \\frac{\\partial L}{\\partial W}",
+    interactiveGoal: "Observe gradient backflow and weights tuning in real-time.",
+    keyTakeaway: "Optimizes filter weights to minimize prediction error."
   }
 };

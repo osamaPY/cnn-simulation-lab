@@ -22,7 +22,7 @@ test('draws a digit, runs real inference, and plays cinematic timeline', async (
 
   // Interact with next/back navigation
   await page.getByRole('button', { name: 'Next Chapter' }).click()
-  await expect(page.getByText('Chapter 3 / 10')).toBeVisible()
+  await expect(page.getByText('Chapter 3 / 11')).toBeVisible()
 
   // Reset
   await page.getByRole('button', { name: 'Restart' }).click()

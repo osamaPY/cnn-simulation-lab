@@ -27,22 +27,20 @@ export const LessonShell: React.FC = () => {
         )}
 
         {/* The Cinematic Canvas */}
-        <div className="absolute top-0 left-0 right-0 bottom-[120px] z-10 flex flex-col items-center overflow-y-auto pb-44 pt-4 scrollbar-thin">
+        <div className="absolute top-0 left-0 right-0 bottom-[140px] z-10 flex flex-col items-center justify-center overflow-hidden">
           {!preprocessedData ? (
-             <div className="my-auto py-8">
-               <motion.div 
-                 initial={{ opacity: 0, scale: 0.95 }}
-                 animate={{ opacity: 1, scale: 1 }}
-                 exit={{ opacity: 0, scale: 1.05 }}
-                 className="flex flex-col items-center gap-8 p-12 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl pointer-events-auto"
-               >
-                 <div className="text-center">
-                    <h2 className="text-4xl font-display text-white mb-3">Draw the Input</h2>
-                    <p className="text-white/60 text-lg">Your stroke will be the tensor processed by the CNN.</p>
-                 </div>
-                 <DrawCanvas />
-               </motion.div>
-             </div>
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               exit={{ opacity: 0, scale: 1.05 }}
+               className="flex flex-col items-center gap-8 p-12 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/5 shadow-2xl pointer-events-auto"
+             >
+               <div className="text-center">
+                  <h2 className="text-4xl font-display text-white mb-3">Draw the Input</h2>
+                  <p className="text-white/60 text-lg">Your stroke will be the tensor processed by the CNN.</p>
+               </div>
+               <DrawCanvas />
+             </motion.div>
           ) : (
              <StageViewer />
           )}

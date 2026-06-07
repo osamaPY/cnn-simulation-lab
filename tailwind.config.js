@@ -22,6 +22,7 @@ export default {
         'aurora-purple': 'var(--aurora-purple)',
         'aurora-teal': 'var(--aurora-teal)',
         'aurora-mint': 'var(--aurora-mint)',
+        'signal-coral': 'var(--signal-coral)',
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'sans-serif'],
