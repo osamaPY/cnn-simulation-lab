@@ -77,7 +77,7 @@ const GLOSSARY_MAP: Record<number, { symbol: string; label: string; desc: string
   ]
 };
 
-export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles' }> = ({ mode = 'all' }) => {
+export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles' | 'glossary' }> = ({ mode = 'all' }) => {
   const currentStageId = useLabStore((state) => state.currentStageId);
   const shouldReduceMotion = useReducedMotion();
   const explanation = EXPLANATIONS[currentStageId] || { body: '', focusFormula: null, keyTakeaway: '', headline: '' };
@@ -86,15 +86,38 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
   const stageColor = STAGE_COLORS[currentStageId] || '#58C4DD';
 
   const showFormula = (mode === 'all' || mode === 'formula') && explanation.focusFormula;
+  const showGlossary = (mode === 'all' || mode === 'glossary') && explanation.focusFormula;
   const showSubtitles = (mode === 'all' || mode === 'subtitles');
 
   return (
     <div className="relative w-full pointer-events-none" style={{ minWidth: 0 }}>
-      {/* Formula panel — rendered inline (not absolute) inside the sidebar */}
+      {/* Horizontal Formula Banner — rendered at the top of Left Column */}
       {showFormula && (
         <AnimatePresence mode="wait">
           <motion.div
             key={`formula-${currentStageId}`}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full pointer-events-auto flex items-center justify-center"
+          >
+            <div className="flex items-center gap-4 py-1.5 px-5 bg-white/[0.01] border border-white/5 rounded-lg max-w-4xl w-full justify-center shadow-lg backdrop-blur-sm">
+              <span className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] font-bold shrink-0">Stage Formula</span>
+              <div className="w-[1px] h-4 bg-white/10 shrink-0" />
+              <div className="flex-1 min-w-0 flex justify-center text-[#58C4DD]">
+                <MathFormula formula={explanation.focusFormula!} />
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      )}
+
+      {/* Glossary panel — rendered inline inside the sidebar */}
+      {showGlossary && GLOSSARY_MAP[currentStageId] && (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`glossary-${currentStageId}`}
             initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={shouldReduceMotion ? undefined : { opacity: 0, y: -5 }}
@@ -102,32 +125,24 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
             className="w-full pointer-events-auto"
           >
             <div
-              className="bg-[#1c1c1c] rounded-sm border border-white/5 flex flex-col items-center gap-3 w-full min-w-0 formula-card"
-              style={{ padding: '16px 12px' }}
+              className="bg-[#1c1c1c] rounded-sm border border-white/5 flex flex-col gap-3 w-full min-w-0 formula-card p-4 shadow-xl"
             >
-              <MathFormula formula={explanation.focusFormula!} />
-              
-              {GLOSSARY_MAP[currentStageId] && (
-                <div className="flex flex-col w-full gap-1.5 mt-1 pt-2 border-t border-white/5">
-                  <div className="text-[8px] font-mono text-white/20 uppercase tracking-widest text-center mb-1 font-bold">Glossary</div>
-                  <div className="flex flex-col gap-1 w-full">
-                    {GLOSSARY_MAP[currentStageId].map((item, idx) => (
-                      <div key={idx} className="flex items-start justify-between text-[9px] font-mono gap-2 hover:bg-white/[0.02] p-1 rounded transition-colors group">
-                        <span className="text-[#58C4DD] font-bold shrink-0">{item.symbol}</span>
-                        <div className="flex flex-col items-end text-right">
-                          <span className="text-white/60 font-semibold uppercase text-[8px] tracking-wider">{item.label}</span>
-                          <span className="text-white/30 text-[8px] leading-tight mt-0.5 group-hover:text-white/50 transition-colors">{item.desc}</span>
-                        </div>
-                      </div>
-                    ))}
+              <div className="text-[9px] font-mono text-white/40 uppercase tracking-widest text-center border-b border-white/5 pb-2 mb-1 font-bold">Glossary</div>
+              <div className="flex flex-col gap-1.5 w-full">
+                {GLOSSARY_MAP[currentStageId].map((item, idx) => (
+                  <div key={idx} className="flex items-start justify-between text-[9px] font-mono gap-2 hover:bg-white/[0.02] p-1 rounded transition-colors group">
+                    <span className="text-[#58C4DD] font-bold shrink-0">{item.symbol}</span>
+                    <div className="flex flex-col items-end text-right">
+                      <span className="text-white/60 font-semibold uppercase text-[8px] tracking-wider">{item.label}</span>
+                      <span className="text-white/30 text-[8px] leading-tight mt-0.5 group-hover:text-white/50 transition-colors">{item.desc}</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                ))}
+              </div>
 
               {explanation.keyTakeaway && (
-                <div className="flex flex-col items-center gap-2 w-full mt-1">
-                  <div className="w-8 h-[1px] bg-white/10" />
-                  <p className="text-[9px] font-mono text-center leading-relaxed uppercase tracking-widest text-white/30" style={{ maxWidth: '200px' }}>
+                <div className="flex flex-col items-center gap-2 w-full mt-1 border-t border-white/5 pt-3">
+                  <p className="text-[9px] font-mono text-center leading-relaxed uppercase tracking-widest text-white/35 font-bold" style={{ maxWidth: '200px' }}>
                     {explanation.keyTakeaway}
                   </p>
                 </div>

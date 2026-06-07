@@ -111,6 +111,13 @@ export const LessonShell: React.FC = () => {
                   className="flex flex-col bg-[#161616]"
                   style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}
                 >
+                  {/* Top Formula Banner — horizontal design for wide screens */}
+                  {preprocessedData && (
+                    <div className="flex-shrink-0 border-b border-white/5 bg-[#161616] py-1.5 px-6 flex items-center justify-center pointer-events-auto">
+                      <ExplanationPanel mode="formula" />
+                    </div>
+                  )}
+
                   {/* Stage viewer — takes available space */}
                   <div
                     className="flex items-center justify-center stage-viewer-wrapper"
@@ -128,7 +135,7 @@ export const LessonShell: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Right sidebar: formula + hyperparams */}
+                {/* Right sidebar: glossary + hyperparams */}
                 <div
                   className="flex-col border-l border-white/5 bg-[#161616] hidden md:flex right-sidebar-wrapper"
                   style={{ width: '280px', minWidth: '280px', maxWidth: '280px', overflowY: 'auto', overflowX: 'hidden', padding: '20px', gap: '24px' }}
@@ -136,7 +143,7 @@ export const LessonShell: React.FC = () => {
                   {preprocessedData && (
                     <>
                       <div className="w-full pointer-events-auto flex-shrink-0">
-                        <ExplanationPanel mode="formula" />
+                        <ExplanationPanel mode="glossary" />
                       </div>
                       <div className="w-full border-t border-white/5 flex-shrink-0" style={{ paddingTop: '20px' }}>
                         <HyperparamControls />

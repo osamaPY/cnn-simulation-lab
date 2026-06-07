@@ -710,6 +710,17 @@
   }
 }
 
+/* Custom 3D Transform Utilities for Feature Map Stacking */
+.perspective-1200 {
+  perspective: 1200px !important;
+}
+.preserve-3d {
+  transform-style: preserve-3d !important;
+}
+.stack-3d-rotate {
+  transform: rotateX(58deg) rotateZ(-42deg) !important;
+}
+
 /* 0 to Hero responsive height styling overrides */
 @media (max-height: 850px) {
   header {

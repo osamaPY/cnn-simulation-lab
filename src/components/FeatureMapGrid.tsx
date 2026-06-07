@@ -81,8 +81,8 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
   const targetNumFilters = isBlock2 ? hyperparams.numFilters * 2 : hyperparams.numFilters;
   
   return (
-    <div className="relative h-[280px] sm:h-[340px] md:h-[400px] w-full flex items-center justify-center perspective-[1200px] feature-map-stack-container">
-      <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-100">
+    <div className="relative h-[280px] sm:h-[340px] md:h-[400px] w-full flex items-center justify-center perspective-1200 feature-map-stack-container">
+      <div className="relative preserve-3d stack-3d-rotate scale-[0.8] sm:scale-90 md:scale-100 w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48">
         {Array.from({ length: Math.min(targetNumFilters, 12) }).map((_, i) => {
           // Sample a small grid from the actual feature map
           const channelData = new Float32Array(dim * dim);
@@ -92,16 +92,15 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
           return (
             <motion.div
               key={i}
-              initial={{ translateZ: -i * 50, opacity: 0 }}
-              animate={{ translateZ: i * 35, opacity: 1 - i * 0.06 }}
+              initial={{ z: -i * 45, opacity: 0 }}
+              animate={{ z: i * 32, opacity: 1 - i * 0.07 }}
               transition={{ delay: i * 0.08, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 w-44 h-44 sm:w-48 sm:h-48 md:w-56 md:h-56 border-2 bg-black/60 backdrop-blur-md rounded-lg overflow-hidden shadow-[0_0_40px_rgba(88,196,221,0.15)]"
+              className="absolute inset-0 border bg-[#0e141a]/95 backdrop-blur-sm rounded-lg overflow-hidden shadow-[0_0_30px_rgba(88,196,221,0.15)]"
               style={{ 
-                transform: `translateZ(${i * 35}px)`,
-                borderColor: i === 0 ? 'rgba(245, 205, 71, 0.6)' : 'rgba(88, 196, 221, 0.3)'
+                borderColor: i === 0 ? 'rgba(245, 205, 71, 0.7)' : 'rgba(88, 196, 221, 0.35)'
               }}
             >
-              <div className="absolute inset-0 bg-gradient-to-tr from-aurora-purple/5 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-aurora-purple/5 to-transparent pointer-events-none" />
               <div className="w-full h-full p-2 flex items-center justify-center">
                  <div className="w-full h-full grid grid-cols-10 grid-rows-10 gap-[1px] opacity-80">
                     {Array.from({ length: 100 }).map((_, j) => {
