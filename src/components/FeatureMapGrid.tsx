@@ -1,4 +1,4 @@
-import React, { memo, useState, useEffect, useRef, useMemo } from 'react';
+import React, { memo, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLabStore } from '../hooks/useLabStore';
 import { renderFeatureMap } from '../canvas/FeatureMapRenderer';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -54,14 +54,14 @@ const ChannelPlane = memo(function ChannelPlane({
   return (
     <div
       className={`absolute inset-0 transition-all duration-300 rounded-lg overflow-hidden border cursor-pointer ${
-        isHovered
-          ? 'border-[#f5cd47] shadow-[0_0_20px_rgba(245,205,71,0.5)] scale-105 z-50'
-          : isFocused
-            ? 'border-aurora-teal shadow-[0_0_15px_rgba(88,196,221,0.4)] z-40'
+        isFocused
+          ? 'border-[#f5cd47] shadow-[0_0_24px_rgba(245,205,71,0.55)] scale-105 z-40 ring-1 ring-[#f5cd47]/40'
+          : isHovered
+            ? 'border-aurora-teal shadow-[0_0_18px_rgba(88,196,221,0.4)] z-30 brightness-110'
             : 'border-white/10 opacity-75 hover:opacity-100 z-10'
       }`}
       style={{
-        transform: `translateZ(${zOffset + (isHovered ? 20 : 0)}px)`,
+        transform: `translateZ(${zOffset + (isFocused ? 24 : isHovered ? 12 : 0)}px)`,
       }}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
@@ -129,10 +129,10 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
       className={`relative flex min-w-0 flex-col items-center p-2 rounded-lg border transition-all duration-200 cursor-pointer group ${
-        isHovered
-          ? 'border-[#f5cd47] bg-[#f5cd47]/5 scale-105'
-          : isFocused 
-            ? 'border-aurora-teal bg-aurora-teal/5'
+        isFocused
+          ? 'border-[#f5cd47] bg-[#f5cd47]/8 scale-105 ring-1 ring-[#f5cd47]/30'
+          : isHovered
+            ? 'border-aurora-teal bg-aurora-teal/8'
             : 'border-white/5 hover:border-white/15 bg-transparent'
       }`}
     >
@@ -142,7 +142,7 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
         height={96}
         className="block h-auto w-full max-w-24 rounded bg-black border border-black/40 shadow-md"
       />
-      <span className={`text-[10px] font-mono mt-1 ${isHovered ? 'text-[#f5cd47]' : isFocused ? 'text-aurora-teal' : 'text-white/40'}`}>
+      <span className={`text-[10px] font-mono mt-1 ${isFocused ? 'text-[#f5cd47] font-bold' : isHovered ? 'text-aurora-teal' : 'text-white/40'}`}>
         Filter #{channelIndex}
       </span>
     </div>
@@ -158,6 +158,29 @@ export const FeatureMapGrid: React.FC = () => {
   
   const [viewMode, setViewMode] = useState<'grid' | 'stack'>('stack');
   const [hoveredChannel, setHoveredChannel] = useState<number | null>(null);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounced hover: set immediately on enter, delay clearing on leave to prevent flicker
+  const handlePlaneHover = useCallback((channelIdx: number) => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    setHoveredChannel(channelIdx);
+  }, []);
+
+  const handlePlaneLeave = useCallback(() => {
+    hoverTimerRef.current = setTimeout(() => {
+      setHoveredChannel(null);
+    }, 180);
+  }, []);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    };
+  }, []);
 
   // Spacing & angle controls for the 3D view
   const [spacing, setSpacing] = useState(18); // 8px to 30px
@@ -297,8 +320,8 @@ export const FeatureMapGrid: React.FC = () => {
                       zOffset={zOffset}
                       isFocused={isFocused}
                       isHovered={isHovered}
-                      onHover={() => setHoveredChannel(i)}
-                      onLeave={() => setHoveredChannel(null)}
+                      onHover={() => handlePlaneHover(i)}
+                      onLeave={handlePlaneLeave}
                       onClick={() => setSelectedChannel(i)}
                     />
                   );
@@ -308,7 +331,7 @@ export const FeatureMapGrid: React.FC = () => {
 
             {/* Float Info Overlay */}
             <div className="absolute bottom-3 left-3 p-2 rounded-lg bg-black/80 border border-white/5 font-mono text-[8px] text-white/40 z-20 pointer-events-none select-none">
-              Hover planes to select channels. Drag sliders below to rotate.
+              Hover a plane to preview it. Click to select a channel. Drag sliders to rotate.
             </div>
           </div>
 
@@ -384,8 +407,8 @@ export const FeatureMapGrid: React.FC = () => {
                 globalMax={currentRecord.max}
                 isFocused={selectedChannel === chIdx}
                 isHovered={hoveredChannel === chIdx}
-                onHover={() => setHoveredChannel(chIdx)}
-                onLeave={() => setHoveredChannel(null)}
+                onHover={() => handlePlaneHover(chIdx)}
+                onLeave={handlePlaneLeave}
                 onClick={() => setSelectedChannel(chIdx)}
               />
             ))}

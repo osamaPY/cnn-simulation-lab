@@ -124,7 +124,7 @@ export function StageViewer() {
       case 8:
         return <div className="flex w-full h-full items-center justify-center"><FlattenStage /></div>
       case 9:
-        return <div className="flex w-full h-full items-center justify-center"><DenseStage /></div>
+        return <div className="flex w-full flex-1 items-center justify-center overflow-hidden"><DenseStage /></div>
       case 10:
         return <div className="flex w-full h-full items-center justify-center"><SoftmaxStage /></div>
       case 11:

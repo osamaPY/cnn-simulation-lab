@@ -3,6 +3,14 @@ import { CNN_STAGES } from '../types/cnn';
 import type { PredictionResult } from '../types/cnn';
 import type { ActivationRecord } from '../ml/activationModel';
 
+export const DEFAULT_HYPERPARAMS = {
+  kernelSize: 3,
+  stride: 1,
+  padding: 0,
+  poolingSize: 2,
+  numFilters: 8,
+} as const;
+
 interface LabState {
   // State variables
   currentStageId: number;
@@ -43,6 +51,7 @@ interface LabState {
   
   // Actions
   updateHyperparams: (params: Partial<LabState['hyperparams']>) => void;
+  resetHyperparams: () => void;
   setCurrentStageId: (id: number) => void;
   setHasDrawing: (hasDrawing: boolean) => void;
   setPrediction: (prediction: PredictionResult | null) => void;
@@ -103,7 +112,18 @@ export const useLabStore = create<LabState>((set, get) => ({
 
   updateHyperparams: (params) => {
     set((state) => ({
-      hyperparams: { ...state.hyperparams, ...params }
+      hyperparams: { ...state.hyperparams, ...params },
+      // Clear results because hyperparams changed the architecture
+      activations: [],
+      prediction: null
+    }));
+  },
+
+  resetHyperparams: () => {
+    set(() => ({
+      hyperparams: { ...DEFAULT_HYPERPARAMS },
+      activations: [],
+      prediction: null
     }));
   },
 

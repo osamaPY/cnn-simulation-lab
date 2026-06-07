@@ -158,7 +158,7 @@ export const DenseStage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full items-center p-0 dense-stage-wrapper overflow-hidden">
+    <div className="relative flex-1 w-full dense-stage-wrapper overflow-hidden">
       {/* Top Controls - Absolutely positioned to the edge */}
       <div className="absolute top-4 left-4 z-20">
         <button
@@ -173,8 +173,8 @@ export const DenseStage: React.FC = () => {
         </button>
       </div>
 
-      {/* Main Graph Area (Filling available space) */}
-      <div className="relative w-full h-full dense-graph-container flex items-center justify-center">
+      {/* Main Graph Area — absolutely fills the entire stage */}
+      <div className="absolute inset-0 flex items-center justify-center dense-graph-container">
         <svg
           viewBox="0 0 1400 900"
           className="w-full h-full select-none"

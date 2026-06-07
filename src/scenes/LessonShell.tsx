@@ -20,6 +20,7 @@ const STAGE_COLORS: Record<number, string> = {
 const MinimalHyperparamControls: React.FC = () => {
   const hyperparams = useLabStore(state => state.hyperparams);
   const updateHyperparams = useLabStore(state => state.updateHyperparams);
+	  const resetHyperparams = useLabStore(state => state.resetHyperparams);
   const currentStageId = useLabStore(state => state.currentStageId);
   const setCurrentStageId = useLabStore(state => state.setCurrentStageId);
   const shouldReduceMotion = useReducedMotion();
@@ -77,6 +78,23 @@ const MinimalHyperparamControls: React.FC = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Reset Defaults Button */}
+      <div className="border-t border-white/5 pt-2.5 mt-1">
+        <button
+          onClick={() => resetHyperparams()}
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md border border-white/15 bg-white/5 text-[9px] font-mono font-bold text-white/40 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all cursor-pointer"
+          type="button"
+          title="Restore all parameters to their default values"
+          aria-label="Reset parameters to default values"
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="opacity-60">
+            <polyline points="1 4 1 10 7 10" />
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+          </svg>
+          RESET DEFAULTS
+        </button>
       </div>
     </motion.div>
   );
@@ -181,7 +199,7 @@ export const LessonShell: React.FC = () => {
       style={{ height: '100dvh', minWidth: '960px', overflow: 'hidden' }}
     >
       <div className={isFullScreenStage ? 'absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent pointer-events-none' : ''}>
-        <div className={isFullScreenStage ? 'pointer-events-auto opacity-40 hover:opacity-100 transition-opacity' : ''}>
+        <div className={isFullScreenStage ? 'pointer-events-auto opacity-70 hover:opacity-100 transition-opacity' : ''}>
           <Header />
         </div>
       </div>
@@ -197,7 +215,7 @@ export const LessonShell: React.FC = () => {
           ) : (
             <motion.div
               key="sim"
-              className="flex flex-col bg-[#1c1c1c]"
+              className="flex flex-col bg-[#1c1c1c] pt-12"
               style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -216,7 +234,7 @@ export const LessonShell: React.FC = () => {
                 >
                   {/* Stage viewer — takes available space */}
                   <div
-                    className={`flex items-center justify-center stage-viewer-wrapper ${isFullScreenStage ? 'p-0' : 'p-1'}`}
+                    className={`flex stage-viewer-wrapper ${isFullScreenStage ? 'p-0' : 'p-1'}`}
                     style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
                   >
                     <StageViewer />

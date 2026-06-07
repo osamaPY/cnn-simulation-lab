@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLabStore } from '../hooks/useLabStore';
 import { CNN_STAGES } from '../types/cnn';
@@ -18,11 +18,19 @@ export const PlayerControls: React.FC = () => {
   const showTuning = useLabStore(state => state.showTuning);
   const setShowTuning = useLabStore(state => state.setShowTuning);
 
+  const [showHelp, setShowHelp] = useState(false);
+
   const canGoNext = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
   const canGoBack = Boolean(preprocessedData) && currentStageId > 1;
 
+  const closeHelp = useCallback(() => setShowHelp(false), []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showHelp) {
+        setShowHelp(false);
+        return;
+      }
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
       if (e.key === 'ArrowRight' || e.key === ' ') {
         if (canGoNext) { e.preventDefault(); setCurrentStageId(currentStageId + 1); }
@@ -32,7 +40,7 @@ export const PlayerControls: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentStageId, canGoNext, canGoBack, setCurrentStageId]);
+  }, [currentStageId, canGoNext, canGoBack, setCurrentStageId, showHelp]);
 
   const progressPercent = ((currentStageId - 1) / (CNN_STAGES.length - 1)) * 100;
   const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
@@ -163,14 +171,80 @@ export const PlayerControls: React.FC = () => {
           </button>
 
           {/* Help/Hint */}
-          <button
-            className="w-6 h-6 flex items-center justify-center rounded-full border border-white/10 text-white/30 hover:text-white hover:border-white/30 transition-all text-[11px] bg-white/5"
-            type="button"
-            title="Keyboard shortcuts: ← → arrow keys or click stage dots"
-            aria-label="Keyboard shortcuts help"
-          >
-            ?
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowHelp(!showHelp)}
+              className={`w-6 h-6 flex items-center justify-center rounded-full border transition-all text-[11px] cursor-pointer ${
+                showHelp
+                  ? 'border-aurora-teal/60 text-aurora-teal bg-aurora-teal/15 shadow-[0_0_10px_rgba(45,212,191,0.3)]'
+                  : 'border-white/10 text-white/30 bg-white/5 hover:text-white hover:border-white/30'
+              }`}
+              type="button"
+              title="Stage help & keyboard shortcuts"
+              aria-label="Open stage help"
+              aria-expanded={showHelp}
+            >
+              ?
+            </button>
+
+            {/* Help Popover */}
+            <AnimatePresence>
+              {showHelp && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-72 p-4 rounded-xl border border-white/15 bg-[#0f0f0f]/95 backdrop-blur-xl shadow-2xl z-50 pointer-events-auto"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div>
+                        <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-aurora-teal font-bold">
+                          Stage {currentStageId.toString().padStart(2, '0')}
+                        </span>
+                        <h4 className="text-sm font-serif font-bold italic text-white/95 mt-0.5">
+                          {activeStage?.name}
+                        </h4>
+                      </div>
+                      <button
+                        onClick={closeHelp}
+                        className="flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full border border-white/10 text-white/30 hover:text-white hover:border-white/30 transition-all text-[10px] cursor-pointer"
+                        type="button"
+                        aria-label="Close help"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <p className="text-[11px] leading-relaxed text-white/50 font-sans mb-4">
+                      {activeStage?.description}
+                    </p>
+
+                    <div className="border-t border-white/5 pt-3 space-y-1.5">
+                      <div className="flex justify-between items-center text-[9px] font-mono">
+                        <span className="text-white/30 uppercase tracking-wider">Shape</span>
+                        <span className="text-aurora-mint font-bold">{activeStage?.shapeLabel}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-[9px] font-mono">
+                        <span className="text-white/30 uppercase tracking-wider">Shortcuts</span>
+                        <span className="text-white/50">← → arrows · Space · dots</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                  {/* Backdrop click to close */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="fixed inset-0 z-40 pointer-events-auto"
+                    onClick={closeHelp}
+                  />
+                </>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Divider */}
           <div className="w-[1px] h-4 bg-white/10" />
