@@ -92,8 +92,8 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
           return (
             <motion.div
               key={i}
-              initial={{ z: -i * 45, opacity: 0 }}
-              animate={{ z: i * 32, opacity: 1 - i * 0.07 }}
+              initial={{ z: -i * 12, opacity: 0 }}
+              animate={{ z: i * 12, opacity: 1 - i * 0.07 }}
               transition={{ delay: i * 0.08, duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0 border bg-[#0e141a]/95 backdrop-blur-sm rounded-lg overflow-hidden shadow-[0_0_30px_rgba(88,196,221,0.15)]"
               style={{ 

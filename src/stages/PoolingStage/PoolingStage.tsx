@@ -113,6 +113,14 @@ export const PoolingStage: React.FC = () => {
   const frameY = row * poolSize * frameCellSize;
   const frameWidth = poolSize * frameCellSize;
 
+  // Clamp bubble position so it never overflows the 260×260 canvas container
+  const BUBBLE_W = 110;
+  const BUBBLE_H = 24;
+  const rawLeft = frameX + frameWidth / 2;
+  const rawTop = frameY;
+  const bubbleLeft = Math.min(Math.max(rawLeft - BUBBLE_W / 2, 2), 260 - BUBBLE_W - 2);
+  const bubbleTop = rawTop < BUBBLE_H + 6 ? rawTop + frameWidth + 4 : rawTop - BUBBLE_H - 4;
+
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-4xl px-8">
       <div className="flex flex-col md:flex-row items-center justify-center gap-16 w-full py-4">
@@ -123,7 +131,7 @@ export const PoolingStage: React.FC = () => {
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 260 260">
               <rect x={frameX} y={frameY} width={frameWidth} height={frameWidth} rx="0" fill="rgba(88, 196, 221, 0.08)" stroke="#58C4DD" strokeWidth="2" className="transition-all duration-150 ease-out" />
             </svg>
-            <div className="absolute pointer-events-none z-30 bg-[#1c1c1c] border border-white/10 rounded-sm px-2 py-1 font-serif italic text-[10px] text-[#58C4DD] shadow-2xl flex items-center gap-2 transition-all duration-150 ease-out" style={{ left: `${frameX + frameWidth / 2}px`, top: `${frameY}px`, transform: 'translate(-50%, -120%)' }}>
+            <div className="absolute pointer-events-none z-30 bg-[#1c1c1c] border border-white/10 rounded-sm px-2 py-1 font-serif italic text-[10px] text-[#58C4DD] shadow-2xl flex items-center gap-2 transition-all duration-150 ease-out" style={{ left: `${bubbleLeft}px`, top: `${bubbleTop}px` }}>
               <span className="text-white opacity-60">max({poolSize}×{poolSize}) =</span>
               <span className="font-bold">{outputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
             </div>

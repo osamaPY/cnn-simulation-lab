@@ -12,9 +12,9 @@ const INITIAL_KERNEL: number[] = [-0.4, 0.7, 0.2, 0.8, -0.9, 0.3, -0.1, 0.5, -0.
 const TARGET_KERNEL:  number[] = [-1.0, 2.0, -1.0, -1.0, 2.0, -1.0, -1.0, 2.0, -1.0];
 
 // SVG layout constants
-const IN_X   = 90;
-const HID_X  = 390;
-const OUT_X  = 680;
+const IN_X   = 220;
+const HID_X  = 460;
+const OUT_X  = 700;
 const IN_Y0  = 60;   const IN_STEP  = 35;
 const HID_Y0 = 60;   const HID_STEP = 24;
 const OUT_Y0 = 65;   const OUT_STEP = 27;

@@ -420,7 +420,7 @@ export const DenseStage: React.FC = () => {
         <div 
           className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2.5 py-1.5 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.6)] flex flex-col gap-0.5 transition-all duration-150 ease-out"
           style={{ 
-            left: '86%', 
+            left: '58%', 
             top: `${((85 + winnerDigit * 30) / 460) * 100}%`,
             transform: 'translate(0, -50%)' 
           }}
