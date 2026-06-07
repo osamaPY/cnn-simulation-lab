@@ -2,7 +2,6 @@ import React from 'react';
 import { useLabStore } from '../../hooks/useLabStore';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { sceneTransition } from '../../animations/motion';
 
 export const PredictionStage: React.FC = () => {
   const prediction = useLabStore(state => state.prediction);
@@ -25,95 +24,104 @@ export const PredictionStage: React.FC = () => {
 
   const confidencePct = (prediction.confidence * 100).toFixed(1);
 
+  const slideTransition = {
+    duration: 0.6,
+    ease: [0.16, 1, 0.3, 1] as const,
+  };
+
   return (
-    <div className="flex flex-col gap-6 w-full max-w-xl items-center py-4 px-2">
-      
+    <div className="flex flex-col gap-8 w-full max-w-xl items-center py-6 px-4">
       {/* Side-by-Side Canvas Input vs prediction output */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full">
         {/* Draw Input Thumbnail Card */}
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-[10px] font-mono text-text-secondary uppercase">
+        <div className="flex flex-col items-center gap-2.5">
+          <span className="text-[10px] font-mono text-text-secondary uppercase tracking-widest">
             Your Ink Input
           </span>
-          <div className="w-32 h-32 bg-black border border-border-muted rounded-xl flex items-center justify-center relative overflow-hidden shadow-inner">
+          <div className="w-32 h-32 bg-black border border-white/10 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-2xl">
             {originalCanvasThumbnail ? (
               <img 
                 src={originalCanvasThumbnail} 
                 alt="Original Drawing" 
-                className="w-full h-full object-contain filter invert opacity-80" 
+                className="w-full h-full object-contain filter invert opacity-90 scale-95" 
               />
             ) : (
               <div className="text-[9px] text-text-muted">Awaiting Ink</div>
             )}
-            <div className="absolute inset-1.5 border border-dashed border-border-muted/30 rounded-lg pointer-events-none" />
+            <div className="absolute inset-1.5 border border-dashed border-white/5 rounded-xl pointer-events-none" />
           </div>
         </div>
 
         {/* Transition Arrow */}
-        <div className="hidden sm:flex items-center gap-1 text-text-muted font-mono text-xs" aria-hidden="true">
-          <span className="h-px w-8 bg-border-muted" />
-          <span>&gt;</span>
+        <div className="hidden sm:flex items-center justify-center text-amber-500/40" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </div>
 
         {/* Classification output */}
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-[10px] font-mono text-text-secondary uppercase">
+        <div className="flex flex-col items-center gap-2.5">
+          <span className="text-[10px] font-mono text-text-secondary uppercase tracking-widest">
             Network Prediction
           </span>
           
           <motion.div 
-            className="w-32 h-32 rounded-lg bg-bg-deep border border-text-accent/50 flex flex-col items-center justify-center relative"
-            initial={shouldReduceMotion ? false : { opacity: 0 }}
+            className="w-32 h-32 rounded-2xl bg-[#030306]/90 border-2 border-amber-500/50 flex flex-col items-center justify-center relative shadow-[0_0_40px_rgba(245,158,11,0.15)]"
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
+            transition={shouldReduceMotion ? { duration: 0 } : slideTransition}
           >
-            <span className="text-6xl font-display font-extrabold text-text-accent leading-none">
+            <span className="text-6xl font-display font-extrabold text-amber-400 leading-none filter drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]">
               {prediction.digit}
             </span>
-            <span className="text-[10px] font-mono text-aurora-mint font-semibold uppercase mt-1">
+            <span className="text-[9px] font-mono text-[#10b981] font-bold uppercase tracking-wider mt-1.5">
               Digit {prediction.digit}
             </span>
-            <div className="absolute inset-1 rounded-lg border border-dashed border-aurora-mint/20 pointer-events-none" />
+            <div className="absolute inset-1 rounded-xl border border-dashed border-amber-500/10 pointer-events-none" />
           </motion.div>
         </div>
       </div>
 
       {/* Confidence gauge display */}
-      <div className="w-full bg-bg-panel border border-border-muted p-4 rounded-xl shadow-inner flex flex-col gap-3">
+      <div className="w-full bg-[#030306]/60 backdrop-blur-md border border-white/10 p-5 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)] flex flex-col gap-4">
         <div className="flex items-center justify-between text-xs font-mono">
-          <span className="text-text-secondary uppercase">Classification Certainty:</span>
-          <span className="text-aurora-mint font-bold text-sm">{confidencePct}%</span>
+          <span className="text-text-secondary uppercase tracking-wider">Classification Certainty:</span>
+          <span className="text-[#10b981] font-bold text-sm">{confidencePct}%</span>
         </div>
         
         {/* Progress Bar Container */}
-        <div className="w-full h-3 rounded-full bg-black border border-border-subtle overflow-hidden relative">
+        <div className="w-full h-3 rounded-full bg-black/40 border border-white/10 overflow-hidden relative">
           <motion.div 
-            className="h-full w-full origin-left rounded-r bg-text-accent"
+            className="h-full w-full origin-left rounded-r bg-gradient-to-r from-cyan-500 via-teal-400 to-[#10b981]"
             initial={shouldReduceMotion ? { scaleX: prediction.confidence } : { scaleX: 0 }}
             animate={{ scaleX: prediction.confidence }}
-            transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
+            transition={shouldReduceMotion ? { duration: 0 } : slideTransition}
           />
         </div>
 
         {/* Confidence Context Explanation */}
-        <p className="text-[10px] text-text-muted text-center mt-1 leading-relaxed">
+        <p className="text-[10px] text-text-muted text-center mt-0.5 leading-relaxed font-serif">
           Confidence is the largest softmax probability. A high value does not guarantee the
           prediction is correct, especially for unusual drawings.
         </p>
       </div>
 
       {/* Core Educational Summary */}
-      <div className="w-full border border-border-subtle p-3.5 rounded-xl bg-bg-deep/40 text-center text-xs text-text-secondary leading-relaxed flex flex-col gap-1">
-        <span className="font-semibold text-text-accent uppercase tracking-wider font-display">
+      <div className="w-full border border-white/5 p-4 rounded-2xl bg-[#030306]/30 text-center text-xs text-text-secondary leading-relaxed flex flex-col gap-1.5 shadow-sm">
+        <span className="font-semibold text-amber-500 uppercase tracking-widest font-display text-[10px]">
           How did the CNN classify this?
         </span>
-        <p className="text-[10px] text-text-muted mt-1 max-w-sm mx-auto">
-          The prediction is the <strong>argmax</strong> (index of the highest probability) of the Softmax vector. 
+        <p className="text-[10.5px] text-text-muted mt-1 max-w-sm mx-auto leading-relaxed font-serif">
+          The prediction is the <strong className="text-text-secondary font-sans font-semibold">argmax</strong> (index of the highest probability) of the Softmax vector. 
           By combining edge detectors, downsampling layers, and fully connected weights, the model learns complex spatial representations.
         </p>
       </div>
 
-      <button className="btn-primary" onClick={clearAll} type="button">
+      <button 
+        className="btn-primary mt-2 px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-black border-amber-500 hover:border-amber-400 rounded-xl transition-all duration-300 font-bold tracking-wide shadow-lg hover:shadow-amber-500/10 hover:-translate-y-0.5" 
+        onClick={clearAll} 
+        type="button"
+      >
         Try another digit
       </button>
     </div>

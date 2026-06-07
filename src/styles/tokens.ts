@@ -39,17 +39,17 @@ export const tokens = {
 
     // Activation Heat Scale (Low to High activations for feature maps and predictions)
     heatScale: [
-      '#020609',
-      '#081923',
-      '#0b2b3a',
-      '#0d4054',
-      '#115b70',
-      '#17778c',
-      '#2695a6',
-      '#50b6c5',
-      '#7bd1cf',
-      '#b5e7c8',
-      '#f2c14e',
+      '#050811', // Deep blackboard navy (zero activation)
+      '#0f1c3f', // Dark steel blue
+      '#1d4ed8', // Vibrant 3B1B blue
+      '#0284c7', // Slate sky blue
+      '#06b6d4', // Glowing cyan
+      '#0d9488', // Teal highlight
+      '#10b981', // Neon mint/green
+      '#4ade80', // Soft electric green
+      '#fcd34d', // Soft gold
+      '#f59e0b', // Amber
+      '#ef4444', // Hot coral/red (maximum activation)
     ]
   },
 

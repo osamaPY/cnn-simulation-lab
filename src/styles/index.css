@@ -36,18 +36,19 @@
   --signal-coral: #ff8066;
 
   /* Fonts */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Lora', Georgia, serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
 @layer base {
   body {
     background:
-      linear-gradient(rgba(179, 216, 230, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(179, 216, 230, 0.025) 1px, transparent 1px),
-      var(--bg-deep);
-    background-size: 32px 32px, 32px 32px, auto;
+      linear-gradient(rgba(80, 201, 230, 0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(80, 201, 230, 0.015) 1px, transparent 1px),
+      radial-gradient(circle at 50% 50%, #0a0e1a 0%, #030407 100%);
+    background-size: 40px 40px, 40px 40px, auto;
     color: var(--text-primary);
     font-family: var(--font-sans);
     overflow-x: hidden;

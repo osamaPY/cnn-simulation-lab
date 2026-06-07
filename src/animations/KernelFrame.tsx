@@ -23,15 +23,27 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
       className="absolute inset-0 w-full h-full pointer-events-none z-20"
       viewBox="0 0 280 280"
     >
+      <defs>
+        <filter id="kernel-glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="1.8" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Outer 3x3 sliding frame */}
       <rect
         x={x}
         y={y}
         width={frameWidth}
         height={frameHeight}
         rx="2"
-        fill="rgba(80, 201, 230, 0.10)"
-        stroke="var(--aurora-purple)"
+        fill="rgba(245, 158, 11, 0.08)"
+        stroke="#f59e0b"
         strokeWidth="2"
+        filter="url(#kernel-glow)"
         className="transition-all duration-150 ease-out"
       />
 
@@ -41,9 +53,18 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
         y={y + cellSize}
         width={cellSize}
         height={cellSize}
-        fill="rgba(242, 193, 78, 0.35)"
-        stroke="var(--text-accent)"
-        strokeWidth="0.75"
+        fill="rgba(16, 185, 129, 0.25)"
+        stroke="#10b981"
+        strokeWidth="1"
+        className="transition-all duration-150 ease-out"
+      />
+
+      {/* Crosshair dot at the center */}
+      <circle
+        cx={x + cellSize + cellSize / 2}
+        cy={y + cellSize + cellSize / 2}
+        r="1.2"
+        fill="#10b981"
         className="transition-all duration-150 ease-out"
       />
     </svg>

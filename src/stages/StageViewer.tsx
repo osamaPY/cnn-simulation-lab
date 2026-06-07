@@ -1,10 +1,9 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLabStore } from '../hooks/useLabStore'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { CNN_STAGES } from '../types/cnn'
 import { PreprocessingPreview } from './DrawingStage/PreprocessingPreview'
-import { sceneTransition } from '../animations/motion'
 
 const TensorGridPreview = lazy(() =>
   import('./TensorGridStage/TensorGridPreview').then((module) => ({ default: module.TensorGridPreview })),
@@ -63,6 +62,13 @@ export function StageViewer() {
   const shouldReduceMotion = useReducedMotion()
   const stage = CNN_STAGES.find((item) => item.id === currentStageId) ?? CNN_STAGES[0]
 
+  const prevStageIdRef = useRef(currentStageId)
+  const direction = currentStageId >= prevStageIdRef.current ? 1 : -1
+
+  useEffect(() => {
+    prevStageIdRef.current = currentStageId
+  }, [currentStageId])
+
   useEffect(() => {
     if (currentStageId === 7) {
       const firstConv = activations.find((record) => record.layerType === 'Conv2D')
@@ -110,16 +116,21 @@ export function StageViewer() {
     }
   }
 
+  const slideTransition = {
+    duration: 0.6,
+    ease: [0.16, 1, 0.3, 1] as const, // Ultra smooth mathematical easeOut
+  }
+
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center p-4 sm:p-8 pointer-events-auto" id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           className="w-full h-full flex items-center justify-center"
           key={`${currentStageId}-${Boolean(preprocessedData)}-${activations.length}-${Boolean(prediction)}`}
-          initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 1.02 }}
-          transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
+          initial={shouldReduceMotion ? false : { opacity: 0, x: direction * 60, scale: 0.98 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0, x: -direction * 60, scale: 0.98 }}
+          transition={shouldReduceMotion ? { duration: 0 } : slideTransition}
         >
           <Suspense fallback={<StageLoadingState />}>{renderStage()}</Suspense>
         </motion.div>
