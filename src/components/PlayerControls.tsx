@@ -107,9 +107,18 @@ export const PlayerControls: React.FC = () => {
             {/* Explanations Toggle */}
             <button
               onClick={() => setShowDetails(true)}
-              className="w-5 h-5 flex items-center justify-center rounded-full border border-white/10 text-white/30 hover:text-white hover:border-white/30 transition-all text-[10px] bg-white/5"
+              className="flex items-center gap-1.5 px-2 py-0.5 rounded transition-all text-[8px] font-mono font-bold tracking-widest text-aurora-teal hover:text-white hover:bg-aurora-teal/20 cursor-pointer border border-aurora-teal/20 bg-aurora-teal/5"
               type="button"
               title="Explanations & Formulas"
+            >
+              DOCS
+            </button>
+
+            {/* Help/Hint */}
+            <button
+              className="w-5 h-5 flex items-center justify-center rounded-full border border-white/10 text-white/30 hover:text-white hover:border-white/30 transition-all text-[10px] bg-white/5"
+              type="button"
+              title="Keyboard Shortcuts"
             >
               ?
             </button>
