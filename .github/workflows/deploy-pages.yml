@@ -1,3 +1,5 @@
+# Note: Ensure GitHub Pages is enabled in the repository settings:
+# Go to Settings -> Pages -> Build and deployment -> Source and select "GitHub Actions".
 name: Deploy GitHub Pages
 
 on:
