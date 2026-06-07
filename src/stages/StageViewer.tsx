@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLabStore } from '../hooks/useLabStore'
 import { useReducedMotion } from '../hooks/useReducedMotion'
@@ -62,12 +62,13 @@ export function StageViewer() {
   const shouldReduceMotion = useReducedMotion()
   const stage = CNN_STAGES.find((item) => item.id === currentStageId) ?? CNN_STAGES[0]
 
-  const prevStageIdRef = useRef(currentStageId)
-  const direction = currentStageId >= prevStageIdRef.current ? 1 : -1
+  const [prevStageId, setPrevStageId] = useState(currentStageId)
+  const [direction, setDirection] = useState(1)
 
-  useEffect(() => {
-    prevStageIdRef.current = currentStageId
-  }, [currentStageId])
+  if (currentStageId !== prevStageId) {
+    setDirection(currentStageId >= prevStageId ? 1 : -1)
+    setPrevStageId(currentStageId)
+  }
 
   useEffect(() => {
     if (currentStageId === 7) {
