@@ -11,14 +11,14 @@ const INPUT_SAMPLES = [0, 57, 99, 143, 211, 277, 333, 399];
 const HIDDEN_SAMPLES = [0, 1, 2, 3, 4, -1, 58, 59, 60, 61, 62, 63];
 
 // Layout vertical coordinate constants (fully stretched to y=80 to y=850)
-const IN_Y0 = 110;
-const IN_STEP = 100;
+const IN_Y0 = 100;
+const IN_STEP = 102;
 
-const HID_Y0 = 110;
-const HID_STEP = 65;
+const HID_Y0 = 100;
+const HID_STEP = 66;
 
-const OUT_Y0 = 110;
-const OUT_STEP = 80;
+const OUT_Y0 = 100;
+const OUT_STEP = 82;
 
 export const DenseStage: React.FC = () => {
   const activations = useLabStore(state => state.activations);
@@ -198,6 +198,7 @@ export const DenseStage: React.FC = () => {
             </filter>
           </defs>
 
+          <g transform="translate(700, 445) scale(1.3) translate(-700, -445)">
           {/* Connection Lines: Input -> Hidden */}
           {INPUT_SAMPLES.map((inputIdx, sampleIdx) => {
             const inPt = [150, IN_Y0 + sampleIdx * IN_STEP];
@@ -306,7 +307,7 @@ export const DenseStage: React.FC = () => {
           })()}
 
           {/* Left Column: Input Vector Nodes */}
-          <rect x={138} y={70} width={24} height={820} rx={12} fill="rgba(255, 255, 255, 0.03)" stroke="rgba(255,255,255,0.06)" />
+          <rect x={138} y={60} width={24} height={830} rx={12} fill="rgba(255, 255, 255, 0.03)" stroke="rgba(255,255,255,0.06)" />
           {INPUT_SAMPLES.map((inputIdx, sampleIdx) => {
             const val = volumeValues[inputIdx];
             const norm = (val - minVal) / (maxVal - minVal || 1);
@@ -397,9 +398,10 @@ export const DenseStage: React.FC = () => {
           })}
 
           {/* Headers */}
-          <text x={150} y={32} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">1. Input Vector</text>
-          <text x={700} y={32} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">2. Hidden Layer</text>
-          <text x={1250} y={32} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">3. Output Classes</text>
+          <text x={150} y={40} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">1. Input Vector</text>
+          <text x={700} y={40} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">2. Hidden Layer</text>
+          <text x={1250} y={40} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">3. Output Classes</text>
+          </g>
         </svg>
 
         {/* Floating details overlay */}
