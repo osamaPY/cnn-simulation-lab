@@ -124,7 +124,16 @@ export function StageViewer() {
       case 8:
         return <div className="flex w-full h-full items-center justify-center"><FlattenStage /></div>
       case 9:
-        return <div className="flex w-full flex-1 overflow-hidden"><DenseStage /></div>
+        return (
+          <div
+            className="fixed right-0 left-0 flex items-center justify-center pointer-events-none"
+            style={{ top: 'clamp(56px, 7vh, 80px)', bottom: 'clamp(90px, 12vh, 130px)' }}
+          >
+            <div className="pointer-events-auto w-full h-full max-w-[1500px] flex items-center justify-center">
+              <DenseStage />
+            </div>
+          </div>
+        );
       case 10:
         return <div className="flex w-full h-full items-center justify-center"><SoftmaxStage /></div>
       case 11:
