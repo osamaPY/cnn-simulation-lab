@@ -26,7 +26,19 @@ export const HyperparamControls: React.FC = () => {
     { key: 'numFilters', label: 'Filters', min: 1, max: 32, step: 1, icon: '⫘', description: 'Number of unique feature extractors in this layer.' },
   ];
 
-  const isDefault = controls.every(c => hyperparams[c.key] === DEFAULT_HYPERPARAMS[c.key]);
+  const visibleControls = controls.filter(ctrl => {
+    if (currentStageId === 2) return true; // All hyperparams affect macro architecture view
+    if (currentStageId === 4) return ['kernelSize', 'stride', 'padding'].includes(ctrl.key);
+    if (currentStageId === 5) return ctrl.key === 'numFilters';
+    if (currentStageId === 7) return ctrl.key === 'poolingSize';
+    return false;
+  });
+
+  const isDefault = visibleControls.every(c => hyperparams[c.key] === DEFAULT_HYPERPARAMS[c.key]);
+
+  if (visibleControls.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-4 w-full animate-in fade-in slide-in-from-right-4 duration-700">
@@ -51,7 +63,7 @@ export const HyperparamControls: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        {controls.map((ctrl) => {
+        {visibleControls.map((ctrl) => {
           const pct = ((hyperparams[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100;
           const isActiveForStage = 
             (currentStageId === 4 && ['kernelSize', 'stride', 'padding'].includes(ctrl.key)) ||
