@@ -50,7 +50,6 @@ export const ConvolutionStage: React.FC = () => {
     return { outMin: min, outMax: max };
   }, [outputMap]);
 
-  // Zoom panel progress: driven by stepIndex cycling
   const zoomProgress = remap(stepIndex % 26, 0, 25, 0, 1);
 
   // Render Input Canvas
@@ -103,6 +102,16 @@ export const ConvolutionStage: React.FC = () => {
 
   if (!preprocessedData) return null;
 
+  // Clamp bubble position so it never overflows the 280×280 canvas
+  const CANVAS_PX = 280;
+  const CELL = 10;
+  const BUBBLE_W = 110;
+  const BUBBLE_H = 28;
+  const rawLeft = col * CELL + 6 + CELL / 2;
+  const rawTop  = row * CELL + 6;
+  const bubbleLeft = Math.min(Math.max(rawLeft - BUBBLE_W / 2, 2), CANVAS_PX - BUBBLE_W - 2);
+  const bubbleTop  = rawTop < BUBBLE_H + 8 ? rawTop + CELL + 4 : rawTop - BUBBLE_H - 4;
+
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-4xl px-4">
       {/* Kernel Selection */}
@@ -131,10 +140,8 @@ export const ConvolutionStage: React.FC = () => {
 
       {/* Main layout */}
       <div className="flex flex-col lg:flex-row items-start justify-center gap-6 w-full py-2">
-
-        {/* Input + Output canvases */}
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-          {/* Input */}
+          {/* Input canvas */}
           <div className="flex flex-col items-center gap-2">
             <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Input: 28×28</span>
             <div className="relative w-[280px] h-[280px] p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
@@ -142,13 +149,13 @@ export const ConvolutionStage: React.FC = () => {
                 className="block h-full w-full rounded-xl bg-black border border-white/5"
               />
               <KernelFrame stepIndex={stepIndex} />
-              {/* Floating math bubble */}
+              {/* Math bubble — clamped so it never clips outside the canvas */}
               <div
-                className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2 py-1 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex items-center gap-1.5 transition-all duration-150 ease-out"
+                className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2 py-1 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex items-center gap-1.5"
                 style={{
-                  left: `${col * 10 + 6 + 15}px`,
-                  top: `${row * 10 + 6}px`,
-                  transform: 'translate(-50%, -120%)'
+                  left: `${bubbleLeft}px`,
+                  top:  `${bubbleTop}px`,
+                  width: `${BUBBLE_W}px`,
                 }}
               >
                 <span className="text-aurora-mint">Σ(x·w)+b</span>
@@ -166,7 +173,7 @@ export const ConvolutionStage: React.FC = () => {
             <span className="text-[9px] font-mono mt-1 text-white/30 uppercase tracking-widest">Convolve</span>
           </div>
 
-          {/* Output */}
+          {/* Output canvas */}
           <div className="flex flex-col items-center gap-2">
             <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Output: 26×26</span>
             <div className="relative w-[260px] h-[260px] p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">

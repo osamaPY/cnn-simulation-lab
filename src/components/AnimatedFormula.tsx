@@ -1,7 +1,6 @@
 /**
- * AnimatedFormula — renders a LaTeX-style formula that "draws on" from left
- * to right, 3Blue1Brown style.  Uses CSS clip-path animation so no external
- * libs needed.
+ * AnimatedFormula — renders a formula that "draws on" from left to right,
+ * 3Blue1Brown style. Uses CSS clip-path animation.
  *
  * Props:
  *   formula   — string, e.g. "output = Σ(x·w) + b"
@@ -24,7 +23,7 @@ export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
   progress,
   color = '#34d399',
   fontSize = '1.1rem',
-  durationMs = 1200,
+  durationMs = 1400,
   className = '',
 }) => {
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -42,14 +41,15 @@ export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
       className={`relative inline-block font-mono font-bold select-none ${className}`}
       style={{ fontSize }}
     >
-      {/* Ghost layer — always visible, very faint */}
-      <span style={{ color, opacity: 0.18, letterSpacing: '0.04em' }}>
+      {/* Ghost layer — very faint skeleton */}
+      <span style={{ color, opacity: 0.10, letterSpacing: '0.04em', pointerEvents: 'none' }}>
         {formula}
       </span>
 
       {/* Animated reveal layer on top */}
       <span
         ref={spanRef}
+        aria-hidden="true"
         style={{
           position: 'absolute',
           inset: 0,
@@ -59,7 +59,8 @@ export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
           animation:
             progress !== undefined
               ? 'none'
-              : `formulaReveal ${durationMs}ms cubic-bezier(0.4, 0, 0.2, 1) forwards`,
+              : `formulaReveal ${durationMs}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+          filter: `drop-shadow(0 0 6px ${color}66)`,
         }}
       >
         {formula}
