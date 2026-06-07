@@ -60,43 +60,41 @@ export function extractActivations(
   const layerOutputs = actModel.predict(inputTensor);
   const outputsArray = Array.isArray(layerOutputs) ? layerOutputs : [layerOutputs];
 
-  const records: ActivationRecord[] = [];
+  try {
+    const records: ActivationRecord[] = [];
 
-  outputsArray.forEach((tensor, index) => {
-    const layerName = supportedLayerNames[index];
-    const layer = model.getLayer(layerName);
-    
-    // Read values and compute statistics
-    const values = tensor.dataSync() as Float32Array;
-    const shape = tensor.shape;
-    
-    // Find min and max values
-    let min = 0;
-    let max = 0;
-    if (values.length > 0) {
-      min = values[0];
-      max = values[0];
-      for (let i = 1; i < values.length; i++) {
-        const val = values[i];
-        if (val < min) min = val;
-        if (val > max) max = val;
+    outputsArray.forEach((tensor, index) => {
+      const layerName = supportedLayerNames[index];
+      const layer = model.getLayer(layerName);
+
+      // dataSync copies values out of TensorFlow-managed memory before disposal.
+      const values = tensor.dataSync() as Float32Array;
+      const shape = tensor.shape;
+
+      let min = 0;
+      let max = 0;
+      if (values.length > 0) {
+        min = values[0];
+        max = values[0];
+        for (let i = 1; i < values.length; i++) {
+          const val = values[i];
+          if (val < min) min = val;
+          if (val > max) max = val;
+        }
       }
-    }
 
-    records.push({
-      layerName,
-      layerType: layer.getClassName(),
-      shape,
-      values,
-      min,
-      max
+      records.push({
+        layerName,
+        layerType: layer.getClassName(),
+        shape,
+        values,
+        min,
+        max
+      });
     });
-  });
 
-  // Explicitly dispose of each output tensor to avoid GPU memory leaks
-  outputsArray.forEach((tensor) => {
-    tensor.dispose();
-  });
-
-  return records;
+    return records;
+  } finally {
+    outputsArray.forEach((tensor) => tensor.dispose());
+  }
 }

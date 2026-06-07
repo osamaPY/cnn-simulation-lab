@@ -1,36 +1,44 @@
 import * as tf from '@tensorflow/tfjs';
 
 let loadedModel: tf.LayersModel | null = null;
+let modelLoadPromise: Promise<tf.LayersModel> | null = null;
 
 /**
- * Loads the pre-trained Keras LayersModel from the public folder.
- * Handles logging and validation of the network topology.
+ * Loads and caches the exported LayersModel relative to Vite's deployment
+ * base, then rejects models that do not match the lesson's public contract.
  */
 export async function loadCNNModel(): Promise<tf.LayersModel> {
   if (loadedModel) {
     return loadedModel;
   }
 
-  // Load from the public directory path
-  const modelUrl = '/model/model.json';
-  
-  try {
+  if (modelLoadPromise) {
+    return modelLoadPromise;
+  }
+
+  const modelUrl = `${import.meta.env.BASE_URL}model/model.json`;
+
+  modelLoadPromise = (async () => {
     const model = await tf.loadLayersModel(modelUrl);
-    
-    // Log layers metadata to ensure shape accuracy
-    console.log('--- CNN model loaded successfully ---');
-    console.log(`Model Inputs: ${model.inputs.map(i => i.name).join(', ')}`);
-    model.layers.forEach((layer) => {
-      const outputShape = Array.isArray(layer.outputShape)
-        ? layer.outputShape.join(' x ')
-        : JSON.stringify(layer.outputShape);
-      console.log(`Layer: "${layer.name}" | Type: ${layer.getClassName()} | Output Shape: ${outputShape}`);
-    });
-    console.log('------------------------------------');
-    
+
+    const inputShape = model.inputs[0]?.shape;
+    const outputShape = model.outputs[0]?.shape;
+    const validInput = inputShape?.slice(-3).join(',') === '28,28,1';
+    const validOutput = outputShape?.at(-1) === 10;
+    if (!validInput || !validOutput) {
+      model.dispose();
+      throw new Error(
+        `Unexpected model contract. Expected input [28,28,1] and 10 output classes; received input [${inputShape?.join(', ')}] and output [${outputShape?.join(', ')}].`,
+      );
+    }
     loadedModel = model;
     return model;
+  })();
+
+  try {
+    return await modelLoadPromise;
   } catch (error) {
+    modelLoadPromise = null;
     console.error('Failed to load layers model from:', modelUrl, error);
     throw error;
   }

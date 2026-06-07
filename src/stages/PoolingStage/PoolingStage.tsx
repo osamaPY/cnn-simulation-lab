@@ -8,22 +8,19 @@ import {
   maxPoolWindow,
   computeMaxPool2D
 } from '../../math/pooling';
-import {
-  computeValidConv2D,
-  REPRESENTATIVE_KERNEL,
-  REPRESENTATIVE_BIAS
-} from '../../math/convolution';
 
 export const PoolingStage: React.FC = () => {
-  const { preprocessedData, activations, selectedChannel } = useLabStore();
+  const activations = useLabStore(state => state.activations);
+  const selectedChannel = useLabStore(state => state.selectedChannel);
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const outputCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const lastDrawnStepRef = useRef(-1);
 
   // Output is 13x13 = 169 positions
   const totalSteps = 169;
-  const { stepIndex } = useTimeline(totalSteps);
+  const { stepIndex } = useTimeline(totalSteps, true);
 
-  // 1. Extract the 26x26 input map (either real activations or convolved fallback)
+  // 1. Extract a real 26x26 model activation map.
   const input26 = useMemo(() => {
     // Look for real conv2d activation records
     const convRecord = activations.find(
@@ -40,13 +37,8 @@ export const PoolingStage: React.FC = () => {
       return data;
     }
 
-    // Fallback: convolve the raw preprocessed drawing
-    if (preprocessedData) {
-      return computeValidConv2D(preprocessedData, REPRESENTATIVE_KERNEL, REPRESENTATIVE_BIAS);
-    }
-
     return new Float32Array(26 * 26);
-  }, [activations, selectedChannel, preprocessedData]);
+  }, [activations, selectedChannel]);
 
   // Find min/max of input for visual scaling
   const { inMin, inMax } = useMemo(() => {
@@ -121,7 +113,16 @@ export const PoolingStage: React.FC = () => {
     }
   }, [input26, inMin, inMax]);
 
-  // Render 13x13 Output Canvas progressively
+  useEffect(() => {
+    const canvas = outputCanvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (canvas && ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    lastDrawnStepRef.current = -1;
+  }, [outputMap, outMin, outMax]);
+
+  // Draw only newly revealed pooled cells unless the timeline moves backward.
   useEffect(() => {
     const canvas = outputCanvasRef.current;
     if (!canvas) return;
@@ -129,10 +130,15 @@ export const PoolingStage: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     const cellSize = 20; // 13 * 20 = 260px output canvas
+    let start = lastDrawnStepRef.current + 1;
 
-    for (let i = 0; i <= stepIndex; i++) {
+    if (stepIndex < lastDrawnStepRef.current) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      start = 0;
+    }
+
+    for (let i = start; i <= stepIndex; i++) {
       const r = Math.floor(i / 13);
       const c = i % 13;
       const val = outputMap[i];
@@ -146,6 +152,7 @@ export const PoolingStage: React.FC = () => {
       ctx.strokeStyle = 'rgba(255,255,255,0.01)';
       ctx.strokeRect(c * cellSize, r * cellSize, cellSize, cellSize);
     }
+    lastDrawnStepRef.current = stepIndex;
   }, [stepIndex, outputMap, outMin, outMax]);
 
   // Calculate pixel coordinates for sliding SVG window
@@ -167,7 +174,7 @@ export const PoolingStage: React.FC = () => {
             </span>
           </div>
 
-          <div className="relative p-1 rounded-xl bg-gradient-to-br from-border-muted to-bg-card border border-border-muted shadow-lg shadow-black/40">
+          <div className="relative p-1 rounded border border-border-muted bg-bg-canvas">
             <canvas
               ref={inputCanvasRef}
               width={260}
@@ -179,22 +186,15 @@ export const PoolingStage: React.FC = () => {
               className="absolute inset-0 w-full h-full pointer-events-none z-20"
               viewBox="0 0 260 260"
             >
-              <defs>
-                <filter id="pool-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="2" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
               <rect
                 x={frameX}
                 y={frameY}
                 width={20}
                 height={20}
                 rx="1"
-                fill="rgba(139, 92, 246, 0.15)"
+                fill="rgba(80, 201, 230, 0.10)"
                 stroke="var(--aurora-purple)"
-                strokeWidth="1.5"
-                filter="url(#pool-glow)"
+                strokeWidth="2"
                 className="transition-all duration-150 ease-out"
               />
             </svg>
@@ -202,7 +202,7 @@ export const PoolingStage: React.FC = () => {
         </div>
 
         {/* Local Max Telemetry Panel */}
-        <div className="flex flex-col items-center justify-center gap-4 bg-bg-panel border border-border-muted p-4 rounded-xl max-w-xs w-full shadow-inner text-center">
+        <div className="flex flex-col items-center justify-center gap-4 bg-bg-panel border border-border-muted p-4 rounded max-w-xs w-full text-center">
           <div className="border-b border-border-subtle pb-2 w-full text-center">
             <span className="text-[10px] font-mono text-text-accent uppercase tracking-wider font-semibold">
               2x2 Max Pooling Window
@@ -220,8 +220,8 @@ export const PoolingStage: React.FC = () => {
                     key={idx}
                     className={`flex items-center justify-center rounded-md text-xs font-mono border transition-all duration-300 ${
                       isMax
-                        ? 'bg-aurora-teal/20 border-aurora-mint text-aurora-mint shadow-[0_0_8px_rgba(52,211,153,0.25)] font-bold scale-105'
-                        : 'bg-bg-deep border-border-subtle text-text-muted scale-95'
+                        ? 'bg-text-accent/15 border-text-accent text-text-accent font-bold'
+                        : 'bg-bg-deep border-border-subtle text-text-muted'
                     }`}
                   >
                     {val.toFixed(2)}
@@ -258,7 +258,7 @@ export const PoolingStage: React.FC = () => {
             </span>
           </div>
 
-          <div className="relative p-1 rounded-xl bg-gradient-to-br from-border-muted to-bg-card border border-border-muted shadow-lg shadow-black/40">
+          <div className="relative p-1 rounded border border-border-muted bg-bg-canvas">
             <canvas
               ref={outputCanvasRef}
               width={260}

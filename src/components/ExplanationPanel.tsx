@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { useLabStore } from '../hooks/useLabStore';
 import { EXPLANATIONS } from '../explanations';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { sceneTransition } from '../animations/motion';
+
+const MathFormula = lazy(() =>
+  import('./MathFormula').then((module) => ({ default: module.MathFormula })),
+);
 
 export const ExplanationPanel: React.FC = () => {
-  const { currentStageId, selectedMode, prediction, hasDrawing, modelStatus, inferenceError, hoveredDigit } = useLabStore();
+  const currentStageId = useLabStore(state => state.currentStageId);
+  const selectedMode = useLabStore(state => state.selectedMode);
+  const prediction = useLabStore(state => state.prediction);
+  const hasDrawing = useLabStore(state => state.hasDrawing);
+  const modelStatus = useLabStore(state => state.modelStatus);
+  const inferenceError = useLabStore(state => state.inferenceError);
+  const hoveredDigit = useLabStore(state => state.hoveredDigit);
+  const shouldReduceMotion = useReducedMotion();
 
   // Retrieve matching explanation
   const modeExplanations = EXPLANATIONS[selectedMode] || EXPLANATIONS.beginner;
   const explanation = modeExplanations[currentStageId] || {
     headline: "Stage Detail",
-    body: "Detail description placeholder.",
+    body: "An explanation is not available for this stage yet.",
     interactiveGoal: "Follow stage instructions."
   };
 
@@ -20,8 +33,14 @@ export const ExplanationPanel: React.FC = () => {
       case 'loading':
         return (
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <div className="w-8 h-8 rounded-full border-2 border-aurora-purple/30 border-t-aurora-purple animate-spin mb-3" />
-            <p className="text-xs text-text-secondary font-mono">Loading CNN Model configurations...</p>
+            <div className="mb-3 h-1 w-24 overflow-hidden rounded bg-border-subtle">
+              <motion.div
+                animate={shouldReduceMotion ? { x: 0 } : { x: ['-100%', '100%'] }}
+                className="h-full w-1/2 bg-aurora-purple"
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.1, ease: 'linear', repeat: Infinity }}
+              />
+            </div>
+            <p className="text-xs text-text-secondary font-mono">Loading the CNN model...</p>
           </div>
         );
 
@@ -29,13 +48,13 @@ export const ExplanationPanel: React.FC = () => {
         return (
           <div className="flex flex-col items-start justify-center py-4 text-left border border-dashed border-red-500/25 p-4 rounded-lg bg-red-950/5 gap-3">
             <div className="flex items-center gap-2 text-red-400">
-              <span className="text-lg">⚠️</span>
-              <h4 className="text-xs font-display font-bold uppercase tracking-wider">
-                CNN Model Config Not Found
+              <span className="font-mono text-xs font-bold">ERROR</span>
+              <h4 className="text-sm font-semibold">
+                CNN model unavailable
               </h4>
             </div>
             <p className="text-xs text-text-secondary leading-relaxed">
-              Vite could not load `/model/model.json` from public assets. Before you can run real inference, you must train the model and convert it.
+              The app could not load the exported model from `model/model.json`. Real inference requires a trained and converted TensorFlow.js model.
             </p>
             <div className="w-full mt-1 border-t border-border-subtle pt-2 flex flex-col gap-1.5 text-[10px] font-mono text-text-muted">
               <span>1. Run script: <code className="text-text-accent font-semibold">python train/train_mnist.py</code></span>
@@ -72,13 +91,13 @@ export const ExplanationPanel: React.FC = () => {
           <div className="flex flex-col gap-5">
             {/* Top row: Digit & confidence circle */}
             <div className="flex items-center gap-4 bg-bg-deep/40 p-3 rounded-lg border border-border-subtle">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-aurora-indigo/30 to-aurora-violet/30 border border-aurora-purple/30 flex items-center justify-center shadow-inner">
+              <div className="w-16 h-16 rounded border border-text-accent/45 bg-text-accent/5 flex items-center justify-center">
                 <span className="text-4xl font-display font-extrabold text-text-primary">
                   {prediction.digit}
                 </span>
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-text-muted font-mono uppercase">Predicted Class</span>
+                <span className="text-xs text-text-muted font-mono">Predicted class</span>
                 <span className="text-lg font-display font-bold text-text-primary">
                   Digit {prediction.digit}
                 </span>
@@ -90,8 +109,8 @@ export const ExplanationPanel: React.FC = () => {
 
             {/* Probability Bars */}
             <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-mono text-text-secondary uppercase tracking-wide mb-1">
-                Softmax Activation Probabilities
+              <span className="text-[10px] font-mono text-text-secondary mb-1">
+                Softmax probabilities
               </span>
               {prediction.probabilities.map((prob, index) => {
                 const isWinner = index === prediction.digit;
@@ -103,7 +122,7 @@ export const ExplanationPanel: React.FC = () => {
                     key={index} 
                     className={`flex items-center gap-2 p-0.5 rounded transition-all duration-200 ${
                       isHovered 
-                        ? 'bg-aurora-teal/15 border border-aurora-teal/30 scale-[1.02] shadow-[0_0_8px_rgba(13,148,136,0.15)] px-1' 
+                        ? 'bg-aurora-teal/10 border border-aurora-teal/40 px-1'
                         : 'border border-transparent'
                     }`}
                   >
@@ -117,14 +136,15 @@ export const ExplanationPanel: React.FC = () => {
                       <motion.div
                         className={`h-full rounded-r ${
                           isWinner
-                            ? 'bg-gradient-to-r from-aurora-purple to-aurora-mint shadow-[0_0_8px_rgba(52,211,153,0.3)]'
+                            ? 'bg-text-accent'
                             : isHovered
                               ? 'bg-aurora-teal/60'
                               : 'bg-aurora-indigo/40'
                         }`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                        initial={shouldReduceMotion ? { scaleX: Number(percentage) / 100 } : { scaleX: 0 }}
+                        animate={{ scaleX: Number(percentage) / 100 }}
+                        style={{ transformOrigin: 'left', width: '100%' }}
+                        transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
                       />
                     </div>
                     
@@ -142,16 +162,14 @@ export const ExplanationPanel: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-6 overflow-y-auto h-full pr-1">
+    <div className="w-full flex flex-col gap-4 xl:gap-5">
       {/* 1. Prediction Output Card */}
-      <div className="aurora-card p-5 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-aurora-purple/5 rounded-full filter blur-2xl pointer-events-none" />
-        
-        <h3 className="text-sm font-display font-semibold uppercase tracking-wider text-text-secondary mb-4 flex items-center justify-between">
-          <span>Prediction Output</span>
+      <div className="aurora-card p-4 sm:p-5 relative overflow-hidden">
+        <h3 className="text-base font-semibold text-text-primary mb-4 flex items-center justify-between">
+          <span>Model readout</span>
           {modelStatus === 'success' && prediction && (
             <span className="text-[10px] font-mono py-0.5 px-1.5 rounded bg-aurora-teal/15 text-aurora-mint border border-aurora-mint/20">
-              REAL-TIME ML
+              Real model
             </span>
           )}
         </h3>
@@ -160,12 +178,12 @@ export const ExplanationPanel: React.FC = () => {
       </div>
 
       {/* 2. Educational / Tutorial Content Card */}
-      <div className="aurora-card p-5 flex-1 flex flex-col justify-between">
+      <div className="aurora-card p-4 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
           {/* Badge */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-[10px] font-mono bg-aurora-indigo/35 text-text-accent px-2 py-0.5 rounded border border-aurora-purple/20">
-              STAGE {currentStageId}
+              Chapter {currentStageId}
             </span>
             <span className="text-xs text-text-muted font-display capitalize">
               {selectedMode} mode
@@ -173,7 +191,7 @@ export const ExplanationPanel: React.FC = () => {
           </div>
 
           {/* Headline */}
-          <h2 className="text-lg font-display font-extrabold text-text-primary tracking-tight leading-snug mb-3">
+          <h2 className="text-xl font-semibold text-text-primary tracking-tight leading-snug mb-3">
             {explanation.headline}
           </h2>
 
@@ -185,21 +203,22 @@ export const ExplanationPanel: React.FC = () => {
           {/* Math Formula Card */}
           {selectedMode !== 'beginner' && explanation.focusFormula && (
             <div className="my-4 p-3 bg-bg-deep border border-border-muted rounded-lg font-mono text-center flex flex-col gap-1 shadow-inner relative overflow-hidden">
-              <span className="text-[9px] uppercase tracking-wider text-text-muted absolute top-1 left-2 font-display">
-                Formula Representation
+              <span className="text-[9px] text-text-muted absolute top-1 left-2 font-mono">
+                Formula
               </span>
               <div className="text-text-accent text-sm py-2 overflow-x-auto select-all">
-                {explanation.focusFormula}
+                <Suspense fallback={<span>{explanation.focusFormula}</span>}>
+                  <MathFormula formula={explanation.focusFormula} />
+                </Suspense>
               </div>
             </div>
           )}
 
           {/* Key Takeaway */}
           {explanation.keyTakeaway && (
-            <div className="mt-3 p-3 rounded-lg bg-aurora-teal/5 border border-aurora-teal/15 text-xs text-text-secondary shadow-sm relative overflow-hidden pl-4">
-              <div className="absolute top-0 left-0 w-1 h-full bg-aurora-mint" />
-              <strong className="text-aurora-mint uppercase font-display tracking-wider text-[9px] block mb-1">
-                Key Takeaway
+            <div className="mt-3 rounded border border-text-accent/25 bg-text-accent/5 p-3 text-xs text-text-secondary">
+              <strong className="text-text-accent font-mono text-[10px] block mb-1">
+                What to notice
               </strong>
               <p className="leading-relaxed text-[11.5px]">{explanation.keyTakeaway}</p>
             </div>
@@ -209,11 +228,11 @@ export const ExplanationPanel: React.FC = () => {
         {/* Action Prompt */}
         <div className="mt-6 pt-4 border-t border-border-subtle flex items-start gap-2.5 bg-bg-deep/10 p-2.5 rounded-lg">
           <div className="w-5 h-5 rounded bg-aurora-indigo/25 text-text-accent flex items-center justify-center font-mono text-xs flex-shrink-0">
-            ℹ️
+            i
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-display font-semibold uppercase tracking-wider text-text-muted leading-none">
-              Interactive Goal
+            <span className="text-[10px] font-mono font-semibold text-aurora-purple leading-none">
+              Try this
             </span>
             <p className="text-xs text-text-secondary mt-1">
               {explanation.interactiveGoal}

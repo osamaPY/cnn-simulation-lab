@@ -24,6 +24,11 @@ pip install tensorflowjs
 > pip install tensorflowjs
 > ```
 
+> [!IMPORTANT]
+> The TensorFlow.js Python converter's optional decision-forests dependency is unreliable on
+> native Windows. Use Linux, WSL, or Colab for the cleanest conversion path. The training script
+> enables TensorFlow's legacy Keras H5 schema so the exported LayersModel loads correctly in TF.js.
+
 ---
 
 ## Conversion Command

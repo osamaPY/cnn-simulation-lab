@@ -1,57 +1,55 @@
 /**
- * Tensor Aurora Design Tokens
- * 
- * Elegant, premium dark theme tokens featuring deep indigo/violet/teal/mint highlights.
- * Built for a high-end educational user experience.
+ * Tensor Aurora scene tokens. Color is reserved for mathematical meaning:
+ * cyan for active data, gold for focus, and coral for negative/error states.
  */
 
 export const tokens = {
   colors: {
     // Backgrounds
     background: {
-      deep: '#03000a',     // Pitch dark background with a tiny violet tint
-      canvas: '#000000',   // Absolute black for ML drawing canvas
-      card: '#0c0717',     // Solid card overlay background
-      panel: '#080410',    // Sidebar and timeline panel background
+      deep: '#071018',
+      canvas: '#020609',
+      card: '#0b1720',
+      panel: '#09131c',
     },
     
     // Borders & Dividers
     border: {
-      subtle: 'rgba(255, 255, 255, 0.04)',
-      muted: 'rgba(255, 255, 255, 0.08)',
-      focus: 'rgba(99, 102, 241, 0.4)', // Indigo glow
+      subtle: 'rgba(179, 216, 230, 0.10)',
+      muted: 'rgba(179, 216, 230, 0.20)',
+      focus: 'rgba(80, 201, 230, 0.55)',
     },
 
     // Typography
     text: {
-      primary: '#f3f1f7',   // Crisp off-white
-      secondary: '#9e99a8', // Muted slate gray
-      muted: '#625d6b',     // Deep placeholder/disabled gray
-      accent: '#a78bfa',    // Bright violet highlight
+      primary: '#f1f5ef',
+      secondary: '#b4c5c9',
+      muted: '#78909a',
+      accent: '#f2c14e',
     },
 
-    // Aurora Accents (Harmonious gradient points)
+    // Mathematical color roles
     aurora: {
-      indigo: '#312e81',    // Deep Indigo base
-      violet: '#6d28d9',    // Violet mid-point
-      purple: '#8b5cf6',    // Bright Purple accent
-      teal: '#0d9488',      // Deep Teal focus
-      mint: '#34d399',      // Bright Mint highlight
+      indigo: '#123447',
+      violet: '#24566d',
+      purple: '#50c9e6',
+      teal: '#2fa6b8',
+      mint: '#8be9c1',
     },
 
     // Activation Heat Scale (Low to High activations for feature maps and predictions)
     heatScale: [
-      '#05020c', // 0.0: Pitch violet/black (Inactive)
-      '#13092b', // 0.1
-      '#230c4e', // 0.2
-      '#350d75', // 0.3
-      '#470d9e', // 0.4: Deep violet
-      '#1e2d83', // 0.5: Transitioning to blue/teal
-      '#0d568c', // 0.6
-      '#0b7f8c', // 0.7: Soft teal
-      '#0d9488', // 0.8: Solid teal
-      '#10b981', // 0.9: Green/mint
-      '#34d399', // 1.0: Bright Mint (Max Activation)
+      '#020609',
+      '#081923',
+      '#0b2b3a',
+      '#0d4054',
+      '#115b70',
+      '#17778c',
+      '#2695a6',
+      '#50b6c5',
+      '#7bd1cf',
+      '#b5e7c8',
+      '#f2c14e',
     ]
   },
 

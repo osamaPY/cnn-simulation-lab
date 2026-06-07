@@ -27,7 +27,7 @@ export const TimelineStepper: React.FC<TimelineStepperProps> = ({ stageTotalStep
   ];
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-4 bg-bg-deep/80 border border-border-muted p-3.5 rounded-xl w-full max-w-xl shadow-inner z-10">
+    <div className="flex w-full max-w-xl flex-col items-center gap-4 rounded border border-border-muted bg-bg-deep/80 p-3.5 z-10 lg:flex-row">
       {/* 1. Main Play/Pause/Navigation Controls */}
       <div className="flex items-center gap-2">
         <button
@@ -35,7 +35,7 @@ export const TimelineStepper: React.FC<TimelineStepperProps> = ({ stageTotalStep
           title="Reset"
           className="p-2 rounded bg-white/5 border border-border-subtle hover:bg-white/10 hover:border-border-muted text-text-secondary hover:text-text-primary transition-all cursor-pointer text-xs"
         >
-          ⏮
+          Reset
         </button>
         <button
           onClick={stepBack}
@@ -43,18 +43,18 @@ export const TimelineStepper: React.FC<TimelineStepperProps> = ({ stageTotalStep
           title="Step Back"
           className="p-2 rounded bg-white/5 border border-border-subtle hover:bg-white/10 hover:border-border-muted text-text-secondary hover:text-text-primary disabled:opacity-25 disabled:cursor-not-allowed transition-all cursor-pointer text-xs"
         >
-          ◀
+          Back
         </button>
         <button
           onClick={isPlaying ? pause : play}
           title={isPlaying ? 'Pause' : 'Play'}
           className={`px-4 py-2 rounded font-display font-medium text-xs transition-all cursor-pointer border flex items-center justify-center min-w-[70px] ${
             isPlaying
-              ? 'bg-aurora-teal/15 border-aurora-mint/40 text-aurora-mint shadow-[0_0_8px_rgba(52,211,153,0.1)]'
-              : 'bg-gradient-to-r from-aurora-violet to-aurora-indigo border-aurora-purple/30 text-text-primary hover:border-aurora-purple/60'
+              ? 'bg-aurora-purple/15 border-aurora-purple/50 text-aurora-purple'
+              : 'bg-text-accent border-text-accent text-bg-deep hover:bg-yellow-300'
           }`}
         >
-          {isPlaying ? '⏸ Pause' : '▶ Play'}
+          {isPlaying ? 'Pause' : 'Play'}
         </button>
         <button
           onClick={stepForward}
@@ -62,7 +62,7 @@ export const TimelineStepper: React.FC<TimelineStepperProps> = ({ stageTotalStep
           title="Step Forward"
           className="p-2 rounded bg-white/5 border border-border-subtle hover:bg-white/10 hover:border-border-muted text-text-secondary hover:text-text-primary disabled:opacity-25 disabled:cursor-not-allowed transition-all cursor-pointer text-xs"
         >
-          ▶
+          Next
         </button>
       </div>
 

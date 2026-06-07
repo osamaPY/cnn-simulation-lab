@@ -2,11 +2,18 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useLabStore } from '../../hooks/useLabStore';
 import { tokens } from '../../styles/tokens';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { sceneTransition } from '../../animations/motion';
 
 export const TensorGridPreview: React.FC = () => {
-  const { preprocessedData } = useLabStore();
+  const preprocessedData = useLabStore(state => state.preprocessedData);
+  const currentStageId = useLabStore(state => state.currentStageId);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const hoverFrameRef = useRef<number | null>(null);
+  const pendingHoverRef = useRef<React.MouseEvent<HTMLCanvasElement> | null>(null);
+  const [showValues, setShowValues] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
   
   // Tooltip tracking state
   const [tooltip, setTooltip] = useState<{
@@ -45,18 +52,34 @@ export const TensorGridPreview: React.FC = () => {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
         ctx.lineWidth = 0.5;
         ctx.strokeRect(c * cellSize, r * cellSize, cellSize, cellSize);
+
+        if (showValues && val >= 0.1) {
+          ctx.fillStyle = val > 0.55 ? '#071018' : '#f1f5ef';
+          ctx.font = '7px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(val.toFixed(1).replace('0.', '.'), c * cellSize + 5, r * cellSize + 5);
+        }
       }
     }
-  }, [preprocessedData]);
+  }, [preprocessedData, showValues]);
 
   // Handle tooltip on mouse move
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    pendingHoverRef.current = e;
+    if (hoverFrameRef.current !== null) return;
+
+    hoverFrameRef.current = requestAnimationFrame(() => {
+      hoverFrameRef.current = null;
+      const pendingEvent = pendingHoverRef.current;
+      if (!pendingEvent) return;
+
     const canvas = canvasRef.current;
     if (!canvas || !preprocessedData) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const x = pendingEvent.clientX - rect.left;
+      const y = pendingEvent.clientY - rect.top;
 
     // Scale mouse coordinates to [0..27] grid coordinates
     const scaleX = canvas.width / rect.width;
@@ -69,8 +92,8 @@ export const TensorGridPreview: React.FC = () => {
       
       // Calculate tooltip position relative to client container
       const containerRect = containerRef.current?.getBoundingClientRect();
-      const tooltipX = e.clientX - (containerRect?.left || 0);
-      const tooltipY = e.clientY - (containerRect?.top || 0) - 40; // Hover slightly above pointer
+        const tooltipX = pendingEvent.clientX - (containerRect?.left || 0);
+        const tooltipY = pendingEvent.clientY - (containerRect?.top || 0) - 40;
 
       setTooltip({
         x: tooltipX,
@@ -83,16 +106,21 @@ export const TensorGridPreview: React.FC = () => {
     } else {
       setTooltip(t => ({ ...t, show: false }));
     }
+    });
   };
 
   const handleMouseLeave = () => {
+    pendingHoverRef.current = null;
+    if (hoverFrameRef.current !== null) {
+      cancelAnimationFrame(hoverFrameRef.current);
+      hoverFrameRef.current = null;
+    }
     setTooltip(t => ({ ...t, show: false }));
   };
 
   if (!preprocessedData) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center text-text-muted border border-dashed border-border-muted rounded-xl min-h-[320px]">
-        <span className="text-3xl mb-3">🔍</span>
         <h4 className="text-sm font-display font-semibold uppercase tracking-wider text-text-secondary">
           No Preprocessed Tensor
         </h4>
@@ -106,13 +134,13 @@ export const TensorGridPreview: React.FC = () => {
   return (
     <motion.div 
       ref={containerRef}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      initial={shouldReduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
       className="relative flex flex-col items-center w-full"
     >
       {/* Canvas container */}
-      <div className="relative p-1 rounded-xl bg-gradient-to-br from-border-muted to-bg-card border border-border-muted shadow-lg shadow-black/50">
+      <div className="relative p-1 rounded border border-border-muted bg-bg-canvas">
         <canvas
           ref={canvasRef}
           width={280}
@@ -120,12 +148,13 @@ export const TensorGridPreview: React.FC = () => {
           className="rounded-lg cursor-crosshair block bg-black border border-border-subtle select-none"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
+          onClick={handleMouseMove}
         />
 
         {/* Hover Tooltip Overlay */}
         {tooltip.show && (
           <div
-            className="absolute z-30 pointer-events-none bg-bg-card/95 border border-aurora-purple/40 px-2 py-1.5 rounded shadow-xl font-mono text-[10px] text-text-primary flex flex-col gap-0.5 backdrop-blur-md"
+            className="absolute z-30 pointer-events-none bg-bg-card border border-text-accent/40 px-2 py-1.5 rounded font-mono text-[10px] text-text-primary flex flex-col gap-0.5"
             style={{ left: `${tooltip.x}px`, top: `${tooltip.y}px` }}
           >
             <div className="flex justify-between gap-3 border-b border-white/5 pb-0.5 mb-0.5">
@@ -149,6 +178,14 @@ export const TensorGridPreview: React.FC = () => {
           Tensor: [1, 28, 28, 1]
         </span>
       </div>
+      {currentStageId === 2 && (
+        <button className="btn-secondary mt-3 text-[10px]" onClick={() => setShowValues((value) => !value)} type="button">
+          {showValues ? 'Show intensity heatmap' : 'Show numeric values'}
+        </button>
+      )}
+      {currentStageId === 3 && (
+        <p className="mt-3 text-center text-[10px] text-text-muted">Hover or tap a cell to inspect its coordinate and exact value.</p>
+      )}
     </motion.div>
   );
 };

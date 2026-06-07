@@ -3,7 +3,9 @@ import { useLabStore } from '../hooks/useLabStore';
 import type { TeachingMode } from '../types/cnn';
 
 export const Header: React.FC = () => {
-  const { selectedMode, setSelectedMode, currentStageId } = useLabStore();
+  const selectedMode = useLabStore(state => state.selectedMode);
+  const setSelectedMode = useLabStore(state => state.setSelectedMode);
+  const currentStageId = useLabStore(state => state.currentStageId);
 
   const modes: { id: TeachingMode; label: string; desc: string }[] = [
     { id: 'beginner', label: 'Beginner', desc: 'Conceptual explanations' },
@@ -12,30 +14,30 @@ export const Header: React.FC = () => {
   ];
 
   return (
-    <header className="relative w-full border-b border-border-muted bg-bg-panel/90 backdrop-blur-md px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 z-10">
+    <header className="relative w-full border-b border-border-muted bg-bg-panel z-10">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-4 md:px-6 xl:flex-row xl:items-center xl:justify-between">
       {/* App Logo & Title */}
-      <div className="flex items-center gap-3">
-        <div className="relative w-9 h-9 rounded-lg bg-gradient-to-tr from-aurora-indigo via-aurora-purple to-aurora-mint flex items-center justify-center shadow-lg shadow-aurora-indigo/35 overflow-hidden">
-          <span className="font-display font-extrabold text-sm text-text-primary tracking-tighter">Σ</span>
-          <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity" />
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="relative flex h-10 w-10 items-center justify-center rounded-full border border-text-accent/60 bg-bg-deep">
+          <span className="font-mono text-base font-bold text-text-accent">Σ</span>
         </div>
-        <div>
-          <h1 className="text-xl font-extrabold bg-gradient-to-r from-text-primary via-text-primary to-text-accent bg-clip-text text-transparent font-display flex items-center gap-2">
-            CNN Digit Lab <span className="text-xs py-0.5 px-1.5 rounded bg-aurora-indigo/40 border border-aurora-purple/30 text-text-accent font-normal font-sans">Tensor Aurora</span>
+        <div className="min-w-0">
+          <h1 className="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg sm:text-xl font-bold text-text-primary">
+            CNN Digit Lab <span className="whitespace-nowrap rounded border border-border-muted px-1.5 py-0.5 font-mono text-[10px] font-normal text-text-accent sm:text-xs">Tensor Aurora</span>
           </h1>
-          <p className="text-xs text-text-secondary">Interactive Convolutional Neural Network Simulator</p>
+          <p className="mt-0.5 text-xs text-text-secondary">See how a CNN transforms your handwritten digit.</p>
         </div>
       </div>
 
       {/* Mode Selector */}
-      <div className="flex items-center gap-1.5 bg-bg-deep border border-border-muted p-1 rounded-lg">
+      <div className="grid w-full grid-cols-3 gap-1 rounded-md border border-border-muted bg-bg-deep p-1 xl:w-auto">
         {modes.map((mode) => (
           <button
             key={mode.id}
             onClick={() => setSelectedMode(mode.id)}
-            className={`px-3 py-1.5 rounded-md text-xs font-display font-medium transition-all duration-200 cursor-pointer ${
+            className={`min-h-11 rounded px-2 py-2 text-xs font-medium transition-all duration-200 cursor-pointer sm:px-3 ${
               selectedMode === mode.id
-                ? 'bg-gradient-to-r from-aurora-violet to-aurora-indigo text-text-primary border border-aurora-purple/40 shadow-md shadow-aurora-violet/20'
+                ? 'bg-aurora-purple/15 text-aurora-purple border border-aurora-purple/50'
                 : 'text-text-secondary hover:text-text-primary hover:bg-white/5 border border-transparent'
             }`}
             title={mode.desc}
@@ -46,9 +48,10 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Global Status Indicator */}
-      <div className="flex items-center gap-3 text-xs bg-bg-card border border-border-muted rounded-full py-1 px-3">
-        <span className="w-2.5 h-2.5 rounded-full bg-aurora-teal animate-pulse" />
-        <span className="text-text-secondary font-mono">Stage: <strong className="text-text-primary">{currentStageId}/13</strong></span>
+      <div className="flex w-fit items-center gap-3 rounded border border-border-muted bg-bg-deep px-3 py-2 text-xs">
+        <span className="h-2 w-2 rounded-full bg-text-accent" />
+        <span className="font-mono text-text-secondary">Chapter <strong className="text-text-primary">{currentStageId}/13</strong></span>
+      </div>
       </div>
     </header>
   );

@@ -9,6 +9,69 @@ export interface PreprocessResult {
   };
 }
 
+export interface BoundingBox {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+export function findInkBoundingBox(
+  pixels: Uint8ClampedArray,
+  width: number,
+  height: number,
+  threshold = 30
+): { boundingBox: BoundingBox | null; nonzeroPixelCount: number } {
+  let minX = width;
+  let maxX = 0;
+  let minY = height;
+  let maxY = 0;
+  let nonzeroPixelCount = 0;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const red = pixels[(y * width + x) * 4];
+      if (red > threshold) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+        nonzeroPixelCount++;
+      }
+    }
+  }
+
+  return {
+    boundingBox: nonzeroPixelCount > 0 ? { minX, minY, maxX, maxY } : null,
+    nonzeroPixelCount
+  };
+}
+
+export function calculateCenterOfMass(
+  values: ArrayLike<number>,
+  width: number,
+  height: number
+): { x: number; y: number } {
+  let totalMass = 0;
+  let sumX = 0;
+  let sumY = 0;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const value = values[y * width + x];
+      if (value > 0) {
+        totalMass += value;
+        sumX += x * value;
+        sumY += y * value;
+      }
+    }
+  }
+
+  return totalMass > 0
+    ? { x: sumX / totalMass, y: sumY / totalMass }
+    : { x: width / 2, y: height / 2 };
+}
+
 /**
  * Preprocesses a 280x280 drawing canvas into an MNIST-compatible 28x28 float array.
  * Steps:
@@ -33,26 +96,7 @@ export function preprocessCanvas(canvas: HTMLCanvasElement): PreprocessResult {
   const pixels = imgData.data;
 
   // 2. Find ink bounding box
-  let minX = width;
-  let maxX = 0;
-  let minY = height;
-  let maxY = 0;
-  let nonzeroPixelCount = 0;
-
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4;
-      // We look at the red channel since it's white-on-black
-      const r = pixels[idx]; 
-      if (r > 30) { // Threshold to ignore minor noise
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-        nonzeroPixelCount++;
-      }
-    }
-  }
+  const { boundingBox, nonzeroPixelCount } = findInkBoundingBox(pixels, width, height);
 
   // If canvas is empty, return zeroed representation
   if (nonzeroPixelCount === 0) {
@@ -68,12 +112,13 @@ export function preprocessCanvas(canvas: HTMLCanvasElement): PreprocessResult {
     };
   }
 
+  const { minX, minY, maxX, maxY } = boundingBox!;
   const boxW = maxX - minX + 1;
   const boxH = maxY - minY + 1;
 
   // 3. Resize longest side to 20px
-  let newW = 20;
-  let newH = 20;
+  let newW: number;
+  let newH: number;
   if (boxW > boxH) {
     newW = 20;
     newH = Math.max(1, Math.round(boxH * (20 / boxW)));
@@ -113,28 +158,14 @@ export function preprocessCanvas(canvas: HTMLCanvasElement): PreprocessResult {
   const massImgData = massCtx.getImageData(0, 0, 28, 28);
   const massPixels = massImgData.data;
   
-  let totalMass = 0;
-  let sumX = 0;
-  let sumY = 0;
-
+  const massValues = new Float32Array(28 * 28);
   for (let y = 0; y < 28; y++) {
     for (let x = 0; x < 28; x++) {
-      const idx = (y * 28 + x) * 4;
-      const val = massPixels[idx]; // Red channel intensity
-      if (val > 0) {
-        totalMass += val;
-        sumX += x * val;
-        sumY += y * val;
-      }
+      massValues[y * 28 + x] = massPixels[(y * 28 + x) * 4];
     }
   }
 
-  let centX = 14;
-  let centY = 14;
-  if (totalMass > 0) {
-    centX = sumX / totalMass;
-    centY = sumY / totalMass;
-  }
+  const { x: centX, y: centY } = calculateCenterOfMass(massValues, 28, 28);
 
   // 5. Shift image so center of mass lies exactly at (14.0, 14.0)
   const dx = 14.0 - centX;

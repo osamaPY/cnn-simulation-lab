@@ -9,8 +9,24 @@ lerna-debug.log*
 
 node_modules
 dist
+.playwright-mcp/
+playwright-report/
+test-results/
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+
+# Python and model-training artifacts
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+train/*.h5
+train/*.keras
+train/checkpoints/
+train/logs/
 
 # Editor directories and files
 .vscode/*

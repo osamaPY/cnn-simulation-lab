@@ -1,10 +1,7 @@
 import { create } from 'zustand';
 import { CNN_STAGES } from '../types/cnn';
 import type { TeachingMode, PredictionResult, StageInfo } from '../types/cnn';
-import { loadCNNModel } from '../ml/loadModel';
-import { runModelInference } from '../ml/runInference';
 import type { ActivationRecord } from '../ml/activationModel';
-import * as tf from '@tensorflow/tfjs';
 
 interface LabState {
   // State variables
@@ -57,6 +54,10 @@ interface LabState {
   loadModel: () => Promise<void>;
   runInference: () => Promise<void>;
   clearAll: () => void;
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
 }
 
 export const useLabStore = create<LabState>((set, get) => ({
@@ -135,12 +136,13 @@ export const useLabStore = create<LabState>((set, get) => ({
 
     set({ modelStatus: 'loading', inferenceError: null });
     try {
+      const { loadCNNModel } = await import('../ml/loadModel');
       await loadCNNModel();
       set({ modelStatus: 'success' });
-    } catch (err: any) {
+    } catch (error: unknown) {
       set({ 
         modelStatus: 'error', 
-        inferenceError: err?.message || 'Error occurred while loading model.json.' 
+        inferenceError: getErrorMessage(error, 'Error occurred while loading model.json.')
       });
     }
   },
@@ -162,6 +164,10 @@ export const useLabStore = create<LabState>((set, get) => ({
 
     set({ inferenceError: null });
     try {
+      const [{ runModelInference }, tf] = await Promise.all([
+        import('../ml/runInference'),
+        import('@tensorflow/tfjs')
+      ]);
       const result = await runModelInference(data);
       
       const currentSelected = get().selectedActivationLayer;
@@ -174,14 +180,16 @@ export const useLabStore = create<LabState>((set, get) => ({
         selectedChannel: 0, // Reset focus
         lastRunTimestamp: Date.now(),
         // Log TF tensor counts to verify zero leaks
-        tfMemoryDebug: {
-          numTensors: tf.memory().numTensors,
-          numBytes: tf.memory().numBytes
-        }
+        tfMemoryDebug: import.meta.env.DEV
+          ? {
+              numTensors: tf.memory().numTensors,
+              numBytes: tf.memory().numBytes
+            }
+          : null
       });
-    } catch (err: any) {
+    } catch (error: unknown) {
       set({ 
-        inferenceError: err?.message || 'Error occurred during inference calculation.' 
+        inferenceError: getErrorMessage(error, 'Error occurred during inference calculation.')
       });
     }
   },

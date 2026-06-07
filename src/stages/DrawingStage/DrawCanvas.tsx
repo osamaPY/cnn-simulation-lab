@@ -1,24 +1,22 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useLabStore } from '../../hooks/useLabStore';
 import { preprocessCanvas } from '../../ml/preprocess';
+import { scrollToStageViewer } from '../../utils/scrollToStage';
 
 export const DrawCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { 
-    hasDrawing, 
-    setHasDrawing, 
-    setPrediction, 
-    clearAll,
-    setOriginalCanvasThumbnail,
-    setPreprocessedData,
-    setCurrentStageId,
-    modelStatus,
-    runInference
-  } = useLabStore();
+  const hasDrawing = useLabStore(state => state.hasDrawing);
+  const setHasDrawing = useLabStore(state => state.setHasDrawing);
+  const setPrediction = useLabStore(state => state.setPrediction);
+  const clearAll = useLabStore(state => state.clearAll);
+  const setOriginalCanvasThumbnail = useLabStore(state => state.setOriginalCanvasThumbnail);
+  const setPreprocessedData = useLabStore(state => state.setPreprocessedData);
+  const setCurrentStageId = useLabStore(state => state.setCurrentStageId);
+  const modelStatus = useLabStore(state => state.modelStatus);
+  const runInference = useLabStore(state => state.runInference);
   const [isDrawing, setIsDrawing] = useState(false);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
 
-  // Initialize canvas with black background
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -30,19 +28,17 @@ export const DrawCanvas: React.FC = () => {
     }
   }, []);
 
-  // Helper to get coordinates relative to canvas
   const getCoords = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return null;
 
     const rect = canvas.getBoundingClientRect();
     
-    // Scale factor in case canvas client width/height differs from drawing width/height
+    // Pointer coordinates must be scaled when CSS and canvas dimensions differ.
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
     if ('touches' in e) {
-      // Touch event
       if (e.touches.length === 0) return null;
       const touch = e.touches[0];
       return {
@@ -50,7 +46,6 @@ export const DrawCanvas: React.FC = () => {
         y: (touch.clientY - rect.top) * scaleY,
       };
     } else {
-      // Mouse event
       return {
         x: (e.clientX - rect.left) * scaleX,
         y: (e.clientY - rect.top) * scaleY,
@@ -58,20 +53,13 @@ export const DrawCanvas: React.FC = () => {
     }
   };
 
-  // Drawing Actions
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-    // Prevent scrolling for touch events
-    if ('touches' in e) {
-      e.preventDefault();
-    }
-    
     const coords = getCoords(e);
     if (!coords) return;
 
     setIsDrawing(true);
     lastPos.current = coords;
     
-    // Set drawing flag in store
     if (!hasDrawing) {
       setHasDrawing(true);
     }
@@ -79,9 +67,6 @@ export const DrawCanvas: React.FC = () => {
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !lastPos.current) return;
-    if ('touches' in e) {
-      e.preventDefault();
-    }
 
     const coords = getCoords(e);
     if (!coords) return;
@@ -118,44 +103,37 @@ export const DrawCanvas: React.FC = () => {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
     }
-    clearAll(); // Reset store
+    clearAll();
   };
 
   const handleRun = async () => {
     const canvas = canvasRef.current;
     if (!canvas || !hasDrawing) return;
 
-    // 1. Run real preprocessing
     const result = preprocessCanvas(canvas);
-
-    // 2. Capture raw canvas state as thumbnail snapshot
     const thumbnail = canvas.toDataURL();
-
-    // 3. Update Zustand store
     setOriginalCanvasThumbnail(thumbnail);
     setPreprocessedData(result.data, result.debug);
 
-    // 4. Run real inference if model is loaded successfully
     if (modelStatus === 'success') {
       await runInference();
     } else {
-      // Clear prediction since model is missing
       setPrediction(null);
     }
 
-    // 5. Automatically jump to Stage 2 to show the tensor grid
     setCurrentStageId(2);
+    scrollToStageViewer();
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      {/* Canvas container with styled card borders and a glow on focus/drawing */}
-      <div className="relative p-1 rounded-xl bg-gradient-to-br from-border-muted to-bg-card border border-border-muted shadow-lg shadow-black/40">
+    <div className="flex w-full flex-col items-center gap-4">
+      <div className="relative aspect-square w-full max-w-[280px] rounded-lg border border-border-muted bg-bg-canvas p-1">
         <canvas
+          aria-label="Digit drawing canvas"
           ref={canvasRef}
           width={280}
           height={280}
-          className="rounded-lg cursor-crosshair touch-none select-none bg-black block border border-border-subtle"
+          className="block h-full w-full rounded-md cursor-crosshair touch-none select-none bg-black border border-border-subtle"
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}
@@ -166,16 +144,16 @@ export const DrawCanvas: React.FC = () => {
         />
         
         {!hasDrawing && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none text-text-muted text-sm font-display uppercase tracking-wider bg-black/60 rounded-lg">
-            Draw a digit (0-9) here
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none text-text-secondary text-sm bg-black/50 rounded-md">
+            Draw a digit from 0 to 9
           </div>
         )}
       </div>
 
-      {/* Button Controls */}
-      <div className="flex gap-3 w-full max-w-[288px]">
+      <div className="grid grid-cols-2 gap-3 w-full max-w-[288px]">
         <button
           onClick={handleClear}
+          type="button"
           className="flex-1 btn-secondary text-sm py-2 px-4 border border-border-muted"
         >
           Clear
@@ -183,6 +161,7 @@ export const DrawCanvas: React.FC = () => {
         <button
           onClick={handleRun}
           disabled={!hasDrawing}
+          type="button"
           className="flex-1 btn-primary text-sm py-2 px-4 disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Run Simulation

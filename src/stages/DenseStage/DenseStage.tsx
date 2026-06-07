@@ -3,62 +3,46 @@ import { useLabStore } from '../../hooks/useLabStore';
 import { useTimeline } from '../../animations/useTimeline';
 import { TimelineStepper } from '../../components/TimelineStepper';
 import { getAuroraColor } from '../../canvas/heatScale';
-import { computeMaxPool2D } from '../../math/pooling';
-import { computeValidConv2D, REPRESENTATIVE_KERNEL, REPRESENTATIVE_BIAS } from '../../math/convolution';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 
 // Samples for Left Panel (Input Vector)
-const INPUT_SAMPLES = [0, 196, 226, 483, 660, 917, 1054, 1351];
+const INPUT_SAMPLES = [0, 57, 99, 143, 211, 277, 333, 399];
 
 // Samples for Center Panel (64 Hidden Neurons)
 // Render 12 nodes total, with index -1 as the ellipsis divider
 const HIDDEN_SAMPLES = [0, 1, 2, 3, 4, -1, 58, 59, 60, 61, 62, 63];
 
 export const DenseStage: React.FC = () => {
-  const { preprocessedData, activations, prediction, hoveredDigit, setHoveredDigit } = useLabStore();
+  const activations = useLabStore(state => state.activations);
+  const prediction = useLabStore(state => state.prediction);
+  const hoveredDigit = useLabStore(state => state.hoveredDigit);
+  const setHoveredDigit = useLabStore(state => state.setHoveredDigit);
   const [topKOnly, setTopKOnly] = useState(false);
 
   const totalSteps = 100;
-  const { stepIndex, seek, play } = useTimeline(totalSteps);
+  const { stepIndex, seek, play } = useTimeline(totalSteps, true);
   const progress = stepIndex / (totalSteps - 1 || 1); // 0.0 to 1.0
   const shouldReduceMotion = useReducedMotion();
 
-  // 1. Extract the input vector activations (size 1352)
+  // 1. Extract the real final pooled or flattened input vector (size 400)
   const volumeValues = useMemo(() => {
     const maxPoolRecord = activations.find(
-      r => r.layerType === 'MaxPooling2D' || 
-           (r.shape.length === 4 && r.shape[1] === 13 && r.shape[2] === 13 && r.shape[3] === 8)
+      r => r.layerType === 'MaxPooling2D' &&
+           r.shape.length === 4 && r.shape[1] === 5 && r.shape[2] === 5 && r.shape[3] === 16
     );
     if (maxPoolRecord) {
       return maxPoolRecord.values;
     }
 
     const flattenRecord = activations.find(
-      r => r.layerType === 'Flatten' || (r.shape.length === 2 && r.shape[1] === 1352)
+      r => r.layerType === 'Flatten' && r.shape.length === 2 && r.shape[1] === 400
     );
     if (flattenRecord) {
       return flattenRecord.values;
     }
 
-    // Fallback: convolve + pool drawing
-    const input26 = preprocessedData
-      ? computeValidConv2D(preprocessedData, REPRESENTATIVE_KERNEL, REPRESENTATIVE_BIAS)
-      : new Float32Array(26 * 26);
-    const pool13 = computeMaxPool2D(input26);
-    
-    const mockVol = new Float32Array(13 * 13 * 8);
-    for (let r = 0; r < 13; r++) {
-      for (let c = 0; c < 13; c++) {
-        const baseVal = pool13[r * 13 + c];
-        for (let ch = 0; ch < 8; ch++) {
-          const idx = (r * 13 + c) * 8 + ch;
-          const factor = 0.45 + 0.55 * Math.sin(ch * 0.9 + r * 0.15 - c * 0.08);
-          mockVol[idx] = Math.max(0, baseVal * factor);
-        }
-      }
-    }
-    return mockVol;
-  }, [activations, preprocessedData]);
+    return new Float32Array(400);
+  }, [activations]);
 
   // Find min/max values of volume for input scaling
   const { minVal, maxVal } = useMemo(() => {
@@ -85,22 +69,8 @@ export const DenseStage: React.FC = () => {
       return denseRecord.values;
     }
 
-    // Fallback: Compute mock dense layer activations using deterministic weights
-    const mockDense = new Float32Array(64);
-    for (let h = 0; h < 64; h++) {
-      let sum = 0;
-      for (let s = 0; s < 8; s++) {
-        const inputIdx = INPUT_SAMPLES[s];
-        const weight = Math.sin(s * 19 + h * 31);
-        sum += volumeValues[inputIdx] * weight;
-      }
-      // Add a small bias
-      sum += Math.sin(h * 7) * 0.1;
-      // ReLU activation function
-      mockDense[h] = Math.max(0, sum);
-    }
-    return mockDense;
-  }, [activations, volumeValues]);
+    return new Float32Array(64);
+  }, [activations]);
 
   // Find min/max of hidden layer for scaling
   const { minDense, maxDense } = useMemo(() => {
@@ -124,24 +94,8 @@ export const DenseStage: React.FC = () => {
       return prediction.probabilities;
     }
 
-    // Fallback: Compute output logits and apply Softmax
-    const mockLogits = new Float32Array(10);
-    for (let o = 0; o < 10; o++) {
-      let sum = 0;
-      for (let h = 0; h < 64; h++) {
-        const weight = Math.sin(o * 23 + h * 47);
-        sum += hiddenValues[h] * weight;
-      }
-      sum += Math.sin(o * 11) * 0.15; // bias
-      mockLogits[o] = sum;
-    }
-
-    // Softmax
-    const maxLogit = Math.max(...Array.from(mockLogits));
-    const exps = Array.from(mockLogits).map(l => Math.exp(l - maxLogit));
-    const sumExps = exps.reduce((a, b) => a + b, 0);
-    return exps.map(e => e / (sumExps || 1));
-  }, [prediction, hiddenValues]);
+    return Array(10).fill(0);
+  }, [prediction]);
 
   // 4. Sampled Weight Functions
   const getWeight1 = (sampleIdx: number, h: number): number => {
@@ -220,7 +174,7 @@ export const DenseStage: React.FC = () => {
             onClick={handleReplayPulse}
             className="btn-primary text-[11px] py-1 px-3 flex items-center gap-1.5"
           >
-            <span>⚡</span> Replay Signal Pulse
+            Replay signal
           </button>
         </div>
         
@@ -230,11 +184,7 @@ export const DenseStage: React.FC = () => {
       </div>
 
       {/* Main Visualizer Board */}
-      <div className="relative w-full max-w-[800px] aspect-[800/460] bg-bg-canvas rounded-xl border border-border-muted overflow-hidden shadow-2xl">
-        
-        {/* Glow ambient background elements */}
-        <div className="absolute top-1/4 left-1/3 w-40 h-40 bg-aurora-purple/5 rounded-full filter blur-2xl pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/3 w-40 h-40 bg-aurora-teal/5 rounded-full filter blur-2xl pointer-events-none" />
+      <div className="relative w-full max-w-[800px] aspect-[800/460] bg-bg-canvas rounded border border-border-muted overflow-hidden">
 
         {/* SVG Node and Link Layout */}
         <svg
@@ -352,7 +302,8 @@ export const DenseStage: React.FC = () => {
                   cy={py}
                   r={3.5}
                   fill="white"
-                  className="filter drop-shadow-[0_0_4px_rgba(52,211,153,0.9)]"
+                  stroke="var(--bg-canvas)"
+                  strokeWidth="1"
                 />
               );
             });
@@ -377,7 +328,8 @@ export const DenseStage: React.FC = () => {
                   cy={py}
                   r={3.5}
                   fill="white"
-                  className="filter drop-shadow-[0_0_4px_rgba(52,211,153,0.9)]"
+                  stroke="var(--bg-canvas)"
+                  strokeWidth="1"
                 />
               );
             });
@@ -481,7 +433,6 @@ export const DenseStage: React.FC = () => {
                     fill="none"
                     stroke={isWinner ? 'var(--aurora-mint)' : 'var(--aurora-teal)'}
                     strokeWidth="1.5"
-                    className="animate-pulse"
                   />
                 )}
                 
@@ -534,7 +485,7 @@ export const DenseStage: React.FC = () => {
           const hoveredProb = outputProbabilities[hoveredDigit];
           return (
             <div 
-              className="absolute top-4 left-4 p-3 rounded-lg bg-bg-card/90 border border-aurora-teal/30 shadow-lg text-[11px] font-mono text-text-primary backdrop-blur-md z-20 flex flex-col gap-1 w-52 select-none pointer-events-none animate-fadeIn"
+              className="absolute top-4 left-4 p-3 rounded bg-bg-card border border-aurora-teal/30 text-[11px] font-mono text-text-primary z-20 flex flex-col gap-1 w-52 select-none pointer-events-none"
             >
               <div className="border-b border-border-muted pb-1 mb-1 font-bold text-aurora-teal uppercase tracking-wider text-[10px]">
                 Digit Class {hoveredDigit} Evidence
@@ -551,7 +502,7 @@ export const DenseStage: React.FC = () => {
         })()}
 
         {!hoveredDigit && (
-          <div className="absolute top-4 left-4 p-2.5 rounded-lg bg-bg-card/75 border border-border-muted text-[10px] font-mono text-text-secondary backdrop-blur-sm z-20 pointer-events-none select-none max-w-[210px]">
+          <div className="absolute top-4 left-4 p-2.5 rounded bg-bg-card border border-border-muted text-[10px] font-mono text-text-secondary z-20 pointer-events-none select-none max-w-[210px]">
             Hover output digit circles (0-9) to highlight their supporting evidence path.
           </div>
         )}
@@ -569,7 +520,7 @@ export const DenseStage: React.FC = () => {
         <TimelineStepper stageTotalSteps={totalSteps} />
         
         {/* Math equation card */}
-        <div className="bg-bg-deep border border-border-subtle p-3.5 rounded-xl flex flex-col gap-2 w-full font-mono text-center shadow-inner relative overflow-hidden">
+        <div className="bg-bg-deep border border-border-subtle p-3.5 rounded flex flex-col gap-2 w-full font-mono text-center relative overflow-hidden">
           <div className="text-[9px] uppercase tracking-wider text-text-muted absolute top-1 left-2 font-display">
             Math Equations
           </div>

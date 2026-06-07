@@ -2,134 +2,94 @@ import React from 'react';
 import { Header } from '../components/Header';
 import { DrawCanvas } from '../stages/DrawingStage/DrawCanvas';
 import { PreprocessingPreview } from '../stages/DrawingStage/PreprocessingPreview';
-import { StagePlaceholder } from '../stages/StagePlaceholder';
+import { StageViewer } from '../stages/StageViewer';
 import { ExplanationPanel } from '../components/ExplanationPanel';
 import { Timeline } from '../components/Timeline';
 import { useLabStore } from '../hooks/useLabStore';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Variants } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { quickTransition } from '../animations/motion';
+import { LessonDirector } from '../components/LessonDirector';
+import { useLessonDirector } from '../animations/useLessonDirector';
+import { PipelineFilm } from '../components/PipelineFilm';
 
 export const LessonShell: React.FC = () => {
-  const { hasDrawing, preprocessedData, prediction, currentStageId } = useLabStore();
+  const hasDrawing = useLabStore(state => state.hasDrawing);
+  const preprocessedData = useLabStore(state => state.preprocessedData);
+  const prediction = useLabStore(state => state.prediction);
+  const currentStageId = useLabStore(state => state.currentStageId);
   const shouldReduceMotion = useReducedMotion();
+  const focusMode = useLessonDirector(state => state.focusMode);
 
-  // Compute guided banner instructions based on application state
   const guideMessage = React.useMemo(() => {
     if (!hasDrawing) {
       return {
-        text: "👉 Welcome to Tensor Aurora! Start by drawing a digit (0–9) on the canvas to the left.",
-        colorClass: "border-aurora-purple/35 text-text-accent bg-aurora-indigo/10"
+        text: "Start by drawing a digit from 0 to 9, then run the simulation.",
+        colorClass: "border-text-accent/40 text-text-primary bg-text-accent/5"
       };
     }
     if (hasDrawing && !preprocessedData) {
       return {
-        text: "⚡ Drawing registered! Click 'Run Simulation' under the canvas to preprocess and trace the CNN.",
-        colorClass: "border-aurora-teal/40 text-aurora-mint bg-aurora-teal/10 animate-pulse"
+        text: "Drawing ready. Run the simulation to preprocess it and trace the CNN.",
+        colorClass: "border-aurora-purple/45 text-aurora-purple bg-aurora-purple/5"
       };
     }
     // Simulation has run
     if (currentStageId === 1) {
       return {
-        text: "🎉 Preprocessing complete! Click 'Next ➔' on the visualizer card to step through the neural network.",
-        colorClass: "border-aurora-mint/40 text-aurora-mint bg-bg-card shadow-inner"
+        text: "Preprocessing complete. Use Next or the timeline to explore the network.",
+        colorClass: "border-aurora-mint/40 text-aurora-mint bg-bg-card"
+      };
+    }
+    if (currentStageId === 13 && prediction) {
+      return {
+        text: `Classification complete. The CNN predicted digit ${prediction?.digit} with ${(prediction?.confidence ? prediction.confidence * 100 : 0).toFixed(1)}% confidence.`,
+        colorClass: "border-text-accent/50 text-text-primary bg-text-accent/5"
       };
     }
     if (currentStageId === 13) {
       return {
-        text: `🎓 Classification Complete! The CNN predicted Digit ${prediction?.digit} with ${(prediction?.confidence ? prediction.confidence * 100 : 0).toFixed(1)}% confidence. Click 'Clear' to draw again.`,
-        colorClass: "border-aurora-mint/50 text-text-primary bg-bg-card shadow-[0_0_15px_rgba(52,211,153,0.1)]"
+        text: "Prediction unavailable. Add the exported TensorFlow.js model, then draw a digit and run the simulation again.",
+        colorClass: "border-red-500/30 text-red-300 bg-red-950/10"
       };
     }
     return {
-      text: `🔍 Tracing Stage ${currentStageId}: Observe the feature transformations. Click 'Next ➔' to advance the story.`,
+      text: `Stage ${currentStageId}: observe the transformation, then use Next to continue.`,
       colorClass: "border-border-muted text-text-secondary bg-bg-panel/40"
     };
   }, [hasDrawing, preprocessedData, prediction, currentStageId]);
 
-  // Motion variants for staggered dashboard layout
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.05
-      }
-    }
-  };
-
-  const columnVariants = (direction: 'left' | 'center' | 'right'): Variants => {
-    if (shouldReduceMotion) {
-      return {
-        hidden: { opacity: 0 },
-        show: { opacity: 1, transition: { duration: 0.25 } }
-      };
-    }
-    
-    const xOffset = direction === 'left' ? -20 : direction === 'right' ? 20 : 0;
-    const yOffset = direction === 'center' ? 20 : 0;
-
-    return {
-      hidden: { opacity: 0, x: xOffset, y: yOffset },
-      show: {
-        opacity: 1,
-        x: 0,
-        y: 0,
-        transition: {
-          duration: 0.55,
-          ease: [0.22, 1, 0.36, 1] as const
-        }
-      }
-    };
-  };
-
   return (
     <div className="relative min-h-screen flex flex-col bg-bg-deep text-text-primary overflow-x-hidden">
-      
-      {/* Premium Aurora Background Ambient Glows */}
-      <div className="aurora-bg-glow glow-indigo" />
-      <div className="aurora-bg-glow glow-violet" />
-
-      {/* Main Header */}
       <Header />
 
-      {/* Dashboard container */}
-      <div className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 flex flex-col gap-5 overflow-hidden z-10">
+      <main className="flex-1 max-w-[1600px] mx-auto w-full px-3 py-4 sm:px-5 md:py-6 xl:px-6 flex flex-col gap-4 md:gap-5 z-10">
         
-        {/* Top Guided Instruction Banner */}
         <AnimatePresence mode="wait">
           <motion.div
             key={guideMessage.text}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+            initial={shouldReduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10 }}
-            transition={shouldReduceMotion ? { duration: 0.15 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const }}
-            className={`w-full p-3.5 border rounded-xl font-display text-xs md:text-sm font-semibold flex items-center justify-center text-center shadow-lg backdrop-blur-md ${guideMessage.colorClass}`}
+            exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+            transition={shouldReduceMotion ? { duration: 0 } : quickTransition}
+            className={`w-full px-4 py-3 border rounded text-sm font-medium flex items-center justify-center text-center ${guideMessage.colorClass}`}
           >
             {guideMessage.text}
           </motion.div>
         </AnimatePresence>
 
-        {/* 3-Zone Dashboard Panel Grid with Staggered Entrance */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch"
-        >
-          {/* Left Zone: Drawing canvas (3/12 width) */}
-          <motion.section 
-            variants={columnVariants('left')}
-            className="lg:col-span-3 flex flex-col gap-4 items-center justify-start"
-          >
-            <div className="aurora-card p-5 w-full flex flex-col items-center gap-4">
+        <LessonDirector />
+        <PipelineFilm />
+
+        <div className={`lesson-workspace ${focusMode ? 'lesson-workspace--focus' : ''}`}>
+          <section className="lesson-drawing flex min-w-0 flex-col gap-4 items-center justify-start">
+            <div className="aurora-card p-4 sm:p-5 w-full flex flex-col items-center gap-4">
               <div className="text-center">
-                <h3 className="text-sm font-display font-semibold uppercase tracking-wider text-text-secondary">
-                  1. Draw Digit
+                <h3 className="text-base font-semibold text-text-primary">
+                  Draw the input
                 </h3>
-                <p className="text-xs text-text-muted mt-1">
-                  Provide custom input to feed the CNN network
+                <p className="text-xs text-text-secondary mt-1">
+                  Your stroke becomes the tensor the network reads.
                 </p>
               </div>
               
@@ -137,37 +97,26 @@ export const LessonShell: React.FC = () => {
               <DrawCanvas />
             </div>
 
-            {/* Preprocessing debug telemetry preview */}
+            {/* Preprocessing transformation preview */}
             <PreprocessingPreview />
-          </motion.section>
+          </section>
 
           {/* Center Zone: Stage Visualizer (5/12 width) */}
-          <motion.section 
-            variants={columnVariants('center')}
-            className="lg:col-span-5 flex flex-col min-h-[420px] lg:min-h-0"
-          >
-            <StagePlaceholder />
-          </motion.section>
+          <section className="lesson-stage flex min-w-0 flex-col">
+            <StageViewer />
+          </section>
 
           {/* Right Zone: Explanations & Softmax outputs (4/12 width) */}
-          <motion.section 
-            variants={columnVariants('right')}
-            className="lg:col-span-4 flex flex-col"
-          >
+          <section className="lesson-explanation flex min-w-0 flex-col">
             <ExplanationPanel />
-          </motion.section>
-        </motion.div>
-      </div>
+          </section>
+        </div>
+      </main>
 
       {/* Bottom Zone: Architecture timeline navigation stepper */}
-      <motion.section
-        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={shouldReduceMotion ? { duration: 0.2 } : { duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] as const }}
-        className="w-full mt-auto"
-      >
+      <section className="w-full mt-2">
         <Timeline />
-      </motion.section>
+      </section>
     </div>
   );
 };

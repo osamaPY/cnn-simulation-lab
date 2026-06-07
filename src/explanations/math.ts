@@ -66,14 +66,14 @@ export const mathExplanations: Record<number, ExplanationContent> = {
   },
   10: {
     headline: "Row-major tensor flattening",
-    body: "Before entering the decision-making layers, the 3D activation tensor must be flattened into a 1D vector. We unroll the shape $[1, 13, 13, 8]$ row-by-row into a vector $x \\in \\mathbb{R}^{1352}$. The index ordering is channel-last (NHWC).",
+    body: "Before entering the decision-making layers, the model's final pooled tensor is flattened into a 1D vector. We unroll shape $[1, 5, 5, 16]$ row-by-row into $x \\in \\mathbb{R}^{400}$. The index ordering is channel-last (NHWC).",
     focusFormula: "x_k = Y_{i, j, c} \\quad \\text{where } k = (i \\cdot W + j) \\cdot C + c",
     interactiveGoal: "Hover over vector elements to trace back to their (row, col, channel) coordinates.",
     keyTakeaway: "Flattening changes the data layout from a spatial grid to a continuous array of inputs."
   },
   11: {
     headline: "Matrix-vector product (Dense layer)",
-    body: "The Dense layer maps the $1352$-length input vector $x$ to $64$ hidden neurons. We compute the dot product of the weights matrix $W_1 \\in \\mathbb{R}^{64 \\times 1352}$ and vector $x$, add the bias vector $b_1 \\in \\mathbb{R}^{64}$, and apply ReLU activation.",
+    body: "The Dense layer maps the $400$-length input vector $x$ to $64$ hidden neurons. We compute the dot product of the weights matrix $W_1 \\in \\mathbb{R}^{64 \\times 400}$ and vector $x$, add the bias vector $b_1 \\in \\mathbb{R}^{64}$, and apply ReLU activation.",
     focusFormula: "a = \\max(0, W_1 \\cdot x + b_1)",
     interactiveGoal: "Hover output digit circles to see the evidence paths contributing positive signals.",
     keyTakeaway: "Fully connected layers combine all spatial features globally to build classification scores."

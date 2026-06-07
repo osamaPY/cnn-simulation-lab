@@ -1,4 +1,8 @@
 import os
+
+# TensorFlow.js LayersModel conversion currently expects the legacy tf.keras H5 schema.
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers

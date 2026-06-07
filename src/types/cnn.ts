@@ -12,7 +12,6 @@ export interface PredictionResult {
   digit: number;
   confidence: number;
   probabilities: number[]; // Softmax distribution for 0-9
-  isPlaceholder: boolean;
 }
 
 export const CNN_STAGES: StageInfo[] = [
@@ -83,8 +82,8 @@ export const CNN_STAGES: StageInfo[] = [
     id: 10,
     name: "Tensor Flattening",
     shortName: "Flatten",
-    description: "The 3D activation volume is unrolled into a single 1D vector of neural connections.",
-    shapeLabel: "1352" // 13 * 13 * 8 = 1352
+    description: "The model's final 5x5x16 pooled activation volume is unrolled into a single 400-value vector.",
+    shapeLabel: "400"
   },
   {
     id: 11,

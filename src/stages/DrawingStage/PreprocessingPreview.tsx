@@ -1,11 +1,18 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useLabStore } from '../../hooks/useLabStore';
 import { tokens } from '../../styles/tokens';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { quickTransition } from '../../animations/motion';
 
 export const PreprocessingPreview: React.FC = () => {
-  const { originalCanvasThumbnail, preprocessedData, preprocessingDebug, tfMemoryDebug } = useLabStore();
+  const originalCanvasThumbnail = useLabStore(state => state.originalCanvasThumbnail);
+  const preprocessedData = useLabStore(state => state.preprocessedData);
+  const preprocessingDebug = useLabStore(state => state.preprocessingDebug);
+  const tfMemoryDebug = useLabStore(state => state.tfMemoryDebug);
   const miniCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [replayKey, setReplayKey] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
 
   // Draw a scaled representation of the preprocessed 28x28 grid
   useEffect(() => {
@@ -28,7 +35,7 @@ export const PreprocessingPreview: React.FC = () => {
         ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
       }
     }
-  }, [preprocessedData]);
+  }, [preprocessedData, replayKey]);
 
   if (!preprocessedData || !preprocessingDebug) {
     return null;
@@ -38,15 +45,16 @@ export const PreprocessingPreview: React.FC = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full bg-bg-deep/50 border border-border-muted rounded-xl p-4 flex flex-col gap-4 shadow-inner"
+      key={replayKey}
+      initial={shouldReduceMotion ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={shouldReduceMotion ? { duration: 0 } : quickTransition}
+      className="w-full bg-bg-deep/50 border border-border-muted rounded-lg p-4 flex flex-col gap-4"
     >
       <div className="flex items-center justify-between border-b border-border-subtle pb-2">
-        <h4 className="text-xs font-display font-bold uppercase tracking-wider text-text-accent flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-aurora-purple animate-pulse" />
-          MNIST Preprocessing Telemetry
+        <h4 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-text-accent" />
+          How the drawing is centered
         </h4>
         <span className="text-[9px] font-mono text-text-muted">
           Active Pixels: {nonzeroPixelCount}
@@ -84,7 +92,7 @@ export const PreprocessingPreview: React.FC = () => {
                 />
                 {boundingBox && (
                   <div 
-                    className="absolute border border-dashed border-aurora-purple/80 shadow-[0_0_4px_rgba(139,92,246,0.3)]"
+                    className="absolute border border-dashed border-text-accent/80"
                     style={{
                       left: `${(boundingBox.minX / 280) * 100}%`,
                       top: `${(boundingBox.minY / 280) * 100}%`,
@@ -101,7 +109,7 @@ export const PreprocessingPreview: React.FC = () => {
         {/* Step 3: Shifted Center of Mass */}
         <div className="flex flex-col items-center gap-1">
           <span className="text-[8px] font-mono text-text-muted uppercase">3. Centered (28x28)</span>
-          <div className="w-16 h-16 bg-black border border-aurora-mint/30 rounded flex items-center justify-center overflow-hidden shadow-inner">
+          <div className="w-16 h-16 bg-black border border-text-accent/40 rounded flex items-center justify-center overflow-hidden">
             <canvas 
               ref={miniCanvasRef} 
               width={64} 
@@ -111,6 +119,9 @@ export const PreprocessingPreview: React.FC = () => {
           </div>
         </div>
       </div>
+      <button className="btn-secondary self-center text-[10px]" onClick={() => setReplayKey((key) => key + 1)} type="button">
+        Replay preprocessing
+      </button>
 
       {/* Numeric Metadata logs */}
       <div className="grid grid-cols-2 gap-2 text-[10px] font-mono bg-bg-deep/80 border border-border-subtle p-3 rounded-lg text-text-secondary">
@@ -139,7 +150,7 @@ export const PreprocessingPreview: React.FC = () => {
         </div>
       </div>
       {/* Dev Memory telemetry */}
-      {tfMemoryDebug && (
+      {import.meta.env.DEV && tfMemoryDebug && (
         <div className="text-[9px] font-mono text-text-muted flex justify-between border-t border-border-subtle pt-2 px-1">
           <span>Active Tensors: <strong className="text-text-secondary">{tfMemoryDebug.numTensors}</strong></span>
           <span>GPU Memory: <strong className="text-text-secondary">{(tfMemoryDebug.numBytes / 1024).toFixed(1)} KB</strong></span>

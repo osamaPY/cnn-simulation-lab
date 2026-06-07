@@ -23,25 +23,15 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
       className="absolute inset-0 w-full h-full pointer-events-none z-20"
       viewBox="0 0 280 280"
     >
-      <defs>
-        {/* Glow filter for aurora accent */}
-        <filter id="aurora-glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-      </defs>
-
-      {/* Outer sliding frame */}
       <rect
         x={x}
         y={y}
         width={frameWidth}
         height={frameHeight}
         rx="2"
-        fill="rgba(139, 92, 246, 0.15)"
+        fill="rgba(80, 201, 230, 0.10)"
         stroke="var(--aurora-purple)"
-        strokeWidth="1.5"
-        filter="url(#aurora-glow)"
+        strokeWidth="2"
         className="transition-all duration-150 ease-out"
       />
 
@@ -51,10 +41,10 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
         y={y + cellSize}
         width={cellSize}
         height={cellSize}
-        fill="rgba(52, 211, 153, 0.3)"
-        stroke="var(--aurora-mint)"
+        fill="rgba(242, 193, 78, 0.35)"
+        stroke="var(--text-accent)"
         strokeWidth="0.75"
-        className="transition-all duration-150 ease-out animate-pulse"
+        className="transition-all duration-150 ease-out"
       />
     </svg>
   );

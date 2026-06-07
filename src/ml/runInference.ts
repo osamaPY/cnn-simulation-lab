@@ -3,6 +3,7 @@ import { getModelInstance } from './loadModel';
 import { extractActivations } from './activationModel';
 import type { ActivationRecord } from './activationModel';
 import type { PredictionResult } from '../types/cnn';
+import { argmax } from '../math/classification';
 
 export interface InferenceResult {
   prediction: PredictionResult;
@@ -35,14 +36,13 @@ export async function runModelInference(preprocessedData: Float32Array): Promise
     const probabilitiesArray = Array.from(outputTensor.dataSync());
     
     // 4. Compute argmax predicted digit
-    const predictedDigit = outputTensor.argMax(1).dataSync()[0];
+    const predictedDigit = argmax(probabilitiesArray);
     const confidence = probabilitiesArray[predictedDigit];
 
     prediction = {
       digit: predictedDigit,
       confidence,
       probabilities: probabilitiesArray,
-      isPlaceholder: false
     };
 
     // 5. Extract intermediate layer activations

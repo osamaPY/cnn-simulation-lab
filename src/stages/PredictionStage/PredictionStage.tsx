@@ -2,15 +2,17 @@ import React from 'react';
 import { useLabStore } from '../../hooks/useLabStore';
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { sceneTransition } from '../../animations/motion';
 
 export const PredictionStage: React.FC = () => {
-  const { prediction, originalCanvasThumbnail } = useLabStore();
+  const prediction = useLabStore(state => state.prediction);
+  const originalCanvasThumbnail = useLabStore(state => state.originalCanvasThumbnail);
+  const clearAll = useLabStore(state => state.clearAll);
   const shouldReduceMotion = useReducedMotion();
 
   if (!prediction) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center text-text-muted border border-dashed border-border-muted rounded-xl min-h-[360px] bg-bg-card/20">
-        <span className="text-3xl mb-3">🎓</span>
         <h4 className="text-sm font-display font-semibold uppercase tracking-wider text-text-secondary">
           No Classification Result
         </h4>
@@ -22,7 +24,6 @@ export const PredictionStage: React.FC = () => {
   }
 
   const confidencePct = (prediction.confidence * 100).toFixed(1);
-  const confidenceBarWidth = Math.round(prediction.confidence * 100);
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-xl items-center py-4 px-2">
@@ -49,21 +50,24 @@ export const PredictionStage: React.FC = () => {
         </div>
 
         {/* Transition Arrow */}
-        <div className="hidden sm:flex text-text-accent font-mono text-xl animate-pulse">➔</div>
+        <div className="hidden sm:flex items-center gap-1 text-text-muted font-mono text-xs" aria-hidden="true">
+          <span className="h-px w-8 bg-border-muted" />
+          <span>&gt;</span>
+        </div>
 
-        {/* Glowing Classification Output Card */}
+        {/* Classification output */}
         <div className="flex flex-col items-center gap-2">
           <span className="text-[10px] font-mono text-text-secondary uppercase">
             Network Prediction
           </span>
           
           <motion.div 
-            className="w-32 h-32 rounded-xl bg-gradient-to-br from-bg-panel to-bg-card border border-aurora-mint/45 flex flex-col items-center justify-center relative shadow-[0_0_25px_rgba(52,211,153,0.15)]"
-            initial={shouldReduceMotion ? { scale: 1 } : { scale: 0.9, opacity: 0 }}
+            className="w-32 h-32 rounded-lg bg-bg-deep border border-text-accent/50 flex flex-col items-center justify-center relative"
+            initial={shouldReduceMotion ? false : { opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={shouldReduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 200, damping: 15 }}
+            transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
           >
-            <span className="text-6xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white via-text-primary to-aurora-mint leading-none">
+            <span className="text-6xl font-display font-extrabold text-text-accent leading-none">
               {prediction.digit}
             </span>
             <span className="text-[10px] font-mono text-aurora-mint font-semibold uppercase mt-1">
@@ -84,17 +88,17 @@ export const PredictionStage: React.FC = () => {
         {/* Progress Bar Container */}
         <div className="w-full h-3 rounded-full bg-black border border-border-subtle overflow-hidden relative">
           <motion.div 
-            className="h-full rounded-r bg-gradient-to-r from-aurora-purple via-aurora-teal to-aurora-mint"
-            initial={shouldReduceMotion ? { width: `${confidenceBarWidth}%` } : { width: '0%' }}
-            animate={{ width: `${confidenceBarWidth}%` }}
-            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            className="h-full w-full origin-left rounded-r bg-text-accent"
+            initial={shouldReduceMotion ? { scaleX: prediction.confidence } : { scaleX: 0 }}
+            animate={{ scaleX: prediction.confidence }}
+            transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
           />
         </div>
 
         {/* Confidence Context Explanation */}
         <p className="text-[10px] text-text-muted text-center mt-1 leading-relaxed">
-          The network weighs evidentiary signals across all 10 candidate nodes in the final softmax layer. 
-          A confidence above 80% denotes high topological convergence.
+          Confidence is the largest softmax probability. A high value does not guarantee the
+          prediction is correct, especially for unusual drawings.
         </p>
       </div>
 
@@ -108,6 +112,10 @@ export const PredictionStage: React.FC = () => {
           By combining edge detectors, downsampling layers, and fully connected weights, the model learns complex spatial representations.
         </p>
       </div>
+
+      <button className="btn-primary" onClick={clearAll} type="button">
+        Try another digit
+      </button>
     </div>
   );
 };

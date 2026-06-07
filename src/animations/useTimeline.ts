@@ -1,13 +1,12 @@
 import { create } from 'zustand';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 interface TimelineState {
   stepIndex: number;
   isPlaying: boolean;
-  speed: number; // Duration of one step in milliseconds
+  speed: number;
   totalSteps: number;
-  
-  // Actions
   play: () => void;
   pause: () => void;
   stepForward: () => void;
@@ -21,8 +20,8 @@ interface TimelineState {
 export const useTimelineStore = create<TimelineState>((set, get) => ({
   stepIndex: 0,
   isPlaying: false,
-  speed: 150, // default 150ms per step
-  totalSteps: 100, // default total steps, will be overridden by stages
+  speed: 150,
+  totalSteps: 100,
 
   play: () => set({ isPlaying: true }),
   
@@ -33,7 +32,7 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     if (stepIndex < totalSteps - 1) {
       set({ stepIndex: stepIndex + 1 });
     } else {
-      set({ isPlaying: false }); // Stop at the end
+      set({ isPlaying: false });
     }
   },
   
@@ -52,50 +51,67 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     set({ stepIndex: safeIndex });
   },
   
-  setSpeed: (speed) => set({ speed: Math.max(20, speed) }), // Cap speed to 20ms min
+  setSpeed: (speed) => set({ speed: Math.max(20, speed) }),
   
   setTotalSteps: (steps) => {
     const safeSteps = Math.max(1, steps);
     const currentIdx = get().stepIndex;
     set({ 
       totalSteps: safeSteps,
-      // clamp current index in case steps shrunk
       stepIndex: Math.min(currentIdx, safeSteps - 1)
     });
   }
 }));
 
 /**
- * Hook to run the animation requestAnimationFrame loop based on isPlaying state.
+ * Drives deterministic, step-based educational animations. Reduced-motion
+ * users jump directly to the completed state rather than running the loop.
  */
-export function useTimeline(stageTotalSteps?: number) {
-  const {
-    stepIndex,
-    isPlaying,
-    speed,
-    totalSteps,
-    play,
-    pause,
-    stepForward,
-    stepBack,
-    reset,
-    seek,
-    setSpeed,
-    setTotalSteps
-  } = useTimelineStore();
+export function useTimeline(stageTotalSteps?: number, autoPlay = false) {
+  const stepIndex = useTimelineStore(state => state.stepIndex);
+  const isPlaying = useTimelineStore(state => state.isPlaying);
+  const speed = useTimelineStore(state => state.speed);
+  const totalSteps = useTimelineStore(state => state.totalSteps);
+  const storePlay = useTimelineStore(state => state.play);
+  const pause = useTimelineStore(state => state.pause);
+  const stepForward = useTimelineStore(state => state.stepForward);
+  const stepBack = useTimelineStore(state => state.stepBack);
+  const reset = useTimelineStore(state => state.reset);
+  const seek = useTimelineStore(state => state.seek);
+  const setSpeed = useTimelineStore(state => state.setSpeed);
+  const setTotalSteps = useTimelineStore(state => state.setTotalSteps);
+  const shouldReduceMotion = useReducedMotion();
 
   const lastTick = useRef<number>(0);
   const animationFrameId = useRef<number | null>(null);
+  const play = useCallback(() => {
+    if (shouldReduceMotion) {
+      seek(totalSteps - 1);
+      return;
+    }
+    storePlay();
+  }, [seek, shouldReduceMotion, storePlay, totalSteps]);
 
-  // Sync total steps when stage mounts/changes
   useEffect(() => {
     if (stageTotalSteps !== undefined) {
       setTotalSteps(stageTotalSteps);
     }
   }, [stageTotalSteps, setTotalSteps]);
 
-  // Animation loop runner
   useEffect(() => {
+    if (!autoPlay || shouldReduceMotion) return;
+    reset();
+    const timer = window.setTimeout(storePlay, 260);
+    return () => window.clearTimeout(timer);
+  }, [autoPlay, reset, shouldReduceMotion, stageTotalSteps, storePlay]);
+
+  useEffect(() => {
+    if (shouldReduceMotion && isPlaying) {
+      pause();
+      seek(totalSteps - 1);
+      return;
+    }
+
     const loop = (timestamp: number) => {
       if (!lastTick.current) {
         lastTick.current = timestamp;
@@ -127,7 +143,7 @@ export function useTimeline(stageTotalSteps?: number) {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [isPlaying, speed, stepForward]);
+  }, [isPlaying, pause, seek, shouldReduceMotion, speed, stepForward, totalSteps]);
 
   return {
     stepIndex,

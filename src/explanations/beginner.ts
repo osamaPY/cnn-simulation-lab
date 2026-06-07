@@ -57,7 +57,7 @@ export const beginnerExplanations: Record<number, ExplanationContent> = {
   },
   10: {
     headline: "Unrolling the grids into a single list",
-    body: "Up to this point, our features are stored in a 3D stack of 8 grids. However, the final decision-making layer expects a single long list of inputs. We 'flatten' the grids by taking their values row-by-row and lining them up in one long 1D list of connections.",
+    body: "After the model's second convolution and pooling pass, its features are stored in a compact stack of 16 grids, each 5x5. The final decision-making layer expects one list, so Flatten lines those 400 real activation values up in order.",
     interactiveGoal: "Scrub the timeline to see the grid cells peel off and line up in a single 1D vector.",
     keyTakeaway: "Flattening transitions the network from spatial features (2D) to a flat list ready for decision-making (1D)."
   },

@@ -57,13 +57,13 @@ export const examExplanations: Record<number, ExplanationContent> = {
   },
   10: {
     headline: "Exam Prep: Flattening Calculations",
-    body: "Flattening changes tensor shape from 3D to 1D without changing the data contents in memory. Total elements must match: $H \\times W \\times C$. For $13 \\times 13 \\times 8$ feature maps, the flattened vector has length $13 \\times 13 \\times 8 = 1352$ connections.",
+    body: "Flattening changes tensor shape from 3D to 1D without changing the data contents in memory. Total elements must match: $H \\times W \\times C$. For the model's final $5 \\times 5 \\times 16$ feature volume, the flattened vector has $400$ values.",
     interactiveGoal: "Verify that unrolling a [5, 5, 16] tensor creates a 1D vector of length 400.",
     keyTakeaway: "Flattening reshapes spatial feature maps into a 1D vector to interface with Dense classification layers."
   },
   11: {
     headline: "Exam Prep: Parameter Count of Dense Layer",
-    body: "Formula: $\\text{Params} = (I \\times O) + O$ where $I$ is inputs and $O$ is outputs. For a Dense layer mapping $1352$ inputs to $64$ hidden neurons: $(1352 \\times 64) + 64 = 86,592$ parameters (weights and biases).",
+    body: "Formula: $\\text{Params} = (I \\times O) + O$ where $I$ is inputs and $O$ is outputs. For a Dense layer mapping $400$ inputs to $64$ hidden neurons: $(400 \\times 64) + 64 = 25,664$ parameters.",
     interactiveGoal: "Calculate parameter count for a Dense layer connecting 64 hidden nodes to 10 output classes. (Ans: 650)",
     keyTakeaway: "Dense layers are highly parameterized, mapping all inputs globally to compile output evidence."
   },

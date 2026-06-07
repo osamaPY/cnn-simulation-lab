@@ -1,29 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useSyncExternalStore } from 'react';
+
+const QUERY = '(prefers-reduced-motion: reduce)';
+
+function subscribe(callback: () => void) {
+  const mediaQuery = window.matchMedia(QUERY);
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
+}
+
+function getSnapshot() {
+  return window.matchMedia(QUERY).matches;
+}
 
 /**
  * Custom hook to detect if the user's OS preference has reduced motion enabled.
  * Useful to disable heavy SVG path animations, layout morphs, or sliding loops.
  */
 export function useReducedMotion(): boolean {
-  const [shouldReduceMotion, setShouldReduceMotion] = useState(false);
-
-  useEffect(() => {
-    // Check client environment media query support
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    
-    setShouldReduceMotion(mediaQuery.matches);
-
-    // Event listener callback
-    const handleChange = (e: MediaQueryListEvent) => {
-      setShouldReduceMotion(e.matches);
-    };
-
-    // Attach listeners
-    mediaQuery.addEventListener('change', handleChange);
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, []);
-
-  return shouldReduceMotion;
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
 }
