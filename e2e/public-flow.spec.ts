@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test'
 
 test('draws a digit, runs real inference, and plays cinematic timeline', async ({ page }) => {
   await page.goto('/', { waitUntil: 'commit' })
-  await expect(page.getByRole('heading', { name: /CNN Digit Lab/i })).toBeVisible({ timeout: 15000 })
-  await expect(page.getByRole('heading', { name: 'Draw the Input' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /CNN Visual Lab/i })).toBeVisible({ timeout: 15000 })
+  await expect(page.getByRole('heading', { name: 'Input Geometry' })).toBeVisible()
 
   const canvas = page.getByLabel('Digit drawing canvas')
   await canvas.evaluate((element) => element.scrollIntoView({ block: 'center' }))
@@ -18,15 +18,18 @@ test('draws a digit, runs real inference, and plays cinematic timeline', async (
   }
   await page.mouse.up()
 
-  await page.getByRole('button', { name: 'Run Simulation' }).click()
+  await page.getByRole('button', { name: /Run Simulation/i }).click()
 
-  // Interact with next/back navigation
-  await page.getByRole('button', { name: 'Next Chapter' }).click()
-  await expect(page.locator('main').getByText('Chapter 3 / 11')).toBeVisible()
+  // Interact with next navigation
+  await page.getByRole('button', { name: /NEXT/i }).click()
+  await expect(page.getByText(/STAGE 02/i)).toBeVisible()
 
-  // Reset
-  await page.getByRole('button', { name: 'Restart' }).click()
-  await expect(page.getByRole('button', { name: 'Run Simulation' })).toBeDisabled()
+  // Reset — navigate to last stage, then finish & restart
+  for (let i = 0; i < 10; i++) {
+    await page.getByRole('button', { name: /NEXT/i }).click()
+  }
+  await page.getByRole('button', { name: /FINISH & RESTART/i }).click()
+  await expect(page.getByRole('button', { name: /Run Simulation/i })).toBeDisabled()
 })
 
 test('supports reduced motion and responsive tablet and phone layouts', async ({ page }) => {
@@ -34,7 +37,7 @@ test('supports reduced motion and responsive tablet and phone layouts', async ({
   for (const viewport of [{ width: 768, height: 1024 }, { width: 390, height: 844 }]) {
     await page.setViewportSize(viewport)
     await page.goto('/', { waitUntil: 'commit' })
-    await expect(page.getByRole('heading', { name: /CNN Digit Lab/i })).toBeVisible()
+    await expect(page.getByRole('heading', { name: /CNN Visual Lab/i })).toBeVisible()
     await expect(page.locator('canvas').first()).toBeVisible()
   }
 })
