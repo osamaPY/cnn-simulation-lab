@@ -33,7 +33,7 @@ export const TensorGridPreview: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const cellSize = 15; // 28 * 15 = 420px canvas
+    const cellSize = 12; // 28 * 12 = 336px canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let r = 0; r < 28; r++) {
@@ -58,7 +58,7 @@ export const TensorGridPreview: React.FC = () => {
           ctx.font = '8px monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(val.toFixed(1).replace('0.', '.'), c * cellSize + 7.5, r * cellSize + 7.5);
+          ctx.fillText(val.toFixed(1).replace('0.', '.'), c * cellSize + 6, r * cellSize + 6);
         }
       }
     }
@@ -84,8 +84,8 @@ export const TensorGridPreview: React.FC = () => {
       // Scale mouse coordinates to [0..27] grid coordinates
       const scaleX = canvas.width / rect.width;
       const scaleY = canvas.height / rect.height;
-      const col = Math.floor((x * scaleX) / 15);
-      const row = Math.floor((y * scaleY) / 15);
+      const col = Math.floor((x * scaleX) / 12);
+      const row = Math.floor((y * scaleY) / 12);
 
       if (row >= 0 && row < 28 && col >= 0 && col < 28) {
         const val = preprocessedData[row * 28 + col];
@@ -93,7 +93,7 @@ export const TensorGridPreview: React.FC = () => {
         // Calculate tooltip position relative to canvas to ensure absolute stability and prevent container overflow
         const BUBBLE_W = 85;
         const BUBBLE_H = 36;
-        const tooltipX = x + BUBBLE_W + 12 > 420 ? x - BUBBLE_W - 8 : x + 8;
+        const tooltipX = x + BUBBLE_W + 12 > 336 ? x - BUBBLE_W - 8 : x + 8;
         const tooltipY = y - BUBBLE_H - 8 < 0 ? y + 15 : y - BUBBLE_H - 8;
 
         setTooltip({
@@ -144,8 +144,8 @@ export const TensorGridPreview: React.FC = () => {
       <div className="relative p-1.5 rounded-lg border border-border-muted bg-bg-canvas shadow-2xl">
         <canvas
           ref={canvasRef}
-          width={420}
-          height={420}
+          width={336}
+          height={336}
           className="rounded-lg cursor-crosshair block bg-black border border-border-subtle select-none"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
@@ -171,7 +171,7 @@ export const TensorGridPreview: React.FC = () => {
       </div>
 
       {/* Grid footer metrics */}
-      <div className="w-full max-w-[428px] flex items-center justify-between mt-3.5 px-1">
+      <div className="w-full max-w-[344px] flex items-center justify-between mt-3.5 px-1">
         <span className="text-[10px] font-mono text-text-muted uppercase">
           Grid: 28x28 Pixels
         </span>

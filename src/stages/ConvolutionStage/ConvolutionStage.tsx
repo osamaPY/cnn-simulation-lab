@@ -118,7 +118,7 @@ export const ConvolutionStage: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const cellSize = 15;
+    const cellSize = 12;
     for (let r = 0; r < 28; r++) {
       for (let c = 0; c < 28; c++) {
         const val = preprocessedData[r * 28 + c];
@@ -152,7 +152,7 @@ export const ConvolutionStage: React.FC = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    const cellSize = 6; // Compact cell size for 168x168 canvases
+    const cellSize = 5; // Compact cell size for 140x140 canvases
     let start = lastDrawnRef.current + 1;
     if (stepIndex < lastDrawnRef.current) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -180,8 +180,8 @@ export const ConvolutionStage: React.FC = () => {
   if (!preprocessedData) return null;
 
   // Math bubble details
-  const CANVAS_PX = 420;
-  const CELL = 15;
+  const CANVAS_PX = 336;
+  const CELL = 12;
   const BUBBLE_W = 110;
   const BUBBLE_H = 28;
   const frameWidth = hyperparams.kernelSize * CELL;
@@ -208,10 +208,10 @@ export const ConvolutionStage: React.FC = () => {
         <div className="flex flex-col items-center gap-3">
           <span className="text-[9px] font-mono text-white/30 uppercase tracking-[0.3em]">Input Plane</span>
           <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl rounded-lg">
-            <canvas ref={inputCanvasRef} width={420} height={420}
-              className="block h-[420px] w-[420px] bg-black rounded-md"
+            <canvas ref={inputCanvasRef} width={336} height={336}
+              className="block h-[336px] w-[336px] bg-black rounded-md"
             />
-            <KernelFrame stepIndex={stepIndex} cellSize={15} canvasSize={420} />
+            <KernelFrame stepIndex={stepIndex} cellSize={12} canvasSize={336} />
             {/* Math bubble */}
             <div
               className="absolute pointer-events-none z-30 bg-[#1c1c1c]/95 border border-white/10 rounded px-2 py-1 font-serif italic text-[10px] text-[#F5CD47] shadow-2xl flex items-center gap-1.5"
@@ -265,12 +265,12 @@ export const ConvolutionStage: React.FC = () => {
                 </span>
 
                 <div className="p-0.5 bg-black rounded border border-white/5">
-                  {/* outputDim * 6 is 168px */}
+                  {/* outputDim * 5 is 140px */}
                   <canvas
                     ref={canvasRef}
-                    width={outputDim * 6}
-                    height={outputDim * 6}
-                    className="block h-[168px] w-[168px] bg-black rounded"
+                    width={outputDim * 5}
+                    height={outputDim * 5}
+                    className="block h-[140px] w-[140px] bg-black rounded"
                   />
                 </div>
               </button>

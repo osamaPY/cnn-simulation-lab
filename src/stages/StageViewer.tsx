@@ -143,7 +143,7 @@ export function StageViewer() {
 
   return (
     // Reduced from p-8 sm:p-16 — gives stage visualizations ~80px more space
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-6 pointer-events-auto overflow-y-auto" id="stage-viewer">
+    <div className={`relative w-full h-full flex flex-col items-center justify-center pointer-events-auto overflow-y-auto ${(currentStageId === 9 || currentStageId === 10) ? 'p-0' : 'p-3 sm:p-6'}`} id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           className="w-full h-full flex flex-col items-center justify-center"

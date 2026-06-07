@@ -111,7 +111,7 @@ export function ReluStage() {
             <span>ReLU mapping</span>
             <span>{outputDim}×{outputDim}</span>
           </div>
-          <canvas ref={canvasRef} width={420} height={420} className="mx-auto block h-auto w-full max-w-[420px] rounded-xl bg-black border border-white/5" />
+          <canvas ref={canvasRef} width={336} height={336} className="mx-auto block h-auto w-full max-w-[336px] rounded-xl bg-black border border-white/5" />
         </div>
 
         {/* Right panel: animated graph + formula */}

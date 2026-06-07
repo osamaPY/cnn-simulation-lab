@@ -88,6 +88,8 @@ export const LessonShell: React.FC = () => {
   };
   const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
 
+  const isFullScreenStage = currentStageId === 9 || currentStageId === 10;
+
   // Listen to Escape key to close details modal
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -104,7 +106,11 @@ export const LessonShell: React.FC = () => {
       className="relative flex flex-col bg-[#161616] text-[#FFFEF0] font-sans"
       style={{ height: '100dvh', minWidth: '960px', overflow: 'hidden' }}
     >
-      <Header />
+      <div className={isFullScreenStage ? 'absolute top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 to-transparent pointer-events-none' : ''}>
+        <div className={isFullScreenStage ? 'pointer-events-auto opacity-40 hover:opacity-100 transition-opacity' : ''}>
+          <Header />
+        </div>
+      </div>
 
       <main
         className="flex-1 relative flex flex-col"
@@ -136,37 +142,39 @@ export const LessonShell: React.FC = () => {
                 >
                   {/* Stage viewer — takes available space */}
                   <div
-                    className="flex items-center justify-center stage-viewer-wrapper"
-                    style={{ flex: 1, minHeight: 0, overflow: 'hidden', padding: '4px' }}
+                    className={`flex items-center justify-center stage-viewer-wrapper ${isFullScreenStage ? 'p-0' : 'p-1'}`}
+                    style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
                   >
                     <StageViewer />
                   </div>
 
                   {/* Compact Stage Summary Bottom Bar */}
                   <div
-                    className="flex-shrink-0 flex items-center justify-between bg-black/45 border-t border-white/5 subtitle-explanation-wrapper"
-                    style={{ minHeight: '34px', padding: '0 16px', zIndex: 30 }}
+                    className={`${isFullScreenStage ? 'absolute bottom-20 left-4 z-40 bg-black/60 backdrop-blur-sm rounded-full px-4 border border-white/10' : 'flex-shrink-0 flex items-center justify-between bg-black/45 border-t border-white/5'} subtitle-explanation-wrapper`}
+                    style={{ minHeight: '34px', zIndex: 30 }}
                   >
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-white/50">
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-white/50 py-1.5">
                       <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: activeColor, boxShadow: `0 0 8px ${activeColor}bb` }} />
                       <span>Stage {currentStageId.toString().padStart(2, '0')}:</span>
                       <span className="text-white/80 font-bold uppercase tracking-wide">{activeStage?.name}</span>
                     </div>
 
-                    <button
-                      onClick={() => setShowDetails(true)}
-                      className="px-2.5 py-0.5 rounded text-[8.5px] font-mono uppercase tracking-widest border border-aurora-teal/30 hover:border-aurora-teal hover:bg-aurora-teal/10 transition-all cursor-pointer text-aurora-teal font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(88,196,221,0.05)] bg-[#161616]"
-                      type="button"
-                    >
-                      <span>Explanations & Formulas</span>
-                      <span className="text-[7.5px] text-white/40">↵</span>
-                    </button>
+                    {!isFullScreenStage && (
+                      <button
+                        onClick={() => setShowDetails(true)}
+                        className="px-2.5 py-0.5 rounded text-[8.5px] font-mono uppercase tracking-widest border border-aurora-teal/30 hover:border-aurora-teal hover:bg-aurora-teal/10 transition-all cursor-pointer text-aurora-teal font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(88,196,221,0.05)] bg-[#161616]"
+                        type="button"
+                      >
+                        <span>Explanations & Formulas</span>
+                        <span className="text-[7.5px] text-white/40">↵</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Right sidebar: glossary + hyperparams */}
                 <div
-                  className="flex-col border-l border-white/5 bg-[#161616] hidden md:flex right-sidebar-wrapper"
+                  className={`flex-col border-l border-white/5 bg-[#161616] ${isFullScreenStage ? 'hidden' : 'hidden md:flex'} right-sidebar-wrapper`}
                   style={{ width: '180px', minWidth: '180px', maxWidth: '180px', overflowY: 'auto', overflowX: 'hidden', padding: '8px 6px', gap: '8px' }}
                 >
                   {preprocessedData && (
@@ -184,8 +192,8 @@ export const LessonShell: React.FC = () => {
 
               {/* Player controls — always at bottom, never overflows */}
               <div
-                className="flex-shrink-0 w-full bg-[#1c1c1c] border-t border-white/5 player-controls-wrapper"
-                style={{ padding: '4px 16px 6px', zIndex: 40 }}
+                className={`${isFullScreenStage ? 'absolute bottom-4 left-1/2 -translate-x-1/2 z-50 bg-black/60 backdrop-blur-md rounded-2xl border border-white/10 w-auto min-w-[400px]' : 'flex-shrink-0 w-full bg-[#1c1c1c] border-t border-white/5'} player-controls-wrapper`}
+                style={{ padding: isFullScreenStage ? '8px 24px' : '4px 16px 6px', zIndex: 40 }}
               >
                 <PlayerControls />
               </div>
@@ -225,7 +233,7 @@ export const LessonShell: React.FC = () => {
                 
                 <button
                   onClick={() => setShowDetails(false)}
-                  className="text-[9px] font-mono uppercase text-white/40 hover:text-white/80 border border-white/10 rounded px-2.5 py-0.5 hover:bg-white/5 transition-all cursor-pointer bg-black/25"
+                  className="text-[9px] font-mono uppercase text-white/40 hover:text-white/80 border border-white/10 rounded px-2.5 py-1.5 hover:bg-white/5 transition-all cursor-pointer bg-black/25"
                   type="button"
                 >
                   Close (ESC)

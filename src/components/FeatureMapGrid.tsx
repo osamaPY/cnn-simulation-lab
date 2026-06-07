@@ -266,10 +266,10 @@ export const FeatureMapGrid: React.FC = () => {
         <div className="grid gap-6 lg:grid-cols-[1fr_210px] items-center w-full">
           
           {/* Left Panel: 3D Stack Viewport */}
-          <div className="flex flex-col items-center justify-center p-6 bg-black/30 border border-white/5 rounded-2xl relative overflow-hidden h-[360px] sm:h-[420px] md:h-[480px]">
+          <div className="flex flex-col items-center justify-center p-6 bg-black/30 border border-white/5 rounded-2xl relative overflow-hidden h-[280px] sm:h-[320px] md:h-[350px]">
             
             {/* 3D Perspective Stack Container */}
-            <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64" style={{ perspective: '800px' }}>
+            <div className="relative w-40 h-40 sm:w-44 sm:h-44 md:w-48 md:h-48" style={{ perspective: '800px' }}>
               <div 
                 className="absolute inset-0 transition-transform duration-100"
                 style={{ 
