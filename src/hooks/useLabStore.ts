@@ -30,6 +30,7 @@ interface LabState {
   hoveredDigit: number | null;
   learningMode: 'beginner' | 'mathematical' | 'examprep';
   showDetails: boolean;
+  showTuning: boolean;
 
   // Hyperparameters
   hyperparams: {
@@ -52,6 +53,7 @@ interface LabState {
   ) => void;
   setLearningMode: (mode: 'beginner' | 'mathematical' | 'examprep') => void;
   setShowDetails: (show: boolean) => void;
+  setShowTuning: (show: boolean) => void;
   
   // Activation Actions
   setSelectedActivationLayer: (layerName: string | null) => void;
@@ -89,6 +91,7 @@ export const useLabStore = create<LabState>((set, get) => ({
   hoveredDigit: null,
   learningMode: 'mathematical',
   showDetails: false,
+  showTuning: false,
 
   hyperparams: {
     kernelSize: 3,
@@ -106,6 +109,7 @@ export const useLabStore = create<LabState>((set, get) => ({
 
   setLearningMode: (mode) => set({ learningMode: mode }),
   setShowDetails: (show) => set({ showDetails: show }),
+  setShowTuning: (show) => set({ showTuning: show }),
 
   // Actions
   getActiveStageInfo: () => {
@@ -233,6 +237,7 @@ export const useLabStore = create<LabState>((set, get) => ({
       tfMemoryDebug: null,
       hoveredDigit: null,
       currentStageId: 1, // Reset to first stage
+      showTuning: false,
     });
   }
 }));

@@ -9,6 +9,78 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PlayerControls } from '../components/PlayerControls';
 import { HyperparamControls } from '../components/HyperparamControls';
 import { CNN_STAGES } from '../types/cnn';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+
+const STAGE_COLORS: Record<number, string> = {
+  1: '#58C4DD', 2: '#58C4DD', 3: '#58C4DD', 4: '#F5CD47', 5: '#83C167',
+  6: '#9C27B0', 7: '#FF6666', 8: '#E07A5F', 9: '#9C27B0',
+  10: '#58C4DD', 11: '#83C167', 12: '#FF6666',
+};
+
+const MinimalHyperparamControls: React.FC = () => {
+  const hyperparams = useLabStore(state => state.hyperparams);
+  const updateHyperparams = useLabStore(state => state.updateHyperparams);
+  const currentStageId = useLabStore(state => state.currentStageId);
+  const setCurrentStageId = useLabStore(state => state.setCurrentStageId);
+  const shouldReduceMotion = useReducedMotion();
+
+  const controls = [
+    { key: 'kernelSize', label: 'Kernel', min: 1, max: 7, step: 2 },
+    { key: 'stride', label: 'Stride', min: 1, max: 3, step: 1 },
+    { key: 'padding', label: 'Padding', min: 0, max: 3, step: 1 },
+    { key: 'poolingSize', label: 'Pool', min: 2, max: 4, step: 1 },
+    { key: 'numFilters', label: 'Filters', min: 4, max: 32, step: 4 },
+  ] as const;
+
+  const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
+
+  return (
+    <motion.div
+      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.95 }}
+      className="flex flex-col gap-3 p-4 bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl w-48 pointer-events-auto"
+    >
+      <div className="flex items-center justify-between border-b border-white/5 pb-1.5 mb-1">
+        <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/40">Parameters</span>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        {controls.map((ctrl) => {
+          const val = hyperparams[ctrl.key];
+          const pct = ((val - ctrl.min) / (ctrl.max - ctrl.min)) * 100;
+          
+          return (
+            <div key={ctrl.key} className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-center text-[8px] font-mono tracking-wider">
+                <span className="text-white/30 uppercase">{ctrl.label}</span>
+                <span style={{ color: activeColor }} className="font-bold">{val}</span>
+              </div>
+              <input
+                type="range"
+                min={ctrl.min}
+                max={ctrl.max}
+                step={ctrl.step}
+                value={val}
+                onChange={(e) => {
+                  const newVal = parseInt(e.target.value);
+                  updateHyperparams({ [ctrl.key]: newVal });
+                  if (ctrl.key === 'poolingSize') setCurrentStageId(7);
+                  else if (['kernelSize', 'stride', 'padding'].includes(ctrl.key)) setCurrentStageId(4);
+                  else if (ctrl.key === 'numFilters') setCurrentStageId(5);
+                }}
+                className="w-full h-0.5 rounded-full appearance-none cursor-pointer bg-white/10 accent-white"
+                style={{
+                  background: `linear-gradient(to right, ${activeColor} ${pct}%, rgba(255,255,255,0.1) ${pct}%)`
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+};
 
 function DrawScreen() {
   return (
@@ -79,6 +151,7 @@ export const LessonShell: React.FC = () => {
   const currentStageId   = useLabStore(state => state.currentStageId);
   const showDetails      = useLabStore(state => state.showDetails);
   const setShowDetails   = useLabStore(state => state.setShowDetails);
+  const showTuning       = useLabStore(state => state.showTuning);
 
   const activeStage = CNN_STAGES.find(s => s.id === currentStageId) || CNN_STAGES[0];
 
@@ -175,6 +248,15 @@ export const LessonShell: React.FC = () => {
               >
                 <PlayerControls />
               </div>
+
+              {/* Minimal Tuning Panel */}
+              <AnimatePresence>
+                {isFullScreenStage && showTuning && (
+                  <div className="absolute bottom-20 right-4 z-50">
+                    <MinimalHyperparamControls />
+                  </div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
         </AnimatePresence>

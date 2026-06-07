@@ -15,6 +15,8 @@ export const PlayerControls: React.FC = () => {
   const preprocessedData = useLabStore((state) => state.preprocessedData);
   const clearAll = useLabStore(state => state.clearAll);
   const setShowDetails = useLabStore(state => state.setShowDetails);
+  const showTuning = useLabStore(state => state.showTuning);
+  const setShowTuning = useLabStore(state => state.setShowTuning);
 
   const canGoNext = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
   const canGoBack = Boolean(preprocessedData) && currentStageId > 1;
@@ -110,6 +112,18 @@ export const PlayerControls: React.FC = () => {
               title="Explanations & Formulas"
             >
               ?
+            </button>
+
+            {/* Tuning Toggle */}
+            <button
+              onClick={() => setShowTuning(!showTuning)}
+              className={`w-5 h-5 flex items-center justify-center rounded-full border transition-all text-[8px] bg-white/5 font-mono ${
+                showTuning ? 'border-aurora-teal text-aurora-teal shadow-[0_0_8px_rgba(45,212,191,0.3)]' : 'border-white/10 text-white/30 hover:text-white hover:border-white/30'
+              }`}
+              type="button"
+              title="Tune Hyperparameters"
+            >
+              T
             </button>
 
             {/* NEXT */}
