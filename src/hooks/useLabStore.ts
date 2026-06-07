@@ -120,7 +120,7 @@ export const useLabStore = create<LabState>((set, get) => ({
   },
 
   resetHyperparams: () => {
-    set((state) => ({
+    set(() => ({
       hyperparams: { ...DEFAULT_HYPERPARAMS },
     }));
   },
