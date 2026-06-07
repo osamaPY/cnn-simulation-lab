@@ -154,7 +154,7 @@ export const DrawCanvas: React.FC = () => {
     } else {
       setPrediction(null);
     }
-    setCurrentStageId(2);
+    setCurrentStageId(1);
     scrollToStageViewer();
   };
 
