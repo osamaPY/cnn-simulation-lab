@@ -20,9 +20,9 @@ export const ExplanationPanel: React.FC = () => {
              initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
              animate={{ opacity: 1, x: 0 }}
              exit={shouldReduceMotion ? undefined : { opacity: 0, x: -20 }}
-             className="absolute top-0 right-0 pointer-events-auto"
+             className="absolute top-0 right-0 pointer-events-auto scale-90 origin-top-right"
            >
-             <div className="bg-black/60 backdrop-blur-xl rounded-2xl p-5 border border-white/10 shadow-[0_0_30px_rgba(100,50,255,0.15)] flex flex-col items-center">
+             <div className="bg-black/60 backdrop-blur-xl rounded-xl p-3 px-5 border border-white/10 shadow-[0_0_30px_rgba(100,50,255,0.15)] flex flex-col items-center">
                 <MathFormula formula={explanation.focusFormula} />
              </div>
            </motion.div>
@@ -30,17 +30,17 @@ export const ExplanationPanel: React.FC = () => {
        </AnimatePresence>
 
        {/* Bottom Center: Cinematic Subtitles */}
-       <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-8 pointer-events-none">
+       <div className="absolute bottom-0 left-0 right-0 flex justify-center pointer-events-none">
          <AnimatePresence mode="wait">
             <motion.div
               key={`subtitle-${currentStageId}`}
               initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={shouldReduceMotion ? undefined : { opacity: 0, y: -10 }}
-              className="max-w-3xl w-full"
+              className="max-w-2xl w-full"
             >
-              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 border border-white/5 text-center shadow-2xl mx-4">
-                <p className="text-lg md:text-xl text-white/90 font-serif leading-relaxed tracking-wide drop-shadow-md">
+              <div className="bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/5 text-center shadow-2xl mx-4">
+                <p className="text-sm md:text-base text-white/90 font-serif leading-relaxed tracking-wide drop-shadow-md">
                   {explanation.body}
                 </p>
               </div>

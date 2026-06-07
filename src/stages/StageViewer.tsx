@@ -83,26 +83,26 @@ export function StageViewer() {
 
     switch (currentStageId) {
       case 1:
-        return <div className="flex flex-col items-center justify-center w-full h-full scale-125"><PreprocessingPreview /></div>
+        return <div className="flex flex-col items-center justify-center w-full h-full"><PreprocessingPreview /></div>
       case 2:
       case 3:
-        return <div className="flex w-full h-full items-center justify-center scale-[1.15]"><TensorGridPreview /></div>
+        return <div className="flex w-full h-full items-center justify-center"><TensorGridPreview /></div>
       case 4:
       case 5:
       case 6:
-        return <div className="flex w-full h-full items-center justify-center scale-110"><ConvolutionStage /></div>
+        return <div className="flex w-full h-full items-center justify-center scale-95"><ConvolutionStage /></div>
       case 7:
-        return <div className="flex w-full h-full items-center justify-center scale-105"><FeatureMapGrid /></div>
+        return <div className="flex w-full h-full items-center justify-center"><FeatureMapGrid /></div>
       case 8:
-        return <div className="flex w-full h-full items-center justify-center scale-110"><ReluStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><ReluStage /></div>
       case 9:
-        return <div className="flex w-full h-full items-center justify-center scale-105"><PoolingStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><PoolingStage /></div>
       case 10:
-        return <div className="flex w-full h-full items-center justify-center scale-110"><FlattenStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><FlattenStage /></div>
       case 11:
         return <div className="flex w-full h-full items-center justify-center"><DenseStage /></div>
       case 12:
-        return <div className="flex w-full h-full items-center justify-center scale-110"><SoftmaxStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><SoftmaxStage /></div>
       case 13:
         return <div className="flex w-full h-full items-center justify-center"><PredictionStage /></div>
       default:
@@ -111,7 +111,7 @@ export function StageViewer() {
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center pb-20 pt-8 px-12 pointer-events-auto" id="stage-viewer">
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 sm:p-8 pointer-events-auto" id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           className="w-full h-full flex items-center justify-center"

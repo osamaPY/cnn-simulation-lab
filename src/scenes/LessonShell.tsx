@@ -21,13 +21,13 @@ export const LessonShell: React.FC = () => {
 
         {/* Floating Subtitles and Math - Absolute overlay */}
         {preprocessedData && (
-          <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-end p-8 pb-32">
+          <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-6 pb-28">
              <ExplanationPanel />
           </div>
         )}
 
         {/* The Cinematic Canvas */}
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 bottom-[140px] z-10 flex flex-col items-center justify-center overflow-hidden">
           {!preprocessedData ? (
              <motion.div 
                initial={{ opacity: 0, scale: 0.95 }}
