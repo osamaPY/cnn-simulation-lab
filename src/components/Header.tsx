@@ -29,23 +29,7 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mode Selector */}
-      <div className="grid w-full grid-cols-3 gap-1 rounded-md border border-border-muted bg-bg-deep p-1 xl:w-auto">
-        {modes.map((mode) => (
-          <button
-            key={mode.id}
-            onClick={() => setSelectedMode(mode.id)}
-            className={`min-h-11 rounded px-2 py-2 text-xs font-medium transition-all duration-200 cursor-pointer sm:px-3 ${
-              selectedMode === mode.id
-                ? 'bg-aurora-purple/15 text-aurora-purple border border-aurora-purple/50'
-                : 'text-text-secondary hover:text-text-primary hover:bg-white/5 border border-transparent'
-            }`}
-            title={mode.desc}
-          >
-            {mode.label}
-          </button>
-        ))}
-      </div>
+
 
       {/* Global Status Indicator */}
       <div className="flex w-fit items-center gap-3 rounded border border-border-muted bg-bg-deep px-3 py-2 text-xs">

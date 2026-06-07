@@ -6,23 +6,16 @@ import { CNN_STAGES } from '../types/cnn';
 import { scrollToStageViewer } from '../utils/scrollToStage';
 import { useTimelineStore } from '../animations/useTimeline';
 
-const paceOptions: { label: string; value: LessonPace }[] = [
-  { label: 'Quick', value: 8000 },
-  { label: 'Study', value: 12000 },
-  { label: 'Reflect', value: 18000 },
-];
+
 
 export function LessonDirector() {
   const currentStageId = useLabStore((state) => state.currentStageId);
   const setCurrentStageId = useLabStore((state) => state.setCurrentStageId);
   const preprocessedData = useLabStore((state) => state.preprocessedData);
   const isPlaying = useLessonDirector((state) => state.isPlaying);
-  const focusMode = useLessonDirector((state) => state.focusMode);
   const pace = useLessonDirector((state) => state.pace);
   const play = useLessonDirector((state) => state.play);
   const pause = useLessonDirector((state) => state.pause);
-  const toggleFocusMode = useLessonDirector((state) => state.toggleFocusMode);
-  const setPace = useLessonDirector((state) => state.setPace);
   const stage = CNN_STAGES[currentStageId - 1];
   const canPlay = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
 
@@ -59,11 +52,7 @@ export function LessonDirector() {
     if (!canPlay && isPlaying) pause();
   }, [canPlay, isPlaying, pause]);
 
-  const moveTo = (stageId: number) => {
-    pause();
-    setCurrentStageId(stageId);
-    scrollToStageViewer();
-  };
+
 
   return (
     <section className="lesson-director" aria-label="Guided lesson controls">
@@ -77,51 +66,13 @@ export function LessonDirector() {
 
       <div className="lesson-director__controls">
         <button
-          className="btn-secondary"
-          disabled={currentStageId === 1}
-          onClick={() => moveTo(currentStageId - 1)}
-          type="button"
-        >
-          Previous scene
-        </button>
-        <button
           className="btn-primary min-w-28"
           disabled={!canPlay}
           onClick={isPlaying ? pause : play}
           type="button"
         >
-          {isPlaying ? 'Pause lesson' : 'Play lesson'}
+          {isPlaying ? 'Pause lesson' : 'Play automated lesson'}
         </button>
-        <button
-          className="btn-secondary"
-          disabled={!preprocessedData || currentStageId === CNN_STAGES.length}
-          onClick={() => moveTo(currentStageId + 1)}
-          type="button"
-        >
-          Next scene
-        </button>
-        <button
-          aria-pressed={focusMode}
-          className={`btn-secondary ${focusMode ? 'lesson-director__active' : ''}`}
-          onClick={toggleFocusMode}
-          type="button"
-        >
-          {focusMode ? 'Show workspace' : 'Focus scene'}
-        </button>
-      </div>
-
-      <div className="lesson-director__pace" aria-label="Lesson pace">
-        {paceOptions.map((option) => (
-          <button
-            aria-pressed={pace === option.value}
-            className={pace === option.value ? 'lesson-director__pace-active' : ''}
-            key={option.value}
-            onClick={() => setPace(option.value)}
-            type="button"
-          >
-            {option.label}
-          </button>
-        ))}
       </div>
 
       <div className="lesson-director__track" aria-hidden="true">
