@@ -178,17 +178,7 @@ export const ExplanationPanel: React.FC = () => {
       {/* 2. Educational / Tutorial Content Card */}
       <div className="aurora-card p-4 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
-          {/* Badge */}
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[10px] font-mono bg-aurora-indigo/35 text-text-accent px-2 py-0.5 rounded border border-aurora-purple/20">
-              Chapter {currentStageId}
-            </span>
-          </div>
 
-          {/* Headline */}
-          <h2 className="text-xl font-semibold text-text-primary tracking-tight leading-snug mb-3">
-            {explanation.headline}
-          </h2>
 
           {/* Body */}
           <p className="text-sm text-text-secondary leading-relaxed mb-4">

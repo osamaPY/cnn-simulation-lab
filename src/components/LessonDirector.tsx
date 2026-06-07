@@ -16,7 +16,6 @@ export function LessonDirector() {
   const pace = useLessonDirector((state) => state.pace);
   const play = useLessonDirector((state) => state.play);
   const pause = useLessonDirector((state) => state.pause);
-  const stage = CNN_STAGES[currentStageId - 1];
   const canPlay = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
 
   useEffect(() => {
@@ -56,13 +55,7 @@ export function LessonDirector() {
 
   return (
     <section className="lesson-director" aria-label="Guided lesson controls">
-      <div className="lesson-director__story">
-        <span className="lesson-director__chapter">Scene {currentStageId} of {CNN_STAGES.length}</span>
-        <div className="min-w-0">
-          <strong>{stage.shortName}</strong>
-          <p>{stage.description}</p>
-        </div>
-      </div>
+
 
       <div className="lesson-director__controls">
         <button
@@ -71,7 +64,7 @@ export function LessonDirector() {
           onClick={isPlaying ? pause : play}
           type="button"
         >
-          {isPlaying ? 'Pause lesson' : 'Play automated lesson'}
+          {isPlaying ? 'Pause lesson' : 'Play lesson'}
         </button>
       </div>
 

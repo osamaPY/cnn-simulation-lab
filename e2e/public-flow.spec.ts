@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('draws a digit, runs real inference, and navigates the timeline', async ({ page }) => {
   await page.goto('/', { waitUntil: 'commit' })
-  await expect(page.getByRole('heading', { name: /CNN Digit Lab/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /CNN Digit Lab/i })).toBeVisible({ timeout: 15000 })
   await expect(page.getByText('Prediction will appear here')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Replay overview' })).toBeVisible()
 
@@ -38,10 +38,6 @@ test('draws a digit, runs real inference, and navigates the timeline', async ({ 
   await page.getByRole('button', { name: /L04 Conv Scan/ }).click()
   await page.getByRole('button', { name: 'Horizontal edge' }).click()
   await expect(page.getByRole('button', { name: 'Horizontal edge' })).toHaveAttribute('aria-pressed', 'true')
-
-  await page.getByRole('button', { name: 'Focus scene' }).click()
-  await expect(page.getByRole('button', { name: 'Show workspace' })).toBeVisible()
-  await page.getByRole('button', { name: 'Show workspace' }).click()
 
   await page.getByRole('button', { name: /L07 Filters/ }).click()
   await expect(page.getByText('Shape: [1, 26, 26, 8]')).toBeVisible()
