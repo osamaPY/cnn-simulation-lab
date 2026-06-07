@@ -27,6 +27,56 @@ const wordVariants = {
   }
 };
 
+const GLOSSARY_MAP: Record<number, { symbol: string; label: string; desc: string }[]> = {
+  1: [
+    { symbol: "x", label: "Pixel Value", desc: "Raw input pixel intensity [0, 255]" },
+    { symbol: "μ", label: "Mean (Centering)", desc: "Average brightness of the active bounds" },
+    { symbol: "σ", label: "StdDev (Scaling)", desc: "Standard deviation to normalize contrast" },
+  ],
+  3: [
+    { symbol: "[r, c]", label: "Pixel Coordinates", desc: "Row and column index in the 28x28 grid" },
+    { symbol: "v", label: "Activation value", desc: "Normalized floating point intensity [0.0, 1.0]" },
+  ],
+  4: [
+    { symbol: "I", label: "Input plane", desc: "The preprocessed 28x28 grid of pixels" },
+    { symbol: "K", label: "3x3 Kernel weights", desc: "Sliding filter matrix extracting features" },
+    { symbol: "b", label: "Bias offset", desc: "Constant shift added to output" },
+  ],
+  5: [
+    { symbol: "I", label: "Input plane", desc: "The preprocessed 28x28 grid of pixels" },
+    { symbol: "K_c", label: "Kernel Stack", desc: "Multiple unique filters applied in parallel" },
+    { symbol: "C", label: "Depth Channels", desc: "Number of feature maps generated (8 or 16)" },
+  ],
+  6: [
+    { symbol: "x", label: "Pre-activation", desc: "Raw activation value from convolution filter" },
+    { symbol: "f(x)", label: "Rectified Output", desc: "Keeps positive values, clips negative values to 0" },
+  ],
+  7: [
+    { symbol: "X", label: "Feature Map", desc: "Input map of dimension 26x26 before pooling" },
+    { symbol: "s", label: "Stride step", desc: "Step size the pool window jumps (2 pixels)" },
+    { symbol: "max", label: "Max pooling", desc: "Retains only the strongest feature in a 2x2 grid" },
+  ],
+  8: [
+    { symbol: "H×W×C", label: "3D Grid Shape", desc: "Height, Width, and Channel depth of maps" },
+    { symbol: "D", label: "1D Length", desc: "Total flattened items: 5 × 5 × 16 = 400 elements" },
+  ],
+  9: [
+    { symbol: "a_j", label: "Input activation", desc: "Activation value from the flattened vector" },
+    { symbol: "w_ji", label: "Connection Weight", desc: "Synaptic connection strength between neurons" },
+    { symbol: "b_i", label: "Neuron Bias", desc: "Activation threshold for output neuron i" },
+  ],
+  10: [
+    { symbol: "z_i", label: "Raw Score (Logit)", desc: "Raw weighted sum output for class digit i" },
+    { symbol: "e^{z_i}", label: "Exponentiation", desc: "Amplifies highest scores and ensures positive value" },
+    { symbol: "Σ e^{z_j}", label: "Sum (Normalization)", desc: "Sum of all exponents; normalizes total to 100%" },
+  ],
+  12: [
+    { symbol: "W", label: "Weights matrix", desc: "Learnable filter values being optimized" },
+    { symbol: "η", label: "Learning Rate", desc: "Step size scaling gradient updates" },
+    { symbol: "∂L/∂W", label: "Gradient slope", desc: "Calculated error direction for minimizing loss" },
+  ]
+};
+
 export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles' }> = ({ mode = 'all' }) => {
   const currentStageId = useLabStore((state) => state.currentStageId);
   const shouldReduceMotion = useReducedMotion();
@@ -52,14 +102,32 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
             className="w-full pointer-events-auto"
           >
             <div
-              className="bg-[#1c1c1c] rounded-sm border border-white/5 flex flex-col items-center gap-3"
+              className="bg-[#1c1c1c] rounded-sm border border-white/5 flex flex-col items-center gap-3 w-full min-w-0 formula-card"
               style={{ padding: '16px 12px' }}
             >
               <MathFormula formula={explanation.focusFormula!} />
+              
+              {GLOSSARY_MAP[currentStageId] && (
+                <div className="flex flex-col w-full gap-1.5 mt-1 pt-2 border-t border-white/5">
+                  <div className="text-[8px] font-mono text-white/20 uppercase tracking-widest text-center mb-1 font-bold">Glossary</div>
+                  <div className="flex flex-col gap-1 w-full">
+                    {GLOSSARY_MAP[currentStageId].map((item, idx) => (
+                      <div key={idx} className="flex items-start justify-between text-[9px] font-mono gap-2 hover:bg-white/[0.02] p-1 rounded transition-colors group">
+                        <span className="text-[#58C4DD] font-bold shrink-0">{item.symbol}</span>
+                        <div className="flex flex-col items-end text-right">
+                          <span className="text-white/60 font-semibold uppercase text-[8px] tracking-wider">{item.label}</span>
+                          <span className="text-white/30 text-[8px] leading-tight mt-0.5 group-hover:text-white/50 transition-colors">{item.desc}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {explanation.keyTakeaway && (
-                <div className="flex flex-col items-center gap-2 w-full">
+                <div className="flex flex-col items-center gap-2 w-full mt-1">
                   <div className="w-8 h-[1px] bg-white/10" />
-                  <p className="text-[10px] font-mono text-center leading-relaxed uppercase tracking-widest text-white/30" style={{ maxWidth: '200px' }}>
+                  <p className="text-[9px] font-mono text-center leading-relaxed uppercase tracking-widest text-white/30" style={{ maxWidth: '200px' }}>
                     {explanation.keyTakeaway}
                   </p>
                 </div>

@@ -78,9 +78,9 @@ export const BackpropStage: React.FC = () => {
   }, [progress]);
 
   return (
-    <div className="flex flex-col gap-5 w-full max-w-[820px] items-center px-4">
+    <div className="flex flex-col gap-4 w-full max-w-[820px] items-center px-4 backprop-stage-wrapper">
       <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-5 w-full">
-        <div className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+        <div className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl backprop-graph-container">
           <svg viewBox="0 0 800 400" className="w-full h-full select-none z-10" preserveAspectRatio="xMidYMid meet">
             <defs>
               <filter id="node-glow" x="-35%" y="-35%" width="170%" height="170%">

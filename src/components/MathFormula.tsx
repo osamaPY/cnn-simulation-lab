@@ -14,5 +14,5 @@ export function MathFormula({ formula }: { formula: string }) {
     }
   }, [formula])
 
-  return <div ref={containerRef} className="py-2" />
+  return <div ref={containerRef} className="py-2 w-full overflow-x-auto no-scrollbar" style={{ minWidth: 0 }} />
 }

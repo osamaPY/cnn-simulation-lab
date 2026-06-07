@@ -113,7 +113,7 @@ export const LessonShell: React.FC = () => {
                 >
                   {/* Stage viewer — takes available space */}
                   <div
-                    className="flex items-center justify-center"
+                    className="flex items-center justify-center stage-viewer-wrapper"
                     style={{ flex: 1, minHeight: 0, overflow: 'hidden', padding: '12px' }}
                   >
                     <StageViewer />
@@ -121,7 +121,7 @@ export const LessonShell: React.FC = () => {
 
                   {/* Subtitle / explanation text — fixed height, no overflow */}
                   <div
-                    className="flex-shrink-0 flex items-center justify-center bg-black/20 border-t border-white/5"
+                    className="flex-shrink-0 flex items-center justify-center bg-black/20 border-t border-white/5 subtitle-explanation-wrapper"
                     style={{ minHeight: '72px', maxHeight: '110px', padding: '10px 24px', zIndex: 30 }}
                   >
                     <ExplanationPanel mode="subtitles" />
@@ -130,7 +130,7 @@ export const LessonShell: React.FC = () => {
 
                 {/* Right sidebar: formula + hyperparams */}
                 <div
-                  className="flex-col border-l border-white/5 bg-[#161616] hidden md:flex"
+                  className="flex-col border-l border-white/5 bg-[#161616] hidden md:flex right-sidebar-wrapper"
                   style={{ width: '280px', minWidth: '280px', maxWidth: '280px', overflowY: 'auto', overflowX: 'hidden', padding: '20px', gap: '24px' }}
                 >
                   {preprocessedData && (
@@ -148,7 +148,7 @@ export const LessonShell: React.FC = () => {
 
               {/* Player controls — always at bottom, never overflows */}
               <div
-                className="flex-shrink-0 w-full bg-[#1c1c1c] border-t border-white/5"
+                className="flex-shrink-0 w-full bg-[#1c1c1c] border-t border-white/5 player-controls-wrapper"
                 style={{ padding: '12px 32px 16px', zIndex: 40 }}
               >
                 <PlayerControls />

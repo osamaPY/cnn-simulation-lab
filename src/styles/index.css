@@ -80,6 +80,29 @@
   /* 3B1B KaTeX Theming */
   .katex-display {
     margin: 0.5em 0 !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    display: flex !important;
+    justify-content: safe center !important;
+    scrollbar-width: none;
+  }
+
+  .katex-display::-webkit-scrollbar {
+    display: none;
+  }
+
+  .formula-card .katex {
+    font-size: 0.85em !important; /* Scale down formula inside sidebar to fit better */
+  }
+
+  /* Utility to hide scrollbar but keep scrollability */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
 
   .katex {
@@ -686,3 +709,48 @@
     background: rgba(255, 255, 255, 0.2);
   }
 }
+
+/* 0 to Hero responsive height styling overrides */
+@media (max-height: 850px) {
+  header {
+    padding: 6px 16px !important;
+  }
+  .stage-viewer-wrapper {
+    padding: 4px !important;
+  }
+  .subtitle-explanation-wrapper {
+    min-height: 52px !important;
+    max-height: 74px !important;
+    padding: 4px 16px !important;
+  }
+  .subtitle-explanation-wrapper p,
+  .subtitle-explanation-wrapper span {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+  .right-sidebar-wrapper {
+    padding: 10px 14px !important;
+    gap: 12px !important;
+  }
+  .right-sidebar-wrapper > div {
+    padding-top: 10px !important;
+  }
+  .player-controls-wrapper {
+    padding: 6px 20px 8px !important;
+  }
+  .dense-graph-container,
+  .backprop-graph-container {
+    height: 250px !important;
+  }
+  .feature-map-stack-container {
+    height: 240px !important;
+  }
+  .feature-map-grid-wrapper {
+    gap: 12px !important;
+  }
+  .dense-stage-wrapper,
+  .backprop-stage-wrapper {
+    gap: 12px !important;
+  }
+}
+

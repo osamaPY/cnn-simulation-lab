@@ -13,6 +13,8 @@ const DEFAULT_HYPERPARAMS = {
 export const HyperparamControls: React.FC = () => {
   const hyperparams = useLabStore(state => state.hyperparams);
   const updateHyperparams = useLabStore(state => state.updateHyperparams);
+  const currentStageId = useLabStore(state => state.currentStageId);
+  const setCurrentStageId = useLabStore(state => state.setCurrentStageId);
 
   const [activeInfo, setActiveInfo] = React.useState<string | null>(null);
 
@@ -51,10 +53,19 @@ export const HyperparamControls: React.FC = () => {
       <div className="flex flex-col gap-2">
         {controls.map((ctrl) => {
           const pct = ((hyperparams[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100;
+          const isActiveForStage = 
+            (currentStageId === 4 && ['kernelSize', 'stride', 'padding'].includes(ctrl.key)) ||
+            (currentStageId === 5 && ctrl.key === 'numFilters') ||
+            (currentStageId === 7 && ctrl.key === 'poolingSize');
+
           return (
             <div
               key={ctrl.key}
-              className="flex flex-col gap-1.5 p-2.5 rounded-lg bg-white/[0.03] border border-white/5 hover:border-aurora-purple/20 transition-all group relative"
+              className={`flex flex-col gap-1.5 p-2.5 rounded-lg bg-white/[0.03] border transition-all duration-300 group relative ${
+                isActiveForStage 
+                  ? 'border-aurora-purple bg-aurora-purple/[0.02] shadow-[0_0_12px_rgba(88,196,221,0.1)]' 
+                  : 'border-white/5 hover:border-aurora-purple/20'
+              }`}
               onMouseEnter={() => setActiveInfo(ctrl.description)}
               onMouseLeave={() => setActiveInfo(null)}
             >
@@ -78,7 +89,18 @@ export const HyperparamControls: React.FC = () => {
                   max={ctrl.max}
                   step={ctrl.step}
                   value={hyperparams[ctrl.key]}
-                  onChange={(e) => updateHyperparams({ [ctrl.key]: parseInt(e.target.value) })}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    updateHyperparams({ [ctrl.key]: val });
+                    // Auto-navigate to the correct visual stage
+                    if (ctrl.key === 'poolingSize') {
+                      setCurrentStageId(7);
+                    } else if (['kernelSize', 'stride', 'padding'].includes(ctrl.key)) {
+                      setCurrentStageId(4);
+                    } else if (ctrl.key === 'numFilters') {
+                      setCurrentStageId(5);
+                    }
+                  }}
                   className="hyperparam-slider w-full h-1 rounded-lg appearance-none cursor-pointer"
                   style={{
                     background: `linear-gradient(to right, #58C4DD ${pct}%, rgba(255,255,255,0.08) ${pct}%)`,

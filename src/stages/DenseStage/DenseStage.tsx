@@ -148,7 +148,7 @@ export const DenseStage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-10 w-full max-w-[900px] items-center px-8 py-4">
+    <div className="flex flex-col gap-6 w-full max-w-[900px] items-center px-8 py-2 dense-stage-wrapper">
       {/* Top Controls */}
       <div className="flex justify-start w-full items-center mb-2">
         <button
@@ -164,7 +164,7 @@ export const DenseStage: React.FC = () => {
       </div>
 
       {/* Main Graph Area */}
-      <div className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+      <div className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl dense-graph-container">
         <svg
           viewBox="0 0 800 460"
           className="w-full h-full select-none z-10"

@@ -71,17 +71,23 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
 
 const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord[], selectedLayer: string }) => {
   const currentRecord = records.find(r => r.layerName === selectedLayer) || records[0];
+  const hyperparams = useLabStore(state => state.hyperparams);
   const shape = currentRecord.shape;
   const numChannels = shape.length === 4 ? shape[3] : 0;
   const dim = shape.length === 4 ? shape[1] : 0;
+
+  // Determine target filters based on layer block
+  const isBlock2 = selectedLayer.includes('2') || selectedLayer.includes('Block 2') || selectedLayer.toLowerCase().includes('maxpool2d_1') || selectedLayer.toLowerCase().includes('conv2d_1');
+  const targetNumFilters = isBlock2 ? hyperparams.numFilters * 2 : hyperparams.numFilters;
   
   return (
-    <div className="relative h-[280px] sm:h-[340px] md:h-[400px] w-full flex items-center justify-center perspective-[1200px]">
+    <div className="relative h-[280px] sm:h-[340px] md:h-[400px] w-full flex items-center justify-center perspective-[1200px] feature-map-stack-container">
       <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-100">
-        {Array.from({ length: Math.min(numChannels, 12) }).map((_, i) => {
+        {Array.from({ length: Math.min(targetNumFilters, 12) }).map((_, i) => {
           // Sample a small grid from the actual feature map
           const channelData = new Float32Array(dim * dim);
-          for(let j=0; j<dim*dim; j++) channelData[j] = currentRecord.values[j * numChannels + i];
+          const actChannelIdx = i % numChannels;
+          for(let j=0; j<dim*dim; j++) channelData[j] = currentRecord.values[j * numChannels + actChannelIdx];
           
           return (
             <motion.div
@@ -151,6 +157,8 @@ export const FeatureMapGrid: React.FC = () => {
     );
   }
 
+  const hyperparams = useLabStore(state => state.hyperparams);
+
   // Get active record
   const currentRecord = activations.find(r => r.layerName === selectedActivationLayer) || activations[0];
   
@@ -162,12 +170,16 @@ export const FeatureMapGrid: React.FC = () => {
   const width = is2D ? 1 : shape[2];
   const numChannels = is2D ? shape[1] : shape[3];
 
+  // Determine target filters based on layer block
+  const isBlock2 = selectedActivationLayer?.includes('2') || selectedActivationLayer?.includes('Block 2') || selectedActivationLayer?.toLowerCase().includes('maxpool2d_1') || selectedActivationLayer?.toLowerCase().includes('conv2d_1');
+  const targetNumFilters = is2D ? numChannels : (isBlock2 ? hyperparams.numFilters * 2 : hyperparams.numFilters);
+
   // Grid pagination settings (show 8 maps at a time)
   const channelsPerPage = 8;
-  const totalPages = Math.ceil(numChannels / channelsPerPage);
+  const totalPages = Math.ceil(targetNumFilters / channelsPerPage);
   const safePage = Math.min(page, Math.max(0, totalPages - 1));
   const startIdx = safePage * channelsPerPage;
-  const endIdx = Math.min(startIdx + channelsPerPage, numChannels);
+  const endIdx = Math.min(startIdx + channelsPerPage, targetNumFilters);
 
   // Make list of channels currently on screen
   const visibleChannelIndices = Array.from(
@@ -176,7 +188,7 @@ export const FeatureMapGrid: React.FC = () => {
   );
 
   return (
-    <div className="w-full flex flex-col gap-10">
+    <div className="w-full flex flex-col gap-6 feature-map-grid-wrapper">
       {/* Selector Tabs for Layers */}
       <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-border-subtle pb-3">
         <div className="flex flex-wrap gap-1.5">
@@ -278,7 +290,7 @@ export const FeatureMapGrid: React.FC = () => {
                     values={currentRecord.values}
                     width={width}
                     height={height}
-                    channelIndex={chIdx}
+                    channelIndex={chIdx % numChannels}
                     numChannels={numChannels}
                     globalMin={currentRecord.min}
                     globalMax={currentRecord.max}
@@ -294,7 +306,7 @@ export const FeatureMapGrid: React.FC = () => {
           {totalPages > 1 && (
             <div className="flex items-center justify-between border-t border-border-subtle pt-3 mt-1">
               <span className="text-[10px] font-mono text-text-muted">
-                Showing Filters {startIdx}-{endIdx - 1} of {numChannels}
+                Showing Filters {startIdx}-{endIdx - 1} of {targetNumFilters}
               </span>
               <div className="flex gap-2">
                 <button

@@ -179,7 +179,7 @@ export const PlayerControls: React.FC = () => {
         </div>
 
         {/* Center: Timeline player controls (conditional) */}
-        {[3, 4, 6, 7, 8, 9, 12].includes(currentStageId) && preprocessedData && (
+        {[4, 6, 7, 8, 9, 12].includes(currentStageId) && preprocessedData && (
           <div className="hidden sm:flex items-center gap-3 bg-white/[0.02] border border-white/5 px-4 py-1.5 rounded-full backdrop-blur-md">
             {/* Play/Pause Button */}
             <button
