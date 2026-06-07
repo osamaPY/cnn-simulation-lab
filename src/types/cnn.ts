@@ -16,7 +16,7 @@ export interface PredictionResult {
 export const CNN_STAGES: StageInfo[] = [
   {
     id: 1,
-    name: "Input Normalization",
+    name: "Standardizing the Image",
     shortName: "Input",
     description: "The raw user drawing is cropped to its bounding box, centered by its center of mass, and rescaled to a canonical 28x28 grayscale coordinate system.",
     shapeLabel: "28 × 28"
@@ -72,14 +72,14 @@ export const CNN_STAGES: StageInfo[] = [
   },
   {
     id: 9,
-    name: "Dense Layer Integration",
+    name: "Making Connections",
     shortName: "Dense",
     description: "A fully connected layer performs a global linear transformation (Wx + b) to correlate local features into high-level semantic class scores.",
     shapeLabel: "64"
   },
   {
     id: 10,
-    name: "Softmax Normalization",
+    name: "Calculating Certainty",
     shortName: "Softmax",
     description: "Logits are transformed via exponentiation and normalization into a probability distribution over the discrete 0-9 class space.",
     shapeLabel: "10"

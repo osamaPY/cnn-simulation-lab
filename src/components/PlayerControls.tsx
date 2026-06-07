@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLabStore } from '../hooks/useLabStore';
 import { CNN_STAGES } from '../types/cnn';
-import { useTimelineStore } from '../animations/useTimeline';
 
 const STAGE_COLORS: Record<number, string> = {
   1: '#58C4DD', 2: '#58C4DD', 3: '#58C4DD', 4: '#F5CD47', 5: '#83C167',
@@ -18,21 +17,8 @@ export const PlayerControls: React.FC = () => {
 
   const [kbHint, setKbHint] = useState(false);
 
-  const isPlaying = useTimelineStore((state) => state.isPlaying);
-  const play = useTimelineStore((state) => state.play);
-  const pause = useTimelineStore((state) => state.pause);
-  const stepIndex = useTimelineStore((state) => state.stepIndex);
-  const totalSteps = useTimelineStore((state) => state.totalSteps);
-  const seek = useTimelineStore((state) => state.seek);
-
   const canGoNext = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
   const canGoBack = Boolean(preprocessedData) && currentStageId > 1;
-
-  useEffect(() => {
-    const timeline = useTimelineStore.getState();
-    timeline.reset();
-    timeline.play();
-  }, [currentStageId]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -173,49 +159,6 @@ export const PlayerControls: React.FC = () => {
             NEXT →
           </button>
         </div>
-
-        {/* Center: Timeline player controls (conditional) */}
-        {[4, 6, 7, 8, 9, 12].includes(currentStageId) && preprocessedData && (
-          <div className="flex items-center gap-2 bg-white/[0.02] border border-white/5 px-3 py-1 rounded-full backdrop-blur-md">
-            {/* Play/Pause Button */}
-            <button
-              onClick={() => isPlaying ? pause() : play()}
-              className="text-white/60 hover:text-white transition-colors cursor-pointer w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/5 active:scale-95"
-              type="button"
-              title={isPlaying ? "Pause animation" : "Play animation"}
-            >
-              {isPlaying ? (
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-                </svg>
-              ) : (
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              )}
-            </button>
-
-            {/* Visual Scrubber Slider */}
-            <input
-              type="range"
-              min={0}
-              max={totalSteps - 1}
-              value={stepIndex}
-              onChange={(e) => seek(parseInt(e.target.value))}
-              className="w-16 sm:w-20 md:w-28 h-1 bg-white/15 rounded-lg appearance-none cursor-pointer accent-white hover:accent-aurora-purple transition-all"
-              style={{
-                outline: 'none',
-                color: '#58C4DD',
-              }}
-              title="Drag to scrub animation"
-            />
-
-            {/* Frame/Step Display */}
-            <span className="text-[8.5px] font-mono text-white/30 select-none min-w-[30px] text-right tracking-tighter">
-              {stepIndex + 1}/{totalSteps}
-            </span>
-          </div>
-        )}
 
         {/* Right side: stage label or finish */}
         <div className="flex items-center gap-2">

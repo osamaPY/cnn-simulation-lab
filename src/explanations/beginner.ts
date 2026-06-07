@@ -2,7 +2,7 @@ import type { ExplanationContent } from './index';
 
 export const beginnerExplanations: Record<number, ExplanationContent> = {
   1: {
-    headline: "Centering & Resizing",
+    headline: "Standardizing the Image",
     body: "Standardizes input data by cropping white space and centering the digit. This ensures the model processes the digit at a consistent scale and position, improving inference reliability.",
     interactiveGoal: "Draw a digit on the left and start the simulation.",
     keyTakeaway: "Enforces scale and translation invariance prior to feature extraction."
@@ -50,13 +50,13 @@ export const beginnerExplanations: Record<number, ExplanationContent> = {
     keyTakeaway: "Flattening links spatial feature extraction with global decision-making."
   },
   9: {
-    headline: "Global Integration",
+    headline: "Making Connections",
     body: "Neurons in the dense layer compute weighted sums of the entire feature vector. This stage integrates local features into global concepts to determine class membership.",
     interactiveGoal: "Inspect how global features contribute to specific digit activations.",
     keyTakeaway: "Dense layers perform high-level reasoning across all combined features."
   },
   10: {
-    headline: "Probability Normalization",
+    headline: "Calculating Certainty",
     body: "Converts raw class scores into a normalized probability distribution using the Softmax function. All outputs sum to 1.0, representing the model's relative confidence.",
     interactiveGoal: "Watch as raw scores are transformed into a competitive probability distribution.",
     keyTakeaway: "Softmax provides an interpretable confidence score for each class."

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { useLabStore } from '../../hooks/useLabStore';
 import { useTimeline } from '../../animations/useTimeline';
 import { KernelFrame } from '../../animations/KernelFrame';

@@ -2,7 +2,7 @@ import type { ExplanationContent } from './index';
 
 export const mathExplanations: Record<number, ExplanationContent> = {
   1: {
-    headline: "Spatial Normalization",
+    headline: "Standardizing the Image",
     body: "Before the network can learn shape, it first needs consistency. Your drawing may be too high, too low, too small, or off to one side, so this step recenters the digit and rescales it into a stable frame. Think of it as placing every handwritten number on the same invisible stage before the real feature extraction begins. Without this alignment, the CNN would waste effort learning position quirks instead of learning what makes a 3 look like a 3.",
     focusFormula: "x_{centered} = S \\cdot (x - x_{centroid}) + 14",
     interactiveGoal: "Observe how the drawing is translated and scaled into a canonical reference frame.",
@@ -58,14 +58,14 @@ export const mathExplanations: Record<number, ExplanationContent> = {
     keyTakeaway: "Flattening converts structured feature maps into a form dense layers can score globally."
   },
   9: {
-    headline: "Matrix-Vector Product",
+    headline: "Making Connections",
     body: "Dense layers combine evidence from across the entire image at once. Each neuron looks at the flattened vector through its own learned weight pattern and decides how strongly the current digit matches a higher-level concept. You can think of these neurons as judges that weigh many clues simultaneously: top curve, bottom loop, stroke thickness, central gap, and more. This is where local features start turning into semantic guesses such as maybe this is a 5, maybe it is a 3.",
     focusFormula: "a = \\max(0, W_1 \\cdot x + b_1)",
     interactiveGoal: "See how many inputs contribute to each hidden neuron and how global evidence is combined.",
     keyTakeaway: "Dense layers perform global reasoning by combining many extracted features at once."
   },
   10: {
-    headline: "Softmax Normalization",
+    headline: "Calculating Certainty",
     body: "The dense layer outputs raw scores called logits, but logits are not probabilities yet. Softmax transforms those competing scores into a distribution that sums to 1, making the model's confidence interpretable. A slightly stronger logit becomes much more persuasive after exponentiation, so softmax amplifies relative advantage while still forcing all classes to compete for the same total mass. This is the point where the network stops saying score and starts saying belief.",
     focusFormula: "\\sigma(z)_i = \\frac{e^{z_i}}{\\sum e^{z_j}}",
     interactiveGoal: "Watch unbounded logits convert into a normalized probability distribution over digits 0 through 9.",

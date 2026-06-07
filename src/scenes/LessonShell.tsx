@@ -218,7 +218,7 @@ export const LessonShell: React.FC = () => {
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 35, opacity: 0, scale: 0.98 }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="max-w-4xl w-full bg-[#121212]/95 border border-white/10 rounded-2xl p-6 shadow-2xl relative flex flex-col gap-5"
+              className="max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-[#121212]/95 border border-white/10 rounded-2xl p-6 shadow-2xl relative flex flex-col gap-5 no-scrollbar"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

@@ -2,7 +2,7 @@ import type { ExplanationContent } from './index';
 
 export const examExplanations: Record<number, ExplanationContent> = {
   1: {
-    headline: "Spatial Normalization",
+    headline: "Standardizing the Image",
     body: "Centering the digit's center of mass at coordinate (14, 14) and scaling its bounding box to fit within a canonical 20x20 area inside the 28x28 grid ensures scale-invariance and translation-invariance during network evaluation.",
     interactiveGoal: "Learn: Centering centroid at (14, 14) prevents spatial shift errors during inference.",
     keyTakeaway: "Standardizes input coordinates to remove translation and scaling offsets."
@@ -50,13 +50,13 @@ export const examExplanations: Record<number, ExplanationContent> = {
     keyTakeaway: "Converts spatial feature representations into flat arrays compatible with dense layers."
   },
   9: {
-    headline: "Fully Connected Parameters",
+    headline: "Making Connections",
     body: "Computes linear combination a = Wx + b. Parameters calculated as (Inputs * Outputs) + Outputs. From 400 inputs to 64 hidden neurons: (400 * 64) + 64 = 25,664. Learns global representations.",
     interactiveGoal: "Practice: Calculate weight matrix dimensions and bias vectors for fully connected projections.",
     keyTakeaway: "Dense layers perform global linear mapping across all combined features."
   },
   10: {
-    headline: "Softmax Definition & Probability Simplex",
+    headline: "Calculating Certainty",
     body: "Takes raw logits z_i and computes probabilities: exp(z_i) / sum(exp(z_j)). Ensures outputs lie on the probability simplex (all values in [0, 1] and sum to 1.0). Exponentiation accentuates highest scores.",
     interactiveGoal: "Formula: p_i = e^{z_i} / sum(e^{z_j}). Softmax is the multi-class generalization of logistic sigmoid.",
     keyTakeaway: "Maps unbounded real logit vectors into a normalized probability distribution."
