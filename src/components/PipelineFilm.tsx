@@ -80,59 +80,67 @@ export function PipelineFilm() {
           <h2>From ink to probability</h2>
           <p>A short visual overview before you inspect every transformation.</p>
         </div>
-        <button className="btn-secondary" onClick={() => setReplayKey((key) => key + 1)} type="button">
-          Replay overview
+        <button
+          className="btn-secondary"
+          onClick={() => setReplayKey((key) => key + 1)}
+          type="button"
+          aria-label="Replay the animated CNN pipeline overview from the start"
+        >
+          ↺ Replay
         </button>
       </header>
 
-      <div className="pipeline-film__scene" key={replayKey} ref={sceneRef}>
-        <div className="pipeline-film__act pipeline-film__input">
-          <span>01 Input</span>
-          <div className="pipeline-film__pixel-grid">
-            {pixels.map((pixel) => <i className="pipeline-film__pixel" key={pixel} />)}
-            <b className="pipeline-film__kernel" />
+      {/* scene-wrapper enables horizontal scroll on small containers */}
+      <div className="pipeline-film__scene-wrapper">
+        <div className="pipeline-film__scene" key={replayKey} ref={sceneRef}>
+          <div className="pipeline-film__act pipeline-film__input">
+            <span>01 Input</span>
+            <div className="pipeline-film__pixel-grid">
+              {pixels.map((pixel) => <i className="pipeline-film__pixel" key={pixel} />)}
+              <b className="pipeline-film__kernel" />
+            </div>
           </div>
-        </div>
 
-        <svg className="pipeline-film__connector" viewBox="0 0 160 40" aria-hidden="true">
-          <path className="pipeline-film__path" d="M4 20 C48 20 72 20 156 20" />
-        </svg>
+          <svg className="pipeline-film__connector" viewBox="0 0 160 40" aria-hidden="true">
+            <path className="pipeline-film__path" d="M4 20 C48 20 72 20 156 20" />
+          </svg>
 
-        <div className="pipeline-film__act">
-          <span>02 Features</span>
-          <div className="pipeline-film__maps">
-            {maps.map((map) => <i className="pipeline-film__map" key={map} />)}
+          <div className="pipeline-film__act">
+            <span>02 Features</span>
+            <div className="pipeline-film__maps">
+              {maps.map((map) => <i className="pipeline-film__map" key={map} />)}
+            </div>
           </div>
-        </div>
 
-        <svg className="pipeline-film__connector" viewBox="0 0 160 40" aria-hidden="true">
-          <path className="pipeline-film__path" d="M4 20 C48 20 72 20 156 20" />
-        </svg>
+          <svg className="pipeline-film__connector" viewBox="0 0 160 40" aria-hidden="true">
+            <path className="pipeline-film__path" d="M4 20 C48 20 72 20 156 20" />
+          </svg>
 
-        <div className="pipeline-film__act">
-          <span>03 Evidence</span>
-          <div className="pipeline-film__vector">
-            {pixels.slice(0, 18).map((cell) => <i className="pipeline-film__vector-cell" key={cell} />)}
+          <div className="pipeline-film__act">
+            <span>03 Evidence</span>
+            <div className="pipeline-film__vector">
+              {pixels.slice(0, 18).map((cell) => <i className="pipeline-film__vector-cell" key={cell} />)}
+            </div>
           </div>
-        </div>
 
-        <svg className="pipeline-film__connector" viewBox="0 0 160 40" aria-hidden="true">
-          <path className="pipeline-film__path" d="M4 20 C48 20 72 20 156 20" />
-        </svg>
+          <svg className="pipeline-film__connector" viewBox="0 0 160 40" aria-hidden="true">
+            <path className="pipeline-film__path" d="M4 20 C48 20 72 20 156 20" />
+          </svg>
 
-        <div className="pipeline-film__act">
-          <span>04 Probability</span>
-          <div className="pipeline-film__bars">
-            {probabilities.map((height, digit) => (
-              <i
-                className="pipeline-film__probability"
-                key={digit}
-                style={{ height: `${height * 100}%` }}
-                title={`Digit ${digit}`}
-              />
-            ))}
+          <div className="pipeline-film__act">
+            <span>04 Probability</span>
+            <div className="pipeline-film__bars">
+              {probabilities.map((height, digit) => (
+                <i
+                  className="pipeline-film__probability"
+                  key={digit}
+                  style={{ height: `${height * 100}%` }}
+                  title={`Digit ${digit}`}
+                />
+              ))}
+            </div>
+            <strong className="pipeline-film__result">4</strong>
           </div>
-          <strong className="pipeline-film__result">4</strong>
         </div>
       </div>
     </section>
