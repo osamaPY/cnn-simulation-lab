@@ -176,7 +176,7 @@ export const DenseStage: React.FC = () => {
       {/* Main Graph Area — fills available space, centers the SVG */}
       <div className="w-full h-full flex items-center justify-center dense-graph-container">
         <svg
-          viewBox="55 30 1290 830"
+          viewBox="50 15 1320 840"
           className="w-full h-full select-none"
           preserveAspectRatio="xMidYMid meet"
         >

@@ -127,7 +127,7 @@ export function StageViewer() {
         return (
           <div
             className="fixed right-0 left-0 flex items-center justify-center pointer-events-none"
-            style={{ top: 'clamp(56px, 7vh, 80px)', bottom: 'clamp(90px, 12vh, 130px)' }}
+            style={{ top: 'clamp(40px, 4.5vh, 58px)', bottom: 'clamp(70px, 8vh, 100px)' }}
           >
             <div className="pointer-events-auto w-full h-full max-w-[1500px] flex items-center justify-center">
               <DenseStage />
