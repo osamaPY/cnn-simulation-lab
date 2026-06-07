@@ -19,91 +19,91 @@ export const CNN_STAGES: StageInfo[] = [
     id: 1,
     name: "Input Image normalization",
     shortName: "Input",
-    description: "Your raw hand-drawn stroke is cropped, resized, and centered to match the training data profile.",
+    description: "Crops and centers your drawing.",
     shapeLabel: "28 × 28 × 1"
   },
   {
     id: 2,
     name: "Pixel Grid Discretization",
     shortName: "Grid",
-    description: "The centered image is converted to a grid of intensity values from 0.0 (black) to 1.0 (white).",
+    description: "Converts the drawing to a 28x28 grid of values.",
     shapeLabel: "28 × 28"
   },
   {
     id: 3,
     name: "Pixel Intensity Probe",
     shortName: "Probe",
-    description: "Examine individual pixel values to observe how numerical values represent spatial patterns.",
+    description: "Hover to inspect cell values.",
     shapeLabel: "1 × 1"
   },
   {
     id: 4,
     name: "3x3 Convolution Kernel",
     shortName: "Conv Scan",
-    description: "A 3x3 pattern filter slides across the image to extract local visual features (edges, corners).",
+    description: "Slides a 3x3 filter to extract local features.",
     shapeLabel: "26 × 26 × 1"
   },
   {
     id: 5,
     name: "Patch Elementwise Product",
     shortName: "Multiply",
-    description: "The 3x3 input patch is multiplied elementwise by the filter kernel weights.",
+    description: "Multiplies local pixels by kernel weights.",
     shapeLabel: "3 × 3"
   },
   {
     id: 6,
     name: "Sum & Bias Integration",
     shortName: "Sum",
-    description: "The 9 products are added together and a bias term is added to form a single output value.",
+    description: "Sums the products and adds a bias threshold.",
     shapeLabel: "1"
   },
   {
     id: 7,
     name: "Multi-Filter Stack",
     shortName: "Filters",
-    description: "Multiple independent filters run in parallel to generate multiple output feature maps.",
+    description: "Runs multiple filters in parallel.",
     shapeLabel: "26 × 26 × 8"
   },
   {
     id: 8,
     name: "ReLU Non-Linearity",
     shortName: "ReLU",
-    description: "Rectified Linear Unit clips all negative feature map values to zero, introducing learning power.",
+    description: "Clips negative feature values to zero.",
     shapeLabel: "26 × 26 × 8"
   },
   {
     id: 9,
     name: "Max Pooling Downsampling",
     shortName: "Pooling",
-    description: "A 2x2 window slides with stride 2, keeping only the maximum value to shrink and abstract the map.",
+    description: "Downsamples grid dimensions to 13x13.",
     shapeLabel: "13 × 13 × 8"
   },
   {
     id: 10,
     name: "Tensor Flattening",
     shortName: "Flatten",
-    description: "The model's final 5x5x16 pooled activation volume is unrolled into a single 400-value vector.",
+    description: "Unrolls 3D feature grids to a 1D vector.",
     shapeLabel: "400"
   },
   {
     id: 11,
     name: "Dense Connected Layer",
     shortName: "Dense",
-    description: "Neurons evaluate connections and weigh evidence to map features to specific digit candidates.",
+    description: "Weighs features globally to evaluate candidates.",
     shapeLabel: "64"
   },
   {
     id: 12,
     name: "Softmax Normalization",
     shortName: "Softmax",
-    description: "Raw digit scores are normalized into a probability distribution summing to 1.0 (100%).",
+    description: "Normalizes scores into probability percentages.",
     shapeLabel: "10"
   },
   {
     id: 13,
     name: "Final Classification Result",
     shortName: "Output",
-    description: "The argmax of the probabilities yields the final predicted digit along with the model's confidence.",
+    description: "Yields predicted digit and model confidence.",
     shapeLabel: "1"
   }
 ];

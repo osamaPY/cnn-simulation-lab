@@ -2,94 +2,94 @@ import type { ExplanationContent } from './index';
 
 export const mathExplanations: Record<number, ExplanationContent> = {
   1: {
-    headline: "Translation and scaling of ink coordinates",
-    body: "Preprocessing normalizes the spatial distribution of drawing coordinates. We calculate the bounding box bounds $[x_{min}, y_{min}, x_{max}, y_{max}]$ and compute the center of mass (centroid) of the ink pixels. We translate this centroid to the center of the grid $(14, 14)$ and scale coordinates by ratio $S$, fitting the stroke inside a $20 \\times 20$ bounding box.",
+    headline: "Spatial Normalization",
+    body: "Translates the drawing centroid to the grid center (14, 14) and scales it to fit a 20x20 bounding box.",
     focusFormula: "x_{centered} = S \\cdot (x - x_{centroid}) + 14",
-    interactiveGoal: "Observe how coordinate translation and scaling matrices align the drawing to training limits.",
-    keyTakeaway: "Spatial normalization translates the input coordinate system to ensure translation-invariance."
+    interactiveGoal: "Observe coordinate translation and scaling alignment.",
+    keyTakeaway: "Ensures translation and scale invariance."
   },
   2: {
-    headline: "Grayscale rasterization and normalization",
-    body: "The continuous centered path vector is rasterized into a discrete matrix of shape $[28, 28, 1]$. To map values to a standardized range, we normalize the raw 8-bit grayscale intensity values (range 0–255) by dividing by 255.0. This yields a single-precision floating point tensor $X \\in [0.0, 1.0]$.",
-    focusFormula: "X_{i,j} = \\frac{I_{i,j}}{255.0} \\quad \\text{where } I_{i,j} \\in [0, 255]",
-    interactiveGoal: "Verify how continuous drawing coordinate lines rasterize to standard Float32 values.",
-    keyTakeaway: "Pixel intensities are scaled to the range [0.0, 1.0] to prevent unstable gradient computations in neural nets."
+    headline: "Rasterization & Scaling",
+    body: "Rasterizes drawing vectors into a [28, 28, 1] grid and divides 8-bit values by 255.0 to map to [0.0, 1.0].",
+    focusFormula: "X_{i,j} = \\frac{I_{i,j}}{255.0}",
+    interactiveGoal: "Observe continuous lines rasterized to Float32 values.",
+    keyTakeaway: "Stabilizes gradient calculations."
   },
   3: {
-    headline: "Tensor element indexing",
-    body: "The digitized drawing is represented as a 4D tensor with shape $[1, 28, 28, 1]$ (Batch, Height, Width, Channels). Since we are processing a single grayscale image, batch index $b=0$ and channel index $c=0$. We query coordinates $(r, c)$ inside the input tensor.",
-    focusFormula: "v = X[0, r, c, 0] \\quad \\text{where } v \\in [0, 1]",
-    interactiveGoal: "Hover over the grid cells to inspect coordinates (r, c) and their scalar intensities.",
-    keyTakeaway: "Tensor addressing allows accessing individual activation values inside multi-dimensional matrices."
+    headline: "Tensor Addressing",
+    body: "Addresses the 4D input tensor with shape [Batch, Height, Width, Channels]. For single grayscale input: [1, 28, 28, 1].",
+    focusFormula: "v = X[0, r, c, 0]",
+    interactiveGoal: "Hover cells to inspect coordinates (r, c) and values.",
+    keyTakeaway: "Allows indexing of multi-dimensional arrays."
   },
   4: {
-    headline: "Discrete 2D cross-correlation",
-    body: "A kernel filter $K$ of shape $3 \\times 3 \\times 1$ slides across the input tensor $X$. The output shape for valid convolution is determined by input size $W$, kernel size $K$, stride $s$, and padding $p$. For $28 \\times 28$ input and $3 \\times 3$ kernel, output height/width is $(28 - 3)/1 + 1 = 26$. Output tensor shape: $[1, 26, 26, 1]$ per filter.",
+    headline: "2D Cross-Correlation",
+    body: "Slides a 3x3 kernel over the 28x28 grid. Output size is determined by (W - K + 2P)/S + 1 = (28 - 3)/1 + 1 = 26.",
     focusFormula: "Y_{i,j} = \\sum_{m=0}^{2} \\sum_{n=0}^{2} X_{i+m, j+n} \\cdot K_{m,n}",
-    interactiveGoal: "Watch the sliding window compute the 2D cross-correlation dot products.",
-    keyTakeaway: "Convolution acts as a translation-invariant localized spatial feature extractor."
+    interactiveGoal: "Watch the sliding frame compute local dot products.",
+    keyTakeaway: "Extracts local spatial features."
   },
   5: {
-    headline: "Receptive field Hadamard product",
-    body: "At each position $(i, j)$ on the feature map, we extract a local $3 \\times 3$ input patch $X_{patch}$. We compute the elementwise Hadamard product between this patch and the kernel matrix $K$. This creates an intermediate matrix $P \\in \\mathbb{R}^{3 \\times 3}$.",
+    headline: "Hadamard Product",
+    body: "Computes the elementwise product between the 3x3 patch and the kernel weights.",
     focusFormula: "P = X_{patch} \\odot K",
-    interactiveGoal: "Compare patch activation values with the filter weight coefficients in the product grid.",
-    keyTakeaway: "The Hadamard product calculates the matching score between local features and filter weights."
+    interactiveGoal: "Compare local patch values and weight coefficients.",
+    keyTakeaway: "Measures local pattern similarity."
   },
   6: {
-    headline: "Summation and bias offset",
-    body: "To combine the 9 local products, the network sums all elements of the Hadamard matrix $P$ and adds a learnable scalar bias $b$. The bias shifts the activation threshold, determining how easy it is for this filter to respond to a given pattern.",
-    focusFormula: "z_{i,j} = \\sum_{r=0}^{2} \\sum_{c=0}^{2} P_{r,c} + b",
-    interactiveGoal: "Verify the calculation: sum the Hadamard products and add the bias coefficient to compute pre-activation z.",
-    keyTakeaway: "The bias parameter allows the network to shift the activation function's threshold response."
+    headline: "Summation & Bias Offset",
+    body: "Sums all 9 Hadamard products and adds a learnable scalar bias parameter.",
+    focusFormula: "z_{i,j} = \\sum P_{r,c} + b",
+    interactiveGoal: "Sum the products and add bias to get the pre-activation score.",
+    keyTakeaway: "Bias adjusts the firing threshold."
   },
   7: {
-    headline: "Depth stacking of C-channel tensors",
-    body: "By applying $C_{out}$ distinct filters in parallel, we extract $C_{out}$ unique feature maps. The output tensor concatenates these maps along the depth dimension. For 8 filters, the output shape transitions from $[1, 26, 26, 1]$ to $[1, 26, 26, 8]$.",
-    focusFormula: "Y \\in \\mathbb{R}^{B \\times H_{out} \\times W_{out} \\times C_{out}} \\quad (C_{out} = 8)",
-    interactiveGoal: "Click channels in the visualizer stack to see the separate feature maps.",
-    keyTakeaway: "Depth channels allow the network to represent multiple visual features at the same spatial coordinates."
+    headline: "Stacking Depth Channels",
+    body: "Concatenates 8 independent filter outputs to form a [1, 26, 26, 8] activation volume.",
+    focusFormula: "Y \\in \\mathbb{R}^{B \\times H \\times W \\times C_{out}}",
+    interactiveGoal: "Click channels in the stack to see separate feature maps.",
+    keyTakeaway: "Represents multiple features at the same coordinates."
   },
   8: {
-    headline: "Rectified Linear Unit (ReLU) activation",
-    body: "To prevent deep networks from collapsing into a single linear map, we apply the ReLU non-linear activation. It evaluates every activation $x$ in the feature maps: positive values are preserved, while negative values (indicating no pattern match) are clipped to exactly zero.",
+    headline: "ReLU Non-Linearity",
+    body: "Applies f(x) = max(0, x) to introduce non-linearity, clipping negative responses to zero.",
     focusFormula: "f(x) = \\max(0, x)",
-    interactiveGoal: "Observe how ReLU clips negative pre-activation values to zero, removing negative values.",
-    keyTakeaway: "ReLU introduces non-linearity to the network, enabling it to model complex decision boundaries."
+    interactiveGoal: "Observe negative values set to zero.",
+    keyTakeaway: "Enables modeling of complex decision boundaries."
   },
   9: {
-    headline: "Max pooling spatial downsampling",
-    body: "Max pooling partitions the feature maps into $2 \\times 2$ blocks. With stride $s=2$, the pooling window selects the maximum activation value in each block. This cuts height and width in half, reducing the tensor shape from $[1, 26, 26, 8]$ to $[1, 13, 13, 8]$.",
-    focusFormula: "P_{i,j,c} = \\max_{m,n \\in \\{0,1\\}} Y_{2i+m, 2j+n, c}",
-    interactiveGoal: "Step the pooling window to see the shape shrink from 26x26 to 13x13.",
-    keyTakeaway: "Max pooling reduces spatial dimensionality while preserving the strongest feature activations."
+    headline: "Max Pooling Downsampling",
+    body: "Selects the maximum value in 2x2 blocks with stride 2, halving spatial dimensions to 13x13.",
+    focusFormula: "P_{i,j,c} = \\max_{m,n} Y_{2i+m, 2j+n, c}",
+    interactiveGoal: "Step the window to watch dimensions halve.",
+    keyTakeaway: "Reduces spatial representation size."
   },
   10: {
-    headline: "Row-major tensor flattening",
-    body: "Before entering the decision-making layers, the model's final pooled tensor is flattened into a 1D vector. We unroll shape $[1, 5, 5, 16]$ row-by-row into $x \\in \\mathbb{R}^{400}$. The index ordering is channel-last (NHWC).",
-    focusFormula: "x_k = Y_{i, j, c} \\quad \\text{where } k = (i \\cdot W + j) \\cdot C + c",
-    interactiveGoal: "Hover over vector elements to trace back to their (row, col, channel) coordinates.",
-    keyTakeaway: "Flattening changes the data layout from a spatial grid to a continuous array of inputs."
+    headline: "Vector Flattening",
+    body: "Unrolls a [1, 5, 5, 16] tensor into a 1D vector of length 400 in row-major order.",
+    focusFormula: "x_k = Y_{i, j, c}",
+    interactiveGoal: "Hover vector elements to view source spatial coordinates.",
+    keyTakeaway: "Prepares data layout for dense layers."
   },
   11: {
-    headline: "Matrix-vector product (Dense layer)",
-    body: "The Dense layer maps the $400$-length input vector $x$ to $64$ hidden neurons. We compute the dot product of the weights matrix $W_1 \\in \\mathbb{R}^{64 \\times 400}$ and vector $x$, add the bias vector $b_1 \\in \\mathbb{R}^{64}$, and apply ReLU activation.",
+    headline: "Matrix-Vector Product",
+    body: "Computes W * x + b mapping the 400-length input vector to 64 hidden neurons.",
     focusFormula: "a = \\max(0, W_1 \\cdot x + b_1)",
-    interactiveGoal: "Hover output digit circles to see the evidence paths contributing positive signals.",
-    keyTakeaway: "Fully connected layers combine all spatial features globally to build classification scores."
+    interactiveGoal: "Hover output digits to view active connections.",
+    keyTakeaway: "Performs global feature reasoning."
   },
   12: {
-    headline: "Softmax probability distribution",
-    body: "The output layer produces $10$ raw logit scores $z$. To convert them to probabilities, the Softmax function exponentiates each score (making it positive) and divides it by the sum of all exponentiated scores, ensuring they sum to 1.0.",
-    focusFormula: "\\sigma(z)_i = \\frac{e^{z_i}}{\\sum_{j=0}^{9} e^{z_j}} \\quad \\text{s.t. } \\sum \\sigma(z) = 1.0",
-    interactiveGoal: "Observe how exponentiation magnifies high scores, creating clear winners.",
-    keyTakeaway: "Softmax maps logits to a probability simplex, normalizing scores to [0.0, 1.0] summing to 1.0."
+    headline: "Softmax Normalization",
+    body: "Normalizes raw logits into a probability distribution summing to 1.0.",
+    focusFormula: "\\sigma(z)_i = \\frac{e^{z_i}}{\\sum e^{z_j}}",
+    interactiveGoal: "Observe raw scores mapped to percentages.",
+    keyTakeaway: "Constructs a probability distribution."
   },
   13: {
-    headline: "Maximum likelihood class selection",
-    body: "The network selects the digit class with the highest probability. This is the argmax (index of maximum probability) of the Softmax output vector. Out-of-distribution (OOD) inputs still map to these classes because the network lacks a rejection threshold.",
+    headline: "Argmax Decision",
+    body: "Selects the class index with the highest probability value.",
     focusFormula: "\\hat{y} = \\arg\\max_{i} \\sigma(z)_i",
-    interactiveGoal: "Test the classification limit: draw scribbles or non-digit shapes and analyze predictions.",
-    keyTakeaway: "The final class is merely the relative maximum of the normalized softmax scores."
+    interactiveGoal: "Observe final index classification.",
+    keyTakeaway: "Identifies the highest confidence prediction."
   }
 };

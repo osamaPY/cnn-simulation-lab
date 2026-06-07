@@ -214,30 +214,6 @@ export const ExplanationPanel: React.FC = () => {
             </div>
           )}
 
-          {/* Key Takeaway */}
-          {explanation.keyTakeaway && (
-            <div className="mt-3 rounded border border-text-accent/25 bg-text-accent/5 p-3 text-xs text-text-secondary">
-              <strong className="text-text-accent font-mono text-[10px] block mb-1">
-                What to notice
-              </strong>
-              <p className="leading-relaxed text-[11.5px]">{explanation.keyTakeaway}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Action Prompt */}
-        <div className="mt-6 pt-4 border-t border-border-subtle flex items-start gap-2.5 bg-bg-deep/10 p-2.5 rounded-lg">
-          <div className="w-5 h-5 rounded bg-aurora-indigo/25 text-text-accent flex items-center justify-center font-mono text-xs flex-shrink-0">
-            i
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-mono font-semibold text-aurora-purple leading-none">
-              Try this
-            </span>
-            <p className="text-xs text-text-secondary mt-1">
-              {explanation.interactiveGoal}
-            </p>
-          </div>
         </div>
       </div>
     </div>
