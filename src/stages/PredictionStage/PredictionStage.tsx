@@ -98,23 +98,6 @@ export const PredictionStage: React.FC = () => {
             transition={shouldReduceMotion ? { duration: 0 } : slideTransition}
           />
         </div>
-
-        {/* Confidence Context Explanation */}
-        <p className="text-[10px] text-text-muted text-center mt-0.5 leading-relaxed font-serif">
-          Confidence is the largest softmax probability. A high value does not guarantee the
-          prediction is correct, especially for unusual drawings.
-        </p>
-      </div>
-
-      {/* Core Educational Summary */}
-      <div className="w-full border border-white/5 p-4 rounded-2xl bg-[#030306]/30 text-center text-xs text-text-secondary leading-relaxed flex flex-col gap-1.5 shadow-sm">
-        <span className="font-semibold text-amber-500 uppercase tracking-widest font-display text-[10px]">
-          How did the CNN classify this?
-        </span>
-        <p className="text-[10.5px] text-text-muted mt-1 max-w-sm mx-auto leading-relaxed font-serif">
-          The prediction is the <strong className="text-text-secondary font-sans font-semibold">argmax</strong> (index of the highest probability) of the Softmax vector. 
-          By combining edge detectors, downsampling layers, and fully connected weights, the model learns complex spatial representations.
-        </p>
       </div>
 
       <button 

@@ -17,18 +17,9 @@ export const LessonShell: React.FC = () => {
       {/* 3B1B Cinematic Viewport */}
       <main className="flex-1 relative flex flex-col overflow-hidden m-4 md:m-6 rounded-2xl border border-white/5 shadow-[0_0_100px_rgba(0,0,0,1)] bg-[#0a0a0e]">
         
-
-
-        {/* Floating Subtitles and Math - Absolute overlay */}
-        {preprocessedData && (
-          <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-6 pb-28">
-             <ExplanationPanel />
-          </div>
-        )}
-
-        {/* The Cinematic Canvas */}
-        <div className="absolute top-0 left-0 right-0 bottom-[140px] z-10 flex flex-col items-center justify-center overflow-hidden">
-          {!preprocessedData ? (
+        {!preprocessedData ? (
+          /* Initial Drawing canvas centered */
+          <div className="flex-1 flex flex-col items-center justify-center overflow-hidden">
              <motion.div 
                initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
@@ -41,15 +32,30 @@ export const LessonShell: React.FC = () => {
                </div>
                <DrawCanvas />
              </motion.div>
-          ) : (
-             <StageViewer />
-          )}
-        </div>
+          </div>
+        ) : (
+          /* Active Simulation state: Stack visualization, subtitles and controls vertically in a flex layout */
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden relative">
+            
+            {/* Visualizer Frame - takes up remaining space */}
+            <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden px-4">
+              <StageViewer />
+              
+              {/* Floating Math Formula (top-right overlay inside the canvas area) */}
+              <div className="absolute top-4 right-4 pointer-events-none z-30">
+                <ExplanationPanel mode="formula" />
+              </div>
+            </div>
+            
+            {/* Subtitles Area - sits cleanly below the StageViewer */}
+            <div className="flex-shrink-0 w-full flex justify-center py-2 px-6 z-20 pointer-events-none">
+              <ExplanationPanel mode="subtitles" />
+            </div>
 
-        {/* Unified Player Controls Bottom Bar */}
-        {preprocessedData && (
-          <div className="absolute bottom-0 left-0 right-0 pt-24 pb-6 px-8 bg-gradient-to-t from-black via-black/80 to-transparent z-40 pointer-events-none flex flex-col justify-end">
-            <PlayerControls />
+            {/* Controls Bottom Bar - sits cleanly below subtitles */}
+            <div className="flex-shrink-0 w-full pt-2 pb-6 px-8 bg-gradient-to-t from-black via-black/90 to-transparent z-10 flex flex-col justify-end">
+              <PlayerControls />
+            </div>
           </div>
         )}
       </main>

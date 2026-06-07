@@ -28,18 +28,6 @@ export const SoftmaxStage: React.FC = () => {
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-5 px-2">
-      <div className="relative flex w-full flex-col items-center gap-1 overflow-hidden rounded border border-border-subtle bg-bg-deep p-4 text-center">
-        <div className="absolute left-2 top-1 text-[9px] uppercase tracking-wider text-text-muted font-display">
-          Softmax Formula
-        </div>
-        <span className="mt-1 text-sm font-semibold text-text-accent font-mono">
-          P(y = i) = e^(z_i) / sum(e^(z_j))
-        </span>
-        <p className="mt-1 max-w-md text-[10px] leading-relaxed text-text-secondary">
-          The exported model already returns Softmax probabilities, so this view shows the real output distribution without inventing unavailable logits.
-        </p>
-      </div>
-
       <div className="flex flex-col overflow-hidden rounded border border-border-muted bg-bg-panel">
         <div className="grid grid-cols-12 gap-2 border-b border-border-muted p-3 text-[10px] font-mono font-semibold uppercase tracking-wider text-text-secondary">
           <div className="col-span-2 text-center">Digit</div>

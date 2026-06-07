@@ -240,24 +240,6 @@ export const FeatureMapGrid: React.FC = () => {
           )}
         </div>
       )}
-
-      {/* Tensor active channel details overlay */}
-      {!is2D && (
-        <div className="p-3 bg-bg-deep/60 border border-border-subtle rounded-lg text-xs leading-relaxed text-text-secondary flex items-start gap-2.5">
-          <div className="w-5 h-5 rounded bg-aurora-purple/15 text-text-accent flex items-center justify-center font-mono text-[10px] flex-shrink-0 border border-aurora-purple/20">
-            {selectedChannel}
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[9px] font-display font-semibold uppercase text-text-muted leading-none">
-              Selected Channel activation
-            </span>
-            <p className="text-[11px] text-text-secondary mt-1">
-              Currently focused on filter channel index <strong className="text-text-primary">#{selectedChannel}</strong>. 
-              The heatmap displays local patterns matched by this convolution weight matrix.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -88,7 +88,7 @@ export function ReluStage() {
           </div>
 
           <div className="grid grid-cols-2 gap-2.5 text-center text-[10px] font-mono">
-            <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-2.5 text-red-400">
+            <div className="rounded-xl border border-signal-coral/20 bg-signal-coral/5 text-signal-coral">
               {stats.negative} clipped
             </div>
             <div className="rounded-xl border border-aurora-mint/20 bg-aurora-mint/5 p-2.5 text-aurora-mint">
