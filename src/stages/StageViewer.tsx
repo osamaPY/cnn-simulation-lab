@@ -40,7 +40,14 @@ const BackpropStage = lazy(() =>
 )
 
 function StageLoadingState() {
-  return <div className="flex h-full w-full items-center justify-center text-lg font-mono text-white/50">Loading simulation frame...</div>
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-6 h-6 border-2 border-white/20 border-t-aurora-purple rounded-full animate-spin" />
+        <span className="text-[11px] font-mono text-white/30 uppercase tracking-widest">Loading frame…</span>
+      </div>
+    </div>
+  )
 }
 
 function StageEmptyState({ stageName, description }: { stageName: string; description: string }) {
@@ -85,10 +92,10 @@ export function StageViewer() {
   const missingState = !preprocessedData
     ? 'Draw a digit and click Run Simulation to generate the real preprocessing data.'
     : (currentStageId === 4 || (currentStageId >= 6 && currentStageId <= 8)) && activations.length === 0
-      ? modelStatus === 'error' 
+      ? modelStatus === 'error'
         ? `Model failed to load: ${inferenceError}. Please check if model.json exists in public/model/.`
         : modelStatus === 'loading'
-          ? 'The model is still loading. Please wait a moment...'
+          ? 'The model is still loading. Please wait a moment…'
           : 'This stage requires intermediate activations. If the model is loaded, try running the simulation again.'
       : currentStageId >= 9 && currentStageId !== 11 && !prediction
         ? modelStatus === 'error'
@@ -131,11 +138,12 @@ export function StageViewer() {
 
   const slideTransition = {
     duration: 0.8,
-    ease: [0.19, 1, 0.22, 1] as const, // Cinematic Expo Out
+    ease: [0.19, 1, 0.22, 1] as const,
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-8 sm:p-16 pointer-events-auto overflow-hidden" id="stage-viewer">
+    // Reduced from p-8 sm:p-16 — gives stage visualizations ~80px more space
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-3 sm:p-6 pointer-events-auto overflow-hidden" id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           className="w-full h-full flex flex-col items-center justify-center"
