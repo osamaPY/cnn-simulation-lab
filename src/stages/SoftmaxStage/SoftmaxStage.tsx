@@ -45,9 +45,9 @@ export const SoftmaxStage: React.FC = () => {
         />
         <motion.p
           className="text-[10px] font-mono text-white/35 mt-0.5"
-          initial={shouldReduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1, duration: 0.5 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         >
           Raw logit scores → normalised probabilities summing to 1.0
         </motion.p>
@@ -70,16 +70,26 @@ export const SoftmaxStage: React.FC = () => {
                   isWinner ? 'bg-aurora-mint/8' : ''
                 }`}
                 key={digit}
-                initial={shouldReduceMotion ? false : { opacity: 0, x: -8 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={shouldReduceMotion ? { duration: 0 } : { delay: 0.35 + digit * 0.04, duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                transition={
+                  shouldReduceMotion
+                    ? { duration: 0 }
+                    : {
+                        delay: 0.3 + digit * 0.045,
+                        duration: 0.4,
+                        ease: [0.16, 1, 0.3, 1],
+                      }
+                }
               >
                 <div className="col-span-2 flex justify-center">
-                  <div className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold font-display transition-all duration-300 ${
-                    isWinner
-                      ? 'bg-aurora-mint text-bg-deep shadow-[0_0_10px_rgba(52,211,153,0.4)]'
-                      : 'border border-border-muted bg-bg-deep text-text-secondary'
-                  }`}>
+                  <div
+                    className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold font-display transition-all duration-300 ${
+                      isWinner
+                        ? 'bg-aurora-mint text-bg-deep shadow-[0_0_12px_rgba(52,211,153,0.45)]'
+                        : 'border border-border-muted bg-bg-deep text-text-secondary'
+                    }`}
+                  >
                     {digit}
                   </div>
                 </div>
@@ -95,20 +105,27 @@ export const SoftmaxStage: React.FC = () => {
                       initial={shouldReduceMotion ? { scaleX: probability } : { scaleX: 0 }}
                       transition={shouldReduceMotion ? { duration: 0 } : sceneTransition}
                     />
-                    {/* Winner glow pulse */}
+                    {/* Winner breathing glow */}
                     {isWinner && !shouldReduceMotion && (
                       <motion.div
-                        className="absolute inset-0 origin-left rounded-r bg-aurora-mint/30"
+                        className="absolute inset-0 origin-left rounded-r bg-aurora-mint/25"
                         style={{ scaleX: animatedP }}
-                        animate={{ opacity: [0.3, 0.7, 0.3] }}
-                        transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                        animate={{ opacity: [0.25, 0.65, 0.25] }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 2.2,
+                          ease: 'easeInOut',
+                          delay: 0.5,
+                        }}
                       />
                     )}
                   </div>
                 </div>
-                <div className={`col-span-2 text-right text-xs font-semibold font-mono ${
-                  isWinner ? 'text-aurora-mint' : 'text-text-primary'
-                }`}>
+                <div
+                  className={`col-span-2 text-right text-xs font-semibold font-mono ${
+                    isWinner ? 'text-aurora-mint' : 'text-text-primary'
+                  }`}
+                >
                   {(probability * 100).toFixed(1)}%
                 </div>
               </motion.div>

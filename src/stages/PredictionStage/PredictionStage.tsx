@@ -11,21 +11,21 @@ function launchConfetti(canvas: HTMLCanvasElement) {
   const H = canvas.height;
 
   const COLORS = ['#34d399', '#22d3ee', '#a78bfa', '#f472b6', '#fbbf24', '#fb923c'];
-  const particles = Array.from({ length: 80 }, () => ({
-    x: W / 2 + (Math.random() - 0.5) * 40,
+  const particles = Array.from({ length: 90 }, () => ({
+    x: W / 2 + (Math.random() - 0.5) * 60,
     y: H / 2 - 20,
-    vx: (Math.random() - 0.5) * 7,
-    vy: -(Math.random() * 6 + 3),
+    vx: (Math.random() - 0.5) * 8,
+    vy: -(Math.random() * 7 + 3),
     rot: Math.random() * Math.PI * 2,
-    rotV: (Math.random() - 0.5) * 0.3,
-    w: Math.random() * 8 + 4,
+    rotV: (Math.random() - 0.5) * 0.35,
+    w: Math.random() * 9 + 4,
     h: Math.random() * 4 + 2,
     color: COLORS[Math.floor(Math.random() * COLORS.length)],
     alpha: 1,
   }));
 
   let frame = 0;
-  const MAX_FRAMES = 80;
+  const MAX_FRAMES = 90;
 
   function draw() {
     if (frame >= MAX_FRAMES) { ctx!.clearRect(0, 0, W, H); return; }
@@ -33,7 +33,7 @@ function launchConfetti(canvas: HTMLCanvasElement) {
     particles.forEach((p) => {
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.22; // gravity
+      p.vy += 0.2; // gravity
       p.rot += p.rotV;
       p.alpha = Math.max(0, 1 - frame / MAX_FRAMES);
       ctx!.save();
@@ -62,7 +62,7 @@ export const PredictionStage: React.FC = () => {
     if (prediction && confettiRef.current && !shouldReduceMotion && !launchedRef.current) {
       launchedRef.current = true;
       // Short delay so the digit card animates in first
-      setTimeout(() => launchConfetti(confettiRef.current!), 500);
+      setTimeout(() => launchConfetti(confettiRef.current!), 550);
     }
   }, [prediction, shouldReduceMotion]);
 
@@ -81,8 +81,9 @@ export const PredictionStage: React.FC = () => {
 
   const confidencePct = (prediction.confidence * 100).toFixed(1);
   const isHighConf = prediction.confidence >= 0.90;
+  const isMedConf = prediction.confidence >= 0.70 && !isHighConf;
 
-  const spring = { type: 'spring' as const, damping: 16, stiffness: 260, mass: 0.8 };
+  const spring = { type: 'spring' as const, damping: 14, stiffness: 240, mass: 0.9 };
 
   return (
     <div className="relative flex flex-col gap-8 w-full max-w-xl items-center py-6 px-4">
@@ -117,8 +118,8 @@ export const PredictionStage: React.FC = () => {
         {/* Arrow */}
         <div className="hidden sm:flex items-center justify-center" aria-hidden="true">
           <motion.div
-            animate={{ x: [0, 5, 0] }}
-            transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+            animate={{ x: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12" />
@@ -134,17 +135,17 @@ export const PredictionStage: React.FC = () => {
             <motion.div
               key={prediction.digit}
               className="w-28 h-28 rounded-2xl bg-[#030306]/90 border-2 border-amber-500/60 flex flex-col items-center justify-center relative"
-              style={{ boxShadow: '0 0 40px rgba(245,158,11,0.20), 0 0 80px rgba(245,158,11,0.08)' }}
-              initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.7, rotate: -6 }}
+              style={{ boxShadow: '0 0 40px rgba(245,158,11,0.22), 0 0 80px rgba(245,158,11,0.08)' }}
+              initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.65, rotate: -8 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={shouldReduceMotion ? { duration: 0 } : spring}
             >
               <motion.span
                 className="font-display font-extrabold text-amber-400 leading-none"
-                style={{ fontSize: 'clamp(3rem, 8vw, 4rem)', filter: 'drop-shadow(0 0 12px rgba(245,158,11,0.4))' }}
-                initial={shouldReduceMotion ? false : { scale: 1.4 }}
+                style={{ fontSize: 'clamp(3rem, 8vw, 4rem)', filter: 'drop-shadow(0 0 14px rgba(245,158,11,0.45))' }}
+                initial={shouldReduceMotion ? false : { scale: 1.5 }}
                 animate={{ scale: 1 }}
-                transition={shouldReduceMotion ? { duration: 0 } : { ...spring, delay: 0.1 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { ...spring, delay: 0.08 }}
               >
                 {prediction.digit}
               </motion.span>
@@ -160,17 +161,17 @@ export const PredictionStage: React.FC = () => {
       {/* Confidence gauge */}
       <motion.div
         className="w-full bg-[#030306]/70 backdrop-blur-md border border-white/10 p-5 rounded-2xl flex flex-col gap-4"
-        initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
       >
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-text-secondary uppercase tracking-wider">Classification Confidence</span>
           <motion.span
-            className={`font-bold text-sm ${ isHighConf ? 'text-emerald-400' : 'text-amber-400' }`}
+            className={`font-bold text-sm ${ isHighConf ? 'text-emerald-400' : isMedConf ? 'text-amber-400' : 'text-orange-400' }`}
             initial={shouldReduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.4 }}
+            transition={{ delay: 0.42, duration: 0.4 }}
           >
             {confidencePct}%
           </motion.span>
@@ -182,40 +183,60 @@ export const PredictionStage: React.FC = () => {
             style={{
               background: isHighConf
                 ? 'linear-gradient(90deg, #0d9488, #34d399, #22d3ee)'
-                : 'linear-gradient(90deg, #d97706, #f59e0b, #fbbf24)',
+                : isMedConf
+                ? 'linear-gradient(90deg, #d97706, #f59e0b, #fbbf24)'
+                : 'linear-gradient(90deg, #c2410c, #ea580c, #fb923c)',
             }}
             initial={shouldReduceMotion ? { scaleX: prediction.confidence } : { scaleX: 0 }}
             animate={{ scaleX: prediction.confidence }}
-            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.9, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 1.0, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
           />
           {/* Shimmer overlay */}
           {!shouldReduceMotion && (
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent"
               initial={{ x: '-100%' }}
               animate={{ x: '200%' }}
-              transition={{ duration: 0.8, delay: 1.1, ease: 'easeInOut' }}
+              transition={{ duration: 0.9, delay: 1.2, ease: 'easeInOut' }}
             />
           )}
         </div>
 
-        {isHighConf && (
-          <motion.p
-            className="text-[10px] font-mono text-emerald-400/70 text-center"
-            initial={shouldReduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.4 }}
-          >
-            ✓ High confidence — the network is sure!
-          </motion.p>
-        )}
+        {/* Contextual confidence label */}
+        <AnimatePresence>
+          {isHighConf && (
+            <motion.p
+              className="text-[10px] font-mono text-emerald-400/80 text-center"
+              initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.85, duration: 0.4 }}
+            >
+              ✓ High confidence — the network is sure!
+            </motion.p>
+          )}
+          {isMedConf && (
+            <motion.p
+              className="text-[10px] font-mono text-amber-400/70 text-center"
+              initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.85, duration: 0.4 }}
+            >
+              ~ Medium confidence — try a cleaner drawing.
+            </motion.p>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       <motion.button
-        className="btn-primary mt-1 px-8 py-2.5 bg-amber-500 hover:bg-amber-400 text-black border-amber-500 hover:border-amber-400 rounded-xl transition-all duration-200 font-bold tracking-wide shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5 active:translate-y-0"
+        className="btn-primary mt-1 px-8 py-2.5 bg-amber-500 hover:bg-amber-400 text-black border-amber-500 hover:border-amber-400 rounded-xl transition-all duration-200 font-bold tracking-wide shadow-lg hover:shadow-amber-500/25 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
         onClick={clearAll}
         type="button"
         whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         Try another digit →
       </motion.button>

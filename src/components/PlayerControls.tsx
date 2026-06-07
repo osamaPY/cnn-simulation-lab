@@ -36,21 +36,22 @@ export const PlayerControls: React.FC = () => {
   return (
     <div className="flex flex-col gap-3 w-full max-w-[1000px] mx-auto pointer-events-auto select-none">
       {/* Stage dots + smooth fill bar */}
-      <div className="relative flex items-center gap-0 w-full h-7">
+      <div className="relative flex items-center gap-0 w-full h-8">
         {/* Background track */}
-        <div className="absolute inset-y-[11px] left-0 right-0 h-1 bg-white/8 rounded-full" />
+        <div className="absolute inset-y-[13px] left-0 right-0 h-[3px] bg-white/8 rounded-full" />
 
         {/* Animated fill */}
         <motion.div
-          className="absolute inset-y-[11px] left-0 h-1 rounded-full bg-gradient-to-r from-aurora-teal via-aurora-mint to-cyan-400 pointer-events-none"
+          className="absolute inset-y-[13px] left-0 h-[3px] rounded-full bg-gradient-to-r from-aurora-teal via-aurora-mint to-cyan-400 pointer-events-none"
+          style={{ boxShadow: '0 0 8px rgba(52,211,153,0.4)' }}
           animate={{ width: `${progressPercent}%` }}
-          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         />
 
         {/* Stage dot markers */}
         {CNN_STAGES.map((stage) => {
           const pct = ((stage.id - 1) / (CNN_STAGES.length - 1)) * 100;
-          const isCompleted = stage.id <= currentStageId;
+          const isCompleted = stage.id < currentStageId;
           const isActive = stage.id === currentStageId;
           const isLocked = !preprocessedData && stage.id > 1;
 
@@ -58,32 +59,43 @@ export const PlayerControls: React.FC = () => {
             <button
               key={stage.id}
               onClick={() => { if (!isLocked) setCurrentStageId(stage.id); }}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 group flex items-center justify-center ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+              className={`absolute -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 group flex items-center justify-center ${
+                isLocked ? 'cursor-not-allowed' : 'cursor-pointer'
+              }`}
               style={{ left: `${pct}%` }}
-              title={isLocked ? `${stage.id}. ${stage.shortName ?? stage.name} (Requires drawing)` : `${stage.id}. ${stage.shortName ?? stage.name}`}
+              title={
+                isLocked
+                  ? `${stage.id}. ${stage.shortName ?? stage.name} (Requires drawing)`
+                  : `${stage.id}. ${stage.shortName ?? stage.name}`
+              }
               type="button"
               aria-label={`Go to stage ${stage.id}: ${stage.name}`}
               disabled={isLocked}
             >
               <motion.div
                 animate={{
-                  width:  isActive ? 12 : isCompleted ? 8 : 6,
-                  height: isActive ? 12 : isCompleted ? 8 : 6,
+                  width: isActive ? 14 : isCompleted ? 9 : 6,
+                  height: isActive ? 14 : isCompleted ? 9 : 6,
                   backgroundColor: isActive
                     ? '#34d399'
                     : isCompleted
                     ? '#0d9488'
                     : isLocked
-                    ? 'rgba(255,255,255,0.08)'
-                    : 'rgba(255,255,255,0.25)',
-                  boxShadow: isActive ? '0 0 12px 3px rgba(52,211,153,0.55)' : 'none',
+                    ? 'rgba(255,255,255,0.06)'
+                    : 'rgba(255,255,255,0.22)',
+                  boxShadow: isActive
+                    ? '0 0 0 3px rgba(52,211,153,0.20), 0 0 14px 4px rgba(52,211,153,0.50)'
+                    : isCompleted
+                    ? '0 0 6px 1px rgba(13,148,136,0.30)'
+                    : 'none',
                 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ type: 'spring', damping: 18, stiffness: 280 }}
                 className="rounded-full"
               />
               {/* Tooltip on hover */}
-              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[9px] font-mono text-white/80 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl">
+              <span className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-1 rounded-lg bg-black/95 border border-white/12 text-[9px] font-mono text-white/85 opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-2xl z-50">
                 {stage.id}. {stage.name} {isLocked && '🔒'}
+                {isActive && <span className="ml-1 text-aurora-mint">←</span>}
               </span>
             </button>
           );
@@ -93,7 +105,7 @@ export const PlayerControls: React.FC = () => {
       {/* Control row */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-1">
         <button
-          className="w-full sm:w-auto px-5 py-2 rounded-xl text-sm font-medium border border-white/10 hover:border-white/20 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:bg-white/5 flex items-center justify-center gap-2"
+          className="w-full sm:w-auto px-5 py-2 rounded-xl text-sm font-medium border border-white/10 hover:border-white/20 text-white/70 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:bg-white/5 flex items-center justify-center gap-2 active:scale-[0.98]"
           disabled={!canGoBack}
           onClick={() => setCurrentStageId(currentStageId - 1)}
           title="Previous Chapter (Left Arrow)"
@@ -106,9 +118,17 @@ export const PlayerControls: React.FC = () => {
         <div className="flex items-center gap-2.5 font-display text-sm">
           <span className="text-white/35 font-mono text-xs">{currentStageId} / {CNN_STAGES.length}</span>
           <span className="text-white/20">·</span>
-          <span className="text-white font-semibold tracking-wide text-sm">{CNN_STAGES[currentStageId - 1].name}</span>
+          <motion.span
+            key={currentStageId}
+            className="text-white font-semibold tracking-wide text-sm"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {CNN_STAGES[currentStageId - 1].name}
+          </motion.span>
           <button
-            className="ml-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors text-[11px] font-sans border border-white/5"
+            className="ml-2 flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors text-[11px] font-sans border border-white/5 active:scale-95"
             onClick={() => { useLabStore.getState().clearAll(); }}
             title="Reset simulation"
             type="button"
@@ -120,7 +140,7 @@ export const PlayerControls: React.FC = () => {
         </div>
 
         <button
-          className="w-full sm:w-auto px-6 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-aurora-teal to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-[#071018] disabled:opacity-30 disabled:cursor-not-allowed disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 transition-all shadow-lg hover:shadow-cyan-500/20 flex items-center justify-center gap-2 hover:-translate-y-px active:translate-y-0"
+          className="w-full sm:w-auto px-6 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-aurora-teal to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-[#071018] disabled:opacity-30 disabled:cursor-not-allowed disabled:from-white/10 disabled:to-white/10 disabled:text-white/40 transition-all shadow-lg hover:shadow-cyan-500/25 flex items-center justify-center gap-2 hover:-translate-y-px active:translate-y-0 active:scale-[0.98]"
           disabled={!canGoNext}
           onClick={() => setCurrentStageId(currentStageId + 1)}
           title="Next Chapter (Right Arrow / Space)"

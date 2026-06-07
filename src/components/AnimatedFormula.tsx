@@ -36,6 +36,10 @@ export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
     spanRef.current.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
   }, [progress]);
 
+  // Compute a softer glow: reduce opacity so it doesn't burn
+  const glowColor = `${color}55`;
+  const strongGlow = `${color}88`;
+
   return (
     <span
       className={`relative inline-block font-mono font-bold select-none ${className}`}
@@ -60,7 +64,8 @@ export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
             progress !== undefined
               ? 'none'
               : `formulaReveal ${durationMs}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
-          filter: `drop-shadow(0 0 6px ${color}66)`,
+          filter: `drop-shadow(0 0 5px ${glowColor}) drop-shadow(0 0 12px ${strongGlow})`,
+          textShadow: `0 0 8px ${glowColor}`,
         }}
       >
         {formula}

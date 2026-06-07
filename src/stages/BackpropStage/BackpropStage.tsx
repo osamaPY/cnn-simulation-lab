@@ -45,16 +45,20 @@ export const BackpropStage: React.FC = () => {
     const W = canvas.width;
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
+
+    // Axes
     ctx.strokeStyle = 'rgba(255,255,255,0.10)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(8, H - 8); ctx.lineTo(W - 4, H - 8);
     ctx.moveTo(8, H - 8); ctx.lineTo(8, 4);
     ctx.stroke();
+
+    // Loss curve
     ctx.strokeStyle = '#f87171';
     ctx.lineWidth = 2.5;
     ctx.shadowColor = '#f87171';
-    ctx.shadowBlur = 6;
+    ctx.shadowBlur = 8;
     ctx.beginPath();
     const drawTo = Math.max(2, Math.floor(progress * (W - 16)));
     for (let x = 0; x <= drawTo; x++) {
@@ -65,7 +69,9 @@ export const BackpropStage: React.FC = () => {
     }
     ctx.stroke();
     ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255,255,255,0.28)';
+
+    // Labels
+    ctx.fillStyle = 'rgba(255,255,255,0.30)';
     ctx.font = '8px monospace';
     ctx.fillText('Loss', 10, 13);
     ctx.fillText('Epochs →', W - 52, H - 1);
@@ -147,7 +153,7 @@ export const BackpropStage: React.FC = () => {
                       const py = Math.min(400, Math.max(0, oY - (oY - hY) * t));
                       return (
                         <circle key={`p2-${pulseIdx}-${idx}`} cx={px} cy={py} r={3.5}
-                          fill="var(--signal-coral)" filter="url(#grad-glow)" opacity={Math.max(0, 0.7 - pulseIdx * 0.1)}
+                          fill="var(--signal-coral)" filter="url(#grad-glow)" opacity={Math.max(0, 0.75 - pulseIdx * 0.1)}
                         />
                       );
                     });
@@ -159,7 +165,7 @@ export const BackpropStage: React.FC = () => {
                       const py = Math.min(400, Math.max(0, hY - (hY - iY) * t));
                       return (
                         <circle key={`p1-${pulseIdx}-${sIdx}`} cx={px} cy={py} r={3.5}
-                          fill="var(--signal-coral)" filter="url(#grad-glow)" opacity={Math.max(0, 0.7 - pulseIdx * 0.1)}
+                          fill="var(--signal-coral)" filter="url(#grad-glow)" opacity={Math.max(0, 0.75 - pulseIdx * 0.1)}
                         />
                       );
                     });
