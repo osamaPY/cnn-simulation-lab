@@ -1,76 +1,101 @@
-# CNN Visual Lab: How Machines "See"
+# CNN Simulation Lab – How Machines "See"
 
-[**Explore the Live Demo**](https://cnn-simulation-psi.vercel.app)
+[**Live demo**](https://cnn-simulation-psi.vercel.app)
 
-I developed this project to demystify the "black box" nature of Convolutional Neural Networks (CNNs). By visualizing underlying mathematical transformations in real-time, this laboratory demonstrates how raw pixel data from a hand-drawn digit is processed and classified through hierarchical layers of abstraction.
-
-Everything runs directly in the browser using **TensorFlow.js**. All inference is performed client-side, requiring no server-side processing or external APIs.
+A browser-based interactive lab to demystify Convolutional Neural Networks (CNNs). Draw a digit, then follow how a real CNN transforms your pixels into feature maps, activations, and final class probabilities – all running client-side with TensorFlow.js.
 
 ---
 
-## Key Features
+## Features
 
-- **Real-Time Visualization**: Watch as your hand-drawn digits are transformed into feature maps and probability distributions.
-- **Hierarchical Depth**: Explore every stage of a CNN, from initial spatial normalization to final softmax classification.
-- **Mathematical Transparency**: View the actual kernels, activation values, and formulas (LaTeX) driving each layer's decision.
-- **Interactive Probing**: Hover over individual pixels and feature maps to inspect raw numerical activations.
-- **Research Module**: Includes pure NumPy implementations of core algorithms for educational deep-dives.
-
----
-
-## Technical Overview
-
-### 1. Interactive Pipeline
-Users can trace a digit through the entire classification process:
-- **Input Normalization**: Centering and scaling raw drawings for translation and scale invariance.
-- **Convolutional Layers**: Feature extraction identifying local patterns (edges, textures).
-- **ReLU Activation**: Non-linear filtering to emphasize significant signals.
-- **Max Pooling**: Spatial downsampling to retain critical features while reducing dimensionality.
-- **Dense Layers**: High-level feature integration for global context.
-- **Softmax**: Conversion of raw logits into an interpretable probability distribution.
-
-### 2. Research & Documentation (`/docs`)
-The repository includes a dedicated research module and documentation for deep-dives into the implementation:
-- `research/explain_cnn.py`: A step-by-step algorithmic walkthrough implemented in pure `numpy`.
-- `research/train_mnist.py`: The Keras training script used to generate the production model.
-- `docs/research/`: Technical guides on training and optimizing models for TensorFlow.js.
+- **Draw and classify**: Freehand digits on a canvas, then run real-time inference in the browser.
+- **Step-by-step stages**: Walk through preprocessing, convolution, ReLU, pooling, flattening, dense layers, softmax, and final prediction.
+- **Activation visualizations**: Inspect intermediate feature maps and class probabilities to see what each layer "looks at".
+- **Educational controls**: Adjust kernel size, stride, padding, and pooling settings for the *visual explanations* (the underlying CNN model remains fixed).
+- **No backend required**: All inference happens locally using TensorFlow.js; no external APIs or servers.
 
 ---
 
-## Tech Stack
-- **Frontend**: React, TypeScript, Tailwind CSS.
-- **Animations**: Framer Motion for high-fidelity interactive flows.
-- **Machine Learning**: TensorFlow.js (Inference), Keras/Python (Training).
-- **Deployment**: Vercel.
+## Tech stack
+
+- React + TypeScript (Vite)
+- Tailwind CSS
+- TensorFlow.js (browser inference)
+- Zustand (state management)
+- Playwright (end-to-end tests)
+- Deployed on Vercel
 
 ---
 
-## Local Development
+## Architecture
 
-To run the project locally:
+High-level flow:
+
+1. **Canvas input** – User draws a digit using mouse or touch.
+2. **Preprocessing** – The drawing is:
+   - Converted to grayscale.
+   - Cropped to the ink bounding box.
+   - Resized to fit a 20×20 region.
+   - Placed into a 28×28 canvas.
+   - Centered by center-of-mass.
+   - Normalized to values in [0, 1].
+3. **Model inference** – A small CNN (Conv2D → MaxPool → Conv2D → MaxPool → Flatten → Dense → Dense softmax) is loaded from `public/model/model.json` and run client-side.
+4. **Activation extraction** – A multi-output model exposes intermediate activations from convolution, pooling, and dense layers.
+5. **Stage UI** – The UI guides the user through each CNN stage and renders activations, explanations, and probabilities.
+
+For deeper details, see the docs in `docs/` and the research scripts in `research/`.
+
+---
+
+## Installation & local development
 
 ```bash
-# 1. Clone and Install
-git clone https://github.com/osamaPY/cnn-visual-lab.git
-cd cnn-visual-lab
+# 1. Clone and install
+git clone https://github.com/osamaPY/cnn_simulation.git
+cd cnn_simulation
 npm install
 
-# 2. Start the Application
+# 2. Start the app
 npm run dev
 ```
 
-To use the Python training utilities:
+End-to-end tests (Playwright):
+
+```bash
+npm run test:e2e
+```
+
+Python research utilities (training / pure-NumPy explanations):
+
 ```bash
 cd research
 python -m venv venv
-source venv/bin/activate # or .\venv\Scripts\activate on Windows
+source venv/bin/activate   # or .\venv\Scripts\activate on Windows
 pip install -r requirements.txt
 python explain_cnn.py
 ```
 
 ---
 
-## Contributions
-Feedback and contributions are welcome. If you encounter an issue or have suggestions for enhanced visualizations, please feel free to open a pull request.
+## Model card
 
-*Developed with a focus on educational clarity and matrix mathematics.*
+See `docs/model-card.md` for:
+
+- Dataset and preprocessing assumptions.
+- Architecture and training setup.
+- Intended use (education / visualization) and limitations.
+
+---
+
+## What I learned building this
+
+- Turning freehand canvas input into a robust MNIST-style tensor via cropping, centering, and normalization.
+- Running a CNN completely in the browser using TensorFlow.js, including model loading and caching.
+- Extracting and visualizing intermediate activations to make CNNs more explainable.
+- Designing a guided, stage-based UI to teach deep learning concepts interactively.
+
+---
+
+## Contributions
+
+Feedback and contributions are welcome. If you have ideas for clearer visualizations, new stages, or better tests, feel free to open an issue or pull request.
