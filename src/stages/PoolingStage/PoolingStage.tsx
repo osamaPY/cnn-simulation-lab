@@ -1,11 +1,8 @@
 import React, { useRef, useEffect, useMemo } from 'react';
 import { useLabStore } from '../../hooks/useLabStore';
 import { useTimeline } from '../../animations/useTimeline';
-import { TimelineStepper } from '../../components/TimelineStepper';
 import { getAuroraColor } from '../../canvas/heatScale';
 import {
-  getPoolingWindow,
-  maxPoolWindow,
   computeMaxPool2D
 } from '../../math/pooling';
 
@@ -20,9 +17,8 @@ export const PoolingStage: React.FC = () => {
   const totalSteps = 169;
   const { stepIndex } = useTimeline(totalSteps, true);
 
-  // 1. Extract a real 26x26 model activation map.
+  // Extract a real 26x26 model activation map.
   const input26 = useMemo(() => {
-    // Look for real conv2d activation records
     const convRecord = activations.find(
       r => r.layerType === 'Conv2D' && r.shape.length === 4 && r.shape[1] === 26
     );
@@ -56,7 +52,7 @@ export const PoolingStage: React.FC = () => {
     return { inMin: min, inMax: max };
   }, [input26]);
 
-  // 2. Pre-calculate the pooled 13x13 output map
+  // Pre-calculate the pooled 13x13 output map
   const outputMap = useMemo(() => {
     return computeMaxPool2D(input26);
   }, [input26]);
@@ -77,14 +73,12 @@ export const PoolingStage: React.FC = () => {
     return { outMin: min, outMax: max };
   }, [outputMap]);
 
-  // 3. Extract active window at current stepIndex
-  const { windowVals, row, col, maxVal, maxIndex } = useMemo(() => {
+  // Extract active window at current stepIndex
+  const { row, col } = useMemo(() => {
     const r = Math.floor(stepIndex / 13);
     const c = stepIndex % 13;
-    const win = getPoolingWindow(input26, r, c);
-    const { maxVal: mv, maxIndex: mi } = maxPoolWindow(win);
-    return { windowVals: win, row: r, col: c, maxVal: mv, maxIndex: mi };
-  }, [input26, stepIndex]);
+    return { row: r, col: c };
+  }, [stepIndex]);
 
   // Render 26x26 Input Canvas
   useEffect(() => {
@@ -100,15 +94,11 @@ export const PoolingStage: React.FC = () => {
     for (let r = 0; r < 26; r++) {
       for (let c = 0; c < 26; c++) {
         const val = input26[r * 26 + c];
-        // Normalize using input min/max
-        const norm = (val - inMin) / (inMax - inMin);
+        const norm = (val - inMin) / (inMax - inMin || 1);
         const { r: cr, g: cg, b: cb } = getAuroraColor(norm);
         
         ctx.fillStyle = `rgb(${cr}, ${cg}, ${cb})`;
         ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
-        
-        ctx.strokeStyle = 'rgba(255,255,255,0.01)';
-        ctx.strokeRect(c * cellSize, r * cellSize, cellSize, cellSize);
       }
     }
   }, [input26, inMin, inMax]);
@@ -122,7 +112,7 @@ export const PoolingStage: React.FC = () => {
     lastDrawnStepRef.current = -1;
   }, [outputMap, outMin, outMax]);
 
-  // Draw only newly revealed pooled cells unless the timeline moves backward.
+  // Draw pooled output map
   useEffect(() => {
     const canvas = outputCanvasRef.current;
     if (!canvas) return;
@@ -143,43 +133,33 @@ export const PoolingStage: React.FC = () => {
       const c = i % 13;
       const val = outputMap[i];
 
-      const norm = (val - outMin) / (outMax - outMin);
+      const norm = (val - outMin) / (outMax - outMin || 1);
       const { r: cr, g: cg, b: cb } = getAuroraColor(norm);
 
       ctx.fillStyle = `rgb(${cr}, ${cg}, ${cb})`;
       ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
-      
-      ctx.strokeStyle = 'rgba(255,255,255,0.01)';
-      ctx.strokeRect(c * cellSize, r * cellSize, cellSize, cellSize);
     }
     lastDrawnStepRef.current = stepIndex;
   }, [stepIndex, outputMap, outMin, outMax]);
 
-  // Calculate pixel coordinates for sliding SVG window
   const frameX = col * 2 * 10;
   const frameY = row * 2 * 10;
 
   return (
-    <div className="flex flex-col gap-6 w-full items-center">
-      {/* 1. Canvas side-by-side grids */}
-      <div className="flex flex-col md:flex-row items-center md:items-stretch justify-center gap-6 w-full">
+    <div className="flex flex-col items-center gap-6 w-full max-w-3xl px-4">
+      {/* Side-by-Side Grids */}
+      <div className="flex flex-col md:flex-row items-center justify-center gap-8 w-full py-4">
         {/* Input Map */}
-        <div className="flex flex-col items-center">
-          <div className="flex items-center justify-between w-full mb-2 px-1">
-            <span className="text-[10px] font-mono text-text-secondary uppercase">
-              Input Map: 26x26
-            </span>
-            <span className="text-[10px] font-mono text-text-muted">
-              Region: ({row * 2}, {col * 2})
-            </span>
-          </div>
-
-          <div className="relative p-1 rounded border border-border-muted bg-bg-canvas">
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">
+            Input Map: 26x26
+          </span>
+          <div className="relative p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
             <canvas
               ref={inputCanvasRef}
               width={260}
               height={260}
-              className="rounded-lg bg-black block border border-border-subtle select-none"
+              className="rounded-xl bg-black block border border-white/5 select-none"
             />
             {/* Sliding 2x2 pooling frame */}
             <svg 
@@ -192,94 +172,43 @@ export const PoolingStage: React.FC = () => {
                 width={20}
                 height={20}
                 rx="1"
-                fill="rgba(80, 201, 230, 0.10)"
+                fill="rgba(147, 51, 234, 0.15)"
                 stroke="var(--aurora-purple)"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 className="transition-all duration-150 ease-out"
               />
             </svg>
           </div>
+          <span className="text-[10px] font-mono text-white/40">
+            Window: ({row * 2}, {col * 2})
+          </span>
         </div>
 
-        {/* Local Max Telemetry Panel */}
-        <div className="flex flex-col items-center justify-center gap-4 bg-bg-panel border border-border-muted p-4 rounded max-w-xs w-full text-center">
-          <div className="border-b border-border-subtle pb-2 w-full text-center">
-            <span className="text-[10px] font-mono text-text-accent uppercase tracking-wider font-semibold">
-              2x2 Max Pooling Window
-            </span>
-          </div>
-
-          {/* 2x2 grid representing values in window */}
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[8px] font-mono text-text-muted uppercase">Window Activations</span>
-            <div className="grid grid-cols-2 gap-1.5 p-2 bg-black rounded-lg border border-border-subtle w-32 h-32">
-              {Array.from(windowVals).map((val, idx) => {
-                const isMax = idx === maxIndex;
-                return (
-                  <div
-                    key={idx}
-                    className={`flex items-center justify-center rounded-md text-xs font-mono border transition-all duration-300 ${
-                      isMax
-                        ? 'bg-text-accent/15 border-text-accent text-text-accent font-bold'
-                        : 'bg-bg-deep border-border-subtle text-text-muted'
-                    }`}
-                  >
-                    {val.toFixed(2)}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Mathematical detail */}
-          <div className="w-full bg-bg-deep border border-border-subtle p-2.5 rounded-lg text-left font-mono text-[10px] flex flex-col gap-1.5">
-            <div className="text-[9px] uppercase text-text-muted border-b border-border-subtle pb-1 font-display">
-              Operation Summary
-            </div>
-            <div className="flex justify-between text-text-secondary">
-              <span>Window:</span>
-              <span>[{Array.from(windowVals).map(v => v.toFixed(1)).join(', ')}]</span>
-            </div>
-            <div className="flex justify-between text-text-accent font-bold text-xs pt-1 border-t border-border-subtle">
-              <span>Max Output:</span>
-              <span className="text-aurora-mint">{maxVal.toFixed(3)}</span>
-            </div>
-          </div>
+        {/* Transition Arrow */}
+        <div className="flex flex-col items-center justify-center text-aurora-purple/40" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          <span className="text-[9px] font-mono mt-1 text-white/30 uppercase tracking-widest">Max Pool</span>
         </div>
 
         {/* Output Map */}
-        <div className="flex flex-col items-center">
-          <div className="flex items-center justify-between w-full mb-2 px-1">
-            <span className="text-[10px] font-mono text-text-secondary uppercase">
-              Output Map: 13x13
-            </span>
-            <span className="text-[10px] font-mono text-text-muted">
-              Progress: {Math.round((stepIndex / totalSteps) * 100)}%
-            </span>
-          </div>
-
-          <div className="relative p-1 rounded border border-border-muted bg-bg-canvas">
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">
+            Output Map: 13x13 (Pooled)
+          </span>
+          <div className="relative p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
             <canvas
               ref={outputCanvasRef}
               width={260}
               height={260}
-              className="rounded-lg bg-black block border border-border-subtle select-none"
+              className="rounded-xl bg-black block border border-white/5 select-none"
             />
           </div>
+          <span className="text-[10px] font-mono text-white/40">
+            Progress: {Math.round((stepIndex / totalSteps) * 100)}%
+          </span>
         </div>
-      </div>
-
-      {/* 2. Timeline Stepper */}
-      <TimelineStepper stageTotalSteps={totalSteps} />
-
-      {/* 3. Mathematical explainer caption */}
-      <div className="w-full text-center max-w-lg border border-border-subtle p-3.5 rounded-xl bg-bg-panel/40 flex flex-col items-center gap-1.5 text-xs text-text-secondary leading-relaxed">
-        <span className="font-semibold text-text-accent font-mono">
-          output(i, j) = Max( input[2i:2i+2, 2j:2j+2] )
-        </span>
-        <p className="text-[10px] text-text-muted">
-          * Note: Dimension scales down from <strong className="text-text-secondary">26x26</strong> to <strong className="text-text-secondary">13x13</strong> because pool size = 2 and stride = 2 cuts spatial height/width in half.
-        </p>
       </div>
     </div>
   );

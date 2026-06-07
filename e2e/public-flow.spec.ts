@@ -20,11 +20,9 @@ test('draws a digit, runs real inference, and plays cinematic timeline', async (
 
   await page.getByRole('button', { name: 'Run Simulation' }).click()
 
-  // Interact with cinematic video player
-  await page.getByRole('button', { name: 'Play', exact: true }).click()
-  await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible()
-  await page.getByRole('button', { name: 'Pause', exact: true }).click()
+  // Interact with next/back navigation
   await page.getByRole('button', { name: 'Next Chapter' }).click()
+  await expect(page.getByText('Chapter 3 / 10')).toBeVisible()
 
   // Reset
   await page.getByRole('button', { name: 'Restart' }).click()

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useTimeline } from '../../animations/useTimeline'
-import { TimelineStepper } from '../../components/TimelineStepper'
 import { useLabStore } from '../../hooks/useLabStore'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { computeValidConv2D, REPRESENTATIVE_BIAS, REPRESENTATIVE_KERNEL } from '../../math/convolution'
@@ -64,42 +63,40 @@ export function ReluStage() {
   }, [shouldReduceMotion, stats.maxMagnitude, stepIndex, values])
 
   return (
-    <div className="flex w-full flex-col items-center gap-5 p-4">
-      <div className="grid w-full max-w-2xl gap-5 md:grid-cols-[1fr_220px]">
-        <div className="rounded-xl border border-border-muted bg-bg-deep/60 p-3">
-          <div className="mb-3 flex items-center justify-between text-[10px] font-mono uppercase text-text-muted">
+    <div className="flex w-full flex-col items-center gap-6 px-4">
+      <div className="grid w-full max-w-2xl gap-8 md:grid-cols-[1fr_220px] py-4">
+        {/* Canvas panel */}
+        <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-2xl">
+          <div className="mb-3 flex items-center justify-between text-[10px] font-mono uppercase text-white/50">
             <span>Pre-activation to ReLU output</span>
             <span>{SIZE}x{SIZE}</span>
           </div>
-          <canvas ref={canvasRef} width={312} height={312} className="mx-auto block h-auto w-full max-w-[312px] rounded-lg bg-black" />
+          <canvas ref={canvasRef} width={312} height={312} className="mx-auto block h-auto w-full max-w-[312px] rounded-xl bg-black border border-white/5" />
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="rounded-xl border border-border-muted bg-bg-panel p-4">
-            <p className="text-[10px] font-mono uppercase text-text-accent">ReLU rule</p>
-            <p className="mt-2 text-lg font-semibold text-text-primary font-mono">f(x) = max(0, x)</p>
-            <svg viewBox="0 0 180 110" className="mt-3 w-full" aria-label="ReLU hinge graph">
-              <path d="M20 90H165M70 100V15" stroke="var(--border-muted)" strokeWidth="1.5" />
+        {/* Info & Hinge graph panel */}
+        <div className="flex flex-col gap-4">
+          <div className="rounded-2xl border border-white/10 bg-black/30 p-5 shadow-xl">
+            <p className="text-[10px] font-mono uppercase text-aurora-mint tracking-wider">ReLU Rule</p>
+            <p className="mt-2 text-xl font-semibold text-white font-mono">f(x) = max(0, x)</p>
+            <svg viewBox="0 0 180 110" className="mt-4 w-full" aria-label="ReLU hinge graph">
+              <path d="M20 90H165M70 100V15" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
               <path d="M20 90H70L155 20" fill="none" stroke="var(--aurora-mint)" strokeWidth="4" strokeLinecap="round" />
-              <text x="150" y="102" fill="var(--text-muted)" fontSize="10">x</text>
-              <text x="77" y="20" fill="var(--text-muted)" fontSize="10">f(x)</text>
+              <text x="150" y="102" fill="rgba(255,255,255,0.4)" fontSize="10">x</text>
+              <text x="77" y="20" fill="rgba(255,255,255,0.4)" fontSize="10">f(x)</text>
             </svg>
           </div>
-          <div className="rounded-xl border border-border-subtle bg-bg-deep/50 p-3 text-[10px] leading-relaxed text-text-muted">
-            <strong className="text-text-secondary">Representative-kernel view:</strong> the input and
-            convolution math are real; the displayed kernel is the explicitly simplified educational filter.
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-center text-[10px] font-mono">
-            <div className="rounded-lg border border-aurora-indigo/30 bg-aurora-indigo/10 p-2 text-text-secondary">
-              {stats.negative} negatives clipped
+
+          <div className="grid grid-cols-2 gap-2.5 text-center text-[10px] font-mono">
+            <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-2.5 text-red-400">
+              {stats.negative} clipped
             </div>
-            <div className="rounded-lg border border-aurora-mint/30 bg-aurora-mint/10 p-2 text-aurora-mint">
-              {stats.positive} positives kept
+            <div className="rounded-xl border border-aurora-mint/20 bg-aurora-mint/5 p-2.5 text-aurora-mint">
+              {stats.positive} kept
             </div>
           </div>
         </div>
       </div>
-      <TimelineStepper stageTotalSteps={totalSteps} />
     </div>
   )
 }

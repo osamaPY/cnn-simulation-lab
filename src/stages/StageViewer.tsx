@@ -71,7 +71,7 @@ export function StageViewer() {
   }
 
   useEffect(() => {
-    if (currentStageId === 7) {
+    if (currentStageId === 4) {
       const firstConv = activations.find((record) => record.layerType === 'Conv2D')
       if (firstConv) setSelectedActivationLayer(firstConv.layerName)
     }
@@ -79,9 +79,9 @@ export function StageViewer() {
 
   const missingState = !preprocessedData
     ? 'Draw a digit and click Run Simulation to generate the real preprocessing data.'
-    : (currentStageId === 7 || (currentStageId >= 9 && currentStageId <= 11)) && activations.length === 0
+    : (currentStageId === 4 || (currentStageId >= 6 && currentStageId <= 8)) && activations.length === 0
       ? 'This stage requires intermediate activations from the exported TensorFlow.js model. Add the model under public/model and run the simulation again.'
-      : currentStageId >= 12 && !prediction
+      : currentStageId >= 9 && !prediction
         ? 'This stage requires a successful model prediction. Add the exported model, then draw a digit and run the simulation again.'
         : null
 
@@ -90,27 +90,24 @@ export function StageViewer() {
 
     switch (currentStageId) {
       case 1:
-        return <div className="flex flex-col items-center justify-center w-full h-full"><PreprocessingPreview /></div>
+        return <div className="flex flex-col items-center justify-center w-full h-full max-w-xl mx-auto"><PreprocessingPreview /></div>
       case 2:
-      case 3:
         return <div className="flex w-full h-full items-center justify-center"><TensorGridPreview /></div>
+      case 3:
+        return <div className="flex w-full h-full items-center justify-center"><ConvolutionStage /></div>
       case 4:
-      case 5:
-      case 6:
-        return <div className="flex w-full h-full items-center justify-center scale-95"><ConvolutionStage /></div>
-      case 7:
         return <div className="flex w-full h-full items-center justify-center"><FeatureMapGrid /></div>
-      case 8:
+      case 5:
         return <div className="flex w-full h-full items-center justify-center"><ReluStage /></div>
-      case 9:
+      case 6:
         return <div className="flex w-full h-full items-center justify-center"><PoolingStage /></div>
-      case 10:
+      case 7:
         return <div className="flex w-full h-full items-center justify-center"><FlattenStage /></div>
-      case 11:
+      case 8:
         return <div className="flex w-full h-full items-center justify-center"><DenseStage /></div>
-      case 12:
+      case 9:
         return <div className="flex w-full h-full items-center justify-center"><SoftmaxStage /></div>
-      case 13:
+      case 10:
         return <div className="flex w-full h-full items-center justify-center"><PredictionStage /></div>
       default:
         return null
@@ -123,10 +120,10 @@ export function StageViewer() {
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 sm:p-8 pointer-events-auto" id="stage-viewer">
+    <div className="relative w-full min-h-full flex flex-col items-center justify-center p-4 sm:p-6 pointer-events-auto" id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          className="w-full h-full flex items-center justify-center"
+          className="w-full flex flex-col items-center justify-center"
           key={`${currentStageId}-${Boolean(preprocessedData)}-${activations.length}-${Boolean(prediction)}`}
           initial={shouldReduceMotion ? false : { opacity: 0, x: direction * 60, scale: 0.98 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}

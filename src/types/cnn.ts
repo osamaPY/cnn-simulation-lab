@@ -16,90 +16,69 @@ export interface PredictionResult {
 export const CNN_STAGES: StageInfo[] = [
   {
     id: 1,
-    name: "Input Image normalization",
+    name: "Input Image Normalization",
     shortName: "Input",
     description: "Crops and centers your drawing.",
-    shapeLabel: "28 × 28 × 1"
+    shapeLabel: "28 × 28"
   },
   {
     id: 2,
     name: "Pixel Grid Discretization",
     shortName: "Grid",
-    description: "Converts the drawing to a 28x28 grid of values.",
+    description: "Converts the drawing to a 28x28 grid. Hover to inspect values.",
     shapeLabel: "28 × 28"
   },
   {
     id: 3,
-    name: "Pixel Intensity Probe",
-    shortName: "Probe",
-    description: "Hover to inspect cell values.",
-    shapeLabel: "1 × 1"
+    name: "3x3 Convolution Filter",
+    shortName: "Convolution",
+    description: "Slides a 3x3 filter to extract local features.",
+    shapeLabel: "26 × 26"
   },
   {
     id: 4,
-    name: "3x3 Convolution Kernel",
-    shortName: "Conv Scan",
-    description: "Slides a 3x3 filter to extract local features.",
-    shapeLabel: "26 × 26 × 1"
-  },
-  {
-    id: 5,
-    name: "Patch Elementwise Product",
-    shortName: "Multiply",
-    description: "Multiplies local pixels by kernel weights.",
-    shapeLabel: "3 × 3"
-  },
-  {
-    id: 6,
-    name: "Sum & Bias Integration",
-    shortName: "Sum",
-    description: "Sums the products and adds a bias threshold.",
-    shapeLabel: "1"
-  },
-  {
-    id: 7,
     name: "Multi-Filter Stack",
     shortName: "Filters",
-    description: "Runs multiple filters in parallel.",
+    description: "Runs multiple filters in parallel to extract different features.",
     shapeLabel: "26 × 26 × 8"
   },
   {
-    id: 8,
-    name: "ReLU Non-Linearity",
+    id: 5,
+    name: "ReLU Activation",
     shortName: "ReLU",
     description: "Clips negative feature values to zero.",
     shapeLabel: "26 × 26 × 8"
   },
   {
-    id: 9,
+    id: 6,
     name: "Max Pooling Downsampling",
     shortName: "Pooling",
     description: "Downsamples grid dimensions to 13x13.",
     shapeLabel: "13 × 13 × 8"
   },
   {
-    id: 10,
+    id: 7,
     name: "Tensor Flattening",
     shortName: "Flatten",
     description: "Unrolls 3D feature grids to a 1D vector.",
     shapeLabel: "400"
   },
   {
-    id: 11,
+    id: 8,
     name: "Dense Connected Layer",
     shortName: "Dense",
     description: "Weighs features globally to evaluate candidates.",
     shapeLabel: "64"
   },
   {
-    id: 12,
+    id: 9,
     name: "Softmax Normalization",
     shortName: "Softmax",
     description: "Normalizes scores into probability percentages.",
     shapeLabel: "10"
   },
   {
-    id: 13,
+    id: 10,
     name: "Final Classification Result",
     shortName: "Output",
     description: "Yields predicted digit and model confidence.",

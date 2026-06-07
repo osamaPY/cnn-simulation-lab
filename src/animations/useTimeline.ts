@@ -32,7 +32,7 @@ export const useTimelineStore = create<TimelineState>((set, get) => ({
     if (stepIndex < totalSteps - 1) {
       set({ stepIndex: stepIndex + 1 });
     } else {
-      set({ isPlaying: false });
+      set({ stepIndex: 0 });
     }
   },
   

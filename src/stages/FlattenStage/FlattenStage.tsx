@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useTimeline } from '../../animations/useTimeline'
-import { TimelineStepper } from '../../components/TimelineStepper'
 import { useLabStore } from '../../hooks/useLabStore'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 
@@ -50,22 +49,22 @@ export function FlattenStage() {
         }
 
   return (
-    <div className="flex w-full flex-col items-center gap-5 p-4">
-      <div className="w-full max-w-2xl rounded-xl border border-border-muted bg-bg-deep/60 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono uppercase text-text-muted">
+    <div className="flex w-full flex-col items-center gap-6 px-4">
+      <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-black/40 p-6 shadow-2xl">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono uppercase text-white/50">
           <span>Real final pooled activation</span>
           <span className="rounded border border-aurora-purple/30 bg-aurora-purple/10 px-2 py-1 text-text-accent">
             [1, 5, 5, 16] to [1, 400]
           </span>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-center">
-          <div className="grid grid-cols-5 gap-1 justify-self-center" aria-label="Representative final pooled map">
+        <div className="mt-6 grid gap-6 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-center">
+          <div className="grid grid-cols-5 gap-1.5 justify-self-center" aria-label="Representative final pooled map">
             {Array.from({ length: 25 }, (_, index) => {
               const value = values[index * 16] ?? 0
               return (
                 <div
-                  className="h-7 w-7 rounded-sm border border-border-subtle"
+                  className="h-8 w-8 rounded-sm border border-white/5"
                   key={index}
                   style={{ backgroundColor: `rgba(80, 201, 230, ${Math.max(0.05, value / maxValue)})` }}
                 />
@@ -73,9 +72,9 @@ export function FlattenStage() {
             })}
           </div>
           <div className="min-w-0">
-            <p className="mb-2 text-center text-xs text-text-muted sm:text-left">16 channels become one 400-value vector</p>
-            <div className="h-7 w-full overflow-hidden rounded border border-border-muted bg-black">
-              <canvas ref={vectorCanvasRef} width={600} height={28} className="h-full w-full" />
+            <p className="mb-2 text-center text-xs text-white/60 sm:text-left">16 channels flatten into one 400-value vector</p>
+            <div className="h-8 w-full overflow-hidden rounded border border-white/10 bg-black shadow-inner">
+              <canvas ref={vectorCanvasRef} width={600} height={32} className="h-full w-full" />
             </div>
           </div>
 
@@ -86,10 +85,14 @@ export function FlattenStage() {
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-5 gap-1 sm:grid-cols-10">
+        <div className="mt-6 grid grid-cols-5 gap-1.5 sm:grid-cols-10">
           {SAMPLE_INDICES.map((index) => (
             <button
-              className={`rounded border px-1 py-2 text-[9px] font-mono ${hoveredIndex === index ? 'border-aurora-mint bg-aurora-mint/15 text-aurora-mint' : 'border-border-subtle bg-bg-panel text-text-muted'}`}
+              className={`rounded-lg border px-1 py-2 text-[9px] font-mono transition-all ${
+                hoveredIndex === index 
+                  ? 'border-aurora-mint bg-aurora-mint/15 text-aurora-mint' 
+                  : 'border-white/10 bg-white/5 text-white/50 hover:text-white hover:bg-white/10'
+              }`}
               key={index}
               onFocus={() => setHoveredIndex(index)}
               onMouseEnter={() => setHoveredIndex(index)}
@@ -100,18 +103,11 @@ export function FlattenStage() {
             </button>
           ))}
         </div>
-        <p className="mt-3 text-center text-[10px] text-text-muted">
+        <p className="mt-4 text-center text-xs text-white/55 h-4">
           {hoveredOrigin
-            ? `Vector index ${hoveredIndex} came from row ${hoveredOrigin.row}, column ${hoveredOrigin.col}, channel ${hoveredOrigin.channel}.`
+            ? `Vector index ${hoveredIndex} came from row ${hoveredOrigin.row}, col ${hoveredOrigin.col}, channel ${hoveredOrigin.channel}.`
             : 'Hover a sampled vector index to trace it back to its source coordinate.'}
         </p>
-      </div>
-
-      <TimelineStepper stageTotalSteps={100} />
-
-      <div className="w-full max-w-2xl rounded-xl border border-border-subtle bg-bg-deep/50 p-3 text-center text-[10px] text-text-muted">
-        The ten moving cells are a representative animation for performance. The full canvas strip uses all
-        400 real activation values from the model.
       </div>
     </div>
   )
