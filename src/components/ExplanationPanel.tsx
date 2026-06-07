@@ -163,41 +163,41 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="w-full"
             >
-              <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5 text-left pointer-events-auto">
+              <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 text-left pointer-events-auto">
                 {/* Column 1: Concept */}
-                <div className="flex flex-col gap-0.5 min-w-0">
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <span className="w-1 h-1 rounded-full animate-pulse" style={{ backgroundColor: stageColor }} />
-                    <span className="text-[7.5px] font-mono font-bold uppercase tracking-wider text-white/40">Visual Concept</span>
+                <div className="flex flex-col gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-1 bg-white/[0.02] border border-white/5 px-2 py-0.5 rounded w-max">
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: stageColor }} />
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-white/50">Visual Concept</span>
                   </div>
-                  <p className="text-[9.5px] font-sans leading-relaxed text-white/60">
+                  <p className="text-[11.5px] font-sans leading-relaxed text-white/70">
                     {beginnerExp?.body}
                   </p>
                 </div>
 
                 {/* Column 2: Math Model */}
-                <div className="flex flex-col gap-0.5 min-w-0 border-l border-white/5 pl-4">
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <span className="w-1 h-1 rounded-full animate-pulse" style={{ backgroundColor: '#58C4DD' }} />
-                    <span className="text-[7.5px] font-mono font-bold uppercase tracking-wider text-white/40">Mathematical Model</span>
+                <div className="flex flex-col gap-1 min-w-0 border-l border-white/5 pl-5">
+                  <div className="flex items-center gap-1.5 mb-1 bg-white/[0.02] border border-white/5 px-2 py-0.5 rounded w-max">
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#58C4DD' }} />
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-white/50">Mathematical Model</span>
                   </div>
-                  <p className="text-[9.5px] font-sans leading-relaxed text-white/60">
+                  <p className="text-[11.5px] font-sans leading-relaxed text-white/70">
                     {mathExp?.body}
                   </p>
                   {mathExp?.focusFormula && (
-                    <div className="mt-1 flex items-center justify-start text-[#58C4DD] scale-[0.75] origin-left">
+                    <div className="mt-2.5 flex items-center justify-start text-[#58C4DD] scale-[0.9] origin-left overflow-x-auto no-scrollbar max-w-full">
                       <MathFormula formula={mathExp.focusFormula} />
                     </div>
                   )}
                 </div>
 
                 {/* Column 3: Technical Specs */}
-                <div className="flex flex-col gap-0.5 min-w-0 border-l border-white/5 pl-4">
-                  <div className="flex items-center gap-1 mb-0.5">
-                    <span className="w-1 h-1 rounded-full animate-pulse" style={{ backgroundColor: '#83C167' }} />
-                    <span className="text-[7.5px] font-mono font-bold uppercase tracking-wider text-white/40">Technical Specs</span>
+                <div className="flex flex-col gap-1 min-w-0 border-l border-white/5 pl-5">
+                  <div className="flex items-center gap-1.5 mb-1 bg-white/[0.02] border border-white/5 px-2 py-0.5 rounded w-max">
+                    <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: '#83C167' }} />
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-white/50">Technical Specs</span>
                   </div>
-                  <p className="text-[9.5px] font-sans leading-relaxed text-white/60">
+                  <p className="text-[11.5px] font-sans leading-relaxed text-white/70">
                     {examExp?.body}
                   </p>
                 </div>

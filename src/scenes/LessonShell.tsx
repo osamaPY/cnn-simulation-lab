@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { DrawCanvas } from '../stages/DrawingStage/DrawCanvas';
 import { StageViewer } from '../stages/StageViewer';
@@ -7,6 +7,7 @@ import { useLabStore } from '../hooks/useLabStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlayerControls } from '../components/PlayerControls';
 import { HyperparamControls } from '../components/HyperparamControls';
+import { CNN_STAGES } from '../types/cnn';
 
 function DrawScreen() {
   return (
@@ -75,6 +76,27 @@ function DrawScreen() {
 export const LessonShell: React.FC = () => {
   const preprocessedData = useLabStore(state => state.preprocessedData);
   const currentStageId   = useLabStore(state => state.currentStageId);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const activeStage = CNN_STAGES.find(s => s.id === currentStageId) || CNN_STAGES[0];
+
+  const STAGE_COLORS: Record<number, string> = {
+    1: '#58C4DD', 2: '#58C4DD', 3: '#58C4DD', 4: '#F5CD47', 5: '#83C167',
+    6: '#9C27B0', 7: '#FF6666', 8: '#E07A5F', 9: '#9C27B0',
+    10: '#58C4DD', 11: '#83C167', 12: '#FF6666',
+  };
+  const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
+
+  // Listen to Escape key to close details modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowDetails(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <div
@@ -119,12 +141,25 @@ export const LessonShell: React.FC = () => {
                     <StageViewer />
                   </div>
 
-                  {/* Unified Learning Cockpit: Concept, Math, and Technical specs */}
+                  {/* Compact Stage Summary Bottom Bar */}
                   <div
-                    className="flex-shrink-0 flex items-start justify-center bg-black/25 border-t border-white/5 subtitle-explanation-wrapper"
-                    style={{ minHeight: '110px', padding: '10px 16px', zIndex: 30, overflowY: 'auto' }}
+                    className="flex-shrink-0 flex items-center justify-between bg-black/45 border-t border-white/5 subtitle-explanation-wrapper"
+                    style={{ minHeight: '34px', padding: '0 16px', zIndex: 30 }}
                   >
-                    <ExplanationPanel mode="subtitles" />
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-white/50">
+                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: activeColor, boxShadow: `0 0 8px ${activeColor}bb` }} />
+                      <span>Stage {currentStageId.toString().padStart(2, '0')}:</span>
+                      <span className="text-white/80 font-bold uppercase tracking-wide">{activeStage?.name}</span>
+                    </div>
+
+                    <button
+                      onClick={() => setShowDetails(true)}
+                      className="px-2.5 py-0.5 rounded text-[8.5px] font-mono uppercase tracking-widest border border-aurora-teal/30 hover:border-aurora-teal hover:bg-aurora-teal/10 transition-all cursor-pointer text-aurora-teal font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(88,196,221,0.05)] bg-[#161616]"
+                      type="button"
+                    >
+                      <span>Explanations & Formulas</span>
+                      <span className="text-[7.5px] text-white/40">↵</span>
+                    </button>
                   </div>
                 </div>
 
@@ -157,6 +192,59 @@ export const LessonShell: React.FC = () => {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Cinematic Full-Screen Explanations Drawer Modal */}
+      <AnimatePresence>
+        {showDetails && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-6 pointer-events-auto"
+            onClick={() => setShowDetails(false)}
+          >
+            <motion.div
+              initial={{ y: 35, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 35, opacity: 0, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              className="max-w-4xl w-full bg-[#121212]/95 border border-white/10 rounded-2xl p-6 shadow-2xl relative flex flex-col gap-5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: activeColor, boxShadow: `0 0 10px ${activeColor}88` }} />
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-mono uppercase text-white/40 tracking-[0.2em] font-bold">Deep Dive Analysis</span>
+                    <h3 className="text-lg font-serif font-bold italic text-white/95 leading-none mt-0.5">{activeStage?.name}</h3>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => setShowDetails(false)}
+                  className="text-[9px] font-mono uppercase text-white/40 hover:text-white/80 border border-white/10 rounded px-2.5 py-0.5 hover:bg-white/5 transition-all cursor-pointer bg-black/25"
+                  type="button"
+                >
+                  Close (ESC)
+                </button>
+              </div>
+
+              {/* Explanations 3-Column Content */}
+              <div className="w-full">
+                <ExplanationPanel mode="subtitles" />
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-between items-center border-t border-white/5 pt-3 text-[8.5px] font-mono text-white/25 uppercase tracking-widest leading-none">
+                <span>CNN Visual Lab study companion</span>
+                <span>Click outside or press Escape to close</span>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
