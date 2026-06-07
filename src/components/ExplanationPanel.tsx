@@ -11,7 +11,6 @@ const MathFormula = lazy(() =>
 
 export const ExplanationPanel: React.FC = () => {
   const currentStageId = useLabStore(state => state.currentStageId);
-  const selectedMode = useLabStore(state => state.selectedMode);
   const prediction = useLabStore(state => state.prediction);
   const hasDrawing = useLabStore(state => state.hasDrawing);
   const modelStatus = useLabStore(state => state.modelStatus);
@@ -20,8 +19,7 @@ export const ExplanationPanel: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
 
   // Retrieve matching explanation
-  const modeExplanations = EXPLANATIONS[selectedMode] || EXPLANATIONS.beginner;
-  const explanation = modeExplanations[currentStageId] || {
+  const explanation = EXPLANATIONS[currentStageId] || {
     headline: "Stage Detail",
     body: "An explanation is not available for this stage yet.",
     interactiveGoal: "Follow stage instructions."
@@ -185,9 +183,6 @@ export const ExplanationPanel: React.FC = () => {
             <span className="text-[10px] font-mono bg-aurora-indigo/35 text-text-accent px-2 py-0.5 rounded border border-aurora-purple/20">
               Chapter {currentStageId}
             </span>
-            <span className="text-xs text-text-muted font-display capitalize">
-              {selectedMode} mode
-            </span>
           </div>
 
           {/* Headline */}
@@ -201,7 +196,7 @@ export const ExplanationPanel: React.FC = () => {
           </p>
 
           {/* Math Formula Card */}
-          {selectedMode !== 'beginner' && explanation.focusFormula && (
+          {explanation.focusFormula && (
             <div className="my-4 p-3 bg-bg-deep border border-border-muted rounded-lg font-mono text-center flex flex-col gap-1 shadow-inner relative overflow-hidden">
               <span className="text-[9px] text-text-muted absolute top-1 left-2 font-mono">
                 Formula

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useLessonDirector, type LessonPace } from '../animations/useLessonDirector';
+import { useLessonDirector } from '../animations/useLessonDirector';
 import { useLabStore } from '../hooks/useLabStore';
 import { CNN_STAGES } from '../types/cnn';
 import { scrollToStageViewer } from '../utils/scrollToStage';

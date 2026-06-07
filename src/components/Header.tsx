@@ -1,17 +1,8 @@
 import React from 'react';
 import { useLabStore } from '../hooks/useLabStore';
-import type { TeachingMode } from '../types/cnn';
 
 export const Header: React.FC = () => {
-  const selectedMode = useLabStore(state => state.selectedMode);
-  const setSelectedMode = useLabStore(state => state.setSelectedMode);
   const currentStageId = useLabStore(state => state.currentStageId);
-
-  const modes: { id: TeachingMode; label: string; desc: string }[] = [
-    { id: 'beginner', label: 'Beginner', desc: 'Conceptual explanations' },
-    { id: 'math', label: 'Mathematical', desc: 'Equations and dimensions' },
-    { id: 'exam', label: 'Exam Prep', desc: 'Calculations and formulas' }
-  ];
 
   return (
     <header className="relative w-full border-b border-border-muted bg-bg-panel z-10">

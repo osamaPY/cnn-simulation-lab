@@ -1,4 +1,3 @@
-export type TeachingMode = 'beginner' | 'math' | 'exam';
 
 export interface StageInfo {
   id: number;

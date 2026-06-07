@@ -1,12 +1,11 @@
 import { create } from 'zustand';
 import { CNN_STAGES } from '../types/cnn';
-import type { TeachingMode, PredictionResult, StageInfo } from '../types/cnn';
+import type { PredictionResult, StageInfo } from '../types/cnn';
 import type { ActivationRecord } from '../ml/activationModel';
 
 interface LabState {
   // State variables
   currentStageId: number;
-  selectedMode: TeachingMode;
   hasDrawing: boolean;
   prediction: PredictionResult | null;
   preprocessedData: Float32Array | null;
@@ -35,7 +34,6 @@ interface LabState {
   
   // Actions
   setCurrentStageId: (id: number) => void;
-  setSelectedMode: (mode: TeachingMode) => void;
   setHasDrawing: (hasDrawing: boolean) => void;
   setPrediction: (prediction: PredictionResult | null) => void;
   setOriginalCanvasThumbnail: (url: string | null) => void;
@@ -63,7 +61,6 @@ function getErrorMessage(error: unknown, fallback: string) {
 export const useLabStore = create<LabState>((set, get) => ({
   // Initial State
   currentStageId: 1,
-  selectedMode: 'beginner',
   hasDrawing: false,
   prediction: null,
   preprocessedData: null,
@@ -92,9 +89,7 @@ export const useLabStore = create<LabState>((set, get) => ({
     set({ currentStageId: safeId });
   },
 
-  setSelectedMode: (mode) => {
-    set({ selectedMode: mode });
-  },
+
 
   setHasDrawing: (hasDrawing) => {
     set({ hasDrawing });
