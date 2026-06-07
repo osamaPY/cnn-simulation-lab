@@ -58,7 +58,7 @@ export const DenseStage: React.FC = () => {
     return { minVal: min, maxVal: max };
   }, [volumeValues]);
 
-  // Extract or generate Hidden Dense layer activations (64 neurons)
+  // Extract Dense layer activations (64 neurons)
   const hiddenValues = useMemo(() => {
     const denseRecord = activations.find(
       r => r.layerType === 'Dense' && r.shape.length === 2 && r.shape[1] === 64
@@ -66,7 +66,6 @@ export const DenseStage: React.FC = () => {
     if (denseRecord) {
       return denseRecord.values;
     }
-
     return new Float32Array(64);
   }, [activations]);
 
@@ -86,13 +85,18 @@ export const DenseStage: React.FC = () => {
     return { minDense: min, maxDense: max };
   }, [hiddenValues]);
 
-  // Extract or generate output Softmax probabilities (10 classes)
+  // Extract output Softmax probabilities
   const outputProbabilities = useMemo(() => {
     if (prediction) {
       return prediction.probabilities;
     }
     return Array(10).fill(0);
   }, [prediction]);
+
+  const winnerDigit = useMemo(() => {
+    if (prediction) return prediction.digit;
+    return outputProbabilities.indexOf(Math.max(...outputProbabilities));
+  }, [prediction, outputProbabilities]);
 
   // Sampled Weight Functions
   const getWeight1 = (sampleIdx: number, h: number): number => {
@@ -166,8 +170,26 @@ export const DenseStage: React.FC = () => {
       <div className="relative w-full aspect-[800/460] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
         <svg
           viewBox="0 0 800 460"
-          className="absolute inset-0 w-full h-full select-none z-10 animate-fade-in"
+          className="absolute inset-0 w-full h-full select-none z-10"
         >
+          {/* SVG Glow Filter Defs */}
+          <defs>
+            <filter id="node-glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="line-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
           {/* Connection Lines: Input -> Hidden */}
           {INPUT_SAMPLES.map((inputIdx, sampleIdx) => {
             const inPt = [90, 80 + sampleIdx * 40];
@@ -258,7 +280,7 @@ export const DenseStage: React.FC = () => {
               const hPt = [390, 80 + HIDDEN_SAMPLES.indexOf(conn.hIndex) * 26];
               const px = inPt[0] + (hPt[0] - inPt[0]) * t1;
               const py = inPt[1] + (hPt[1] - inPt[1]) * t1;
-              return <circle key={`p1-${idx}`} cx={px} cy={py} r={3.5} fill="white" stroke="black" strokeWidth="1" />;
+              return <circle key={`p1-${idx}`} cx={px} cy={py} r={4.5} fill="white" stroke="var(--aurora-mint)" strokeWidth="1.5" filter="url(#line-glow)" />;
             });
           })()}
 
@@ -271,7 +293,7 @@ export const DenseStage: React.FC = () => {
               const outPt = [680, 85 + conn.o * 30];
               const px = hPt[0] + (outPt[0] - hPt[0]) * t2;
               const py = hPt[1] + (outPt[1] - hPt[1]) * t2;
-              return <circle key={`p2-${idx}`} cx={px} cy={py} r={3.5} fill="white" stroke="black" strokeWidth="1" />;
+              return <circle key={`p2-${idx}`} cx={px} cy={py} r={4.5} fill="white" stroke="var(--aurora-mint)" strokeWidth="1.5" filter="url(#line-glow)" />;
             });
           })()}
 
@@ -309,10 +331,19 @@ export const DenseStage: React.FC = () => {
             const isLit = progress >= 0.5;
             const finalNorm = isLit ? norm : 0;
             const { r, g, b } = getAuroraColor(finalNorm);
+            const isPulseActive = isLit && finalNorm > 0.3;
 
             return (
               <g key={`hNode-${hIndex}`}>
-                <circle cx={390} cy={y} r={8} fill={`rgb(${r}, ${g}, ${b})`} stroke="rgba(255,255,255,0.2)" strokeWidth="1.2" />
+                <circle 
+                  cx={390} 
+                  cy={y} 
+                  r={8} 
+                  fill={`rgb(${r}, ${g}, ${b})`} 
+                  stroke="rgba(255,255,255,0.2)" 
+                  strokeWidth="1.2" 
+                  filter={isPulseActive ? "url(#node-glow)" : undefined}
+                />
                 <text x={375} y={y + 3.5} fill="rgba(255,255,255,0.3)" fontSize="8" fontFamily="var(--font-mono)" textAnchor="end">h[{hIndex}]</text>
               </g>
             );
@@ -340,7 +371,7 @@ export const DenseStage: React.FC = () => {
                 onMouseLeave={() => setHoveredDigit(null)}
               >
                 {(isHovered || (isWinner && progress >= 0.9)) && (
-                  <circle cx={680} cy={y} r={16} fill="none" stroke={isWinner ? 'var(--aurora-mint)' : 'var(--aurora-teal)'} strokeWidth="1.5" />
+                  <circle cx={680} cy={y} r={16} fill="none" stroke={isWinner ? 'var(--aurora-mint)' : 'var(--aurora-teal)'} strokeWidth="1.5" filter="url(#node-glow)" />
                 )}
                 
                 <circle cx={680} cy={y} r={12} fill={`rgb(${r}, ${g}, ${b})`} stroke="rgba(255,255,255,0.25)" strokeWidth={isWinner ? '1.5' : '1'} />
@@ -359,7 +390,7 @@ export const DenseStage: React.FC = () => {
           {/* Headers */}
           <text x={90} y={45} fill="rgba(255,255,255,0.5)" fontSize="10" fontWeight="bold" textAnchor="middle">1. Flattened Vector</text>
           <text x={390} y={45} fill="rgba(255,255,255,0.5)" fontSize="10" fontWeight="bold" textAnchor="middle">2. Hidden Layer</text>
-          <text x={680} y={45} fill="rgba(255,255,255,0.5)" fontSize="10" fontWeight="bold" textAnchor="middle">3. Output Probabilities</text>
+          <text x={680} y={45} fill="rgba(255,255,255,0.5)" fontSize="10" fontWeight="bold" textAnchor="middle">3. Output Classes</text>
         </svg>
 
         {/* Floating details overlay */}
@@ -386,6 +417,19 @@ export const DenseStage: React.FC = () => {
             Hover digits 0-9 to highlight supporting network weights.
           </div>
         )}
+
+        {/* Floating Winner Math Bubble */}
+        <div 
+          className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2.5 py-1.5 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.6)] flex flex-col gap-0.5 transition-all duration-150 ease-out"
+          style={{ 
+            left: '86%', 
+            top: `${((85 + winnerDigit * 30) / 460) * 100}%`,
+            transform: 'translate(0, -50%)' 
+          }}
+        >
+          <span className="text-aurora-mint font-semibold text-[8px] uppercase tracking-wider">Winning Score</span>
+          <span className="text-white/80 font-bold">Σ(a_j · w_ji) + b_i</span>
+        </div>
       </div>
     </div>
   );

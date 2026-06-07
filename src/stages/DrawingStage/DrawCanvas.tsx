@@ -22,8 +22,7 @@ export const DrawCanvas: React.FC = () => {
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
   }, []);
@@ -80,10 +79,13 @@ export const DrawCanvas: React.FC = () => {
         ctx.lineWidth = 16;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
+        ctx.shadowColor = '#06b6d4'; // Cyan neon chalk glow
+        ctx.shadowBlur = 12;
         ctx.moveTo(lastPos.current.x, lastPos.current.y);
         ctx.lineTo(coords.x, coords.y);
         ctx.stroke();
         
+        ctx.shadowBlur = 0; // Reset blur
         lastPos.current = coords;
       }
     }
@@ -99,8 +101,7 @@ export const DrawCanvas: React.FC = () => {
     if (canvas) {
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
     clearAll();
@@ -127,13 +128,18 @@ export const DrawCanvas: React.FC = () => {
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
-      <div className="relative aspect-square w-full max-w-[280px] rounded-lg border border-border-muted bg-bg-canvas p-1">
+      <div className="relative aspect-square w-full max-w-[280px] rounded-2xl border border-white/10 bg-black/40 p-1.5 shadow-2xl">
         <canvas
           aria-label="Digit drawing canvas"
           ref={canvasRef}
           width={280}
           height={280}
-          className="block h-full w-full rounded-md cursor-crosshair touch-none select-none bg-black border border-border-subtle"
+          style={{
+            backgroundColor: '#0c141a',
+            backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px)',
+            backgroundSize: '20px 20px'
+          }}
+          className="block h-full w-full rounded-xl cursor-crosshair touch-none select-none border border-white/5 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]"
           onMouseDown={startDrawing}
           onMouseMove={draw}
           onMouseUp={stopDrawing}

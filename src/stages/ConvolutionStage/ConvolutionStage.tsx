@@ -171,6 +171,19 @@ export const ConvolutionStage: React.FC = () => {
             />
             {/* SVG KernelFrame moving on top of input canvas */}
             <KernelFrame stepIndex={stepIndex} />
+            {/* Floating Math Calculation Bubble */}
+            <div 
+              className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2 py-1 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex items-center gap-1.5 transition-all duration-150 ease-out"
+              style={{ 
+                left: `${col * 10 + 6 + 15}px`, 
+                top: `${row * 10 + 6}px`,
+                transform: 'translate(-50%, -120%)' 
+              }}
+            >
+              <span className="text-aurora-mint">Σ(x·w)+b</span>
+              <span className="text-white/30">=</span>
+              <span className="text-text-accent font-semibold">{outputMap[stepIndex].toFixed(2)}</span>
+            </div>
           </div>
           <span className="text-[10px] font-mono text-white/40">
             Scanning: ({row + 1}, {col + 1})

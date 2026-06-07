@@ -178,6 +178,19 @@ export const PoolingStage: React.FC = () => {
                 className="transition-all duration-150 ease-out"
               />
             </svg>
+            {/* Floating Max Pool Math Bubble */}
+            <div 
+              className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2 py-1 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex items-center gap-1.5 transition-all duration-150 ease-out"
+              style={{ 
+                left: `${col * 20 + 6 + 10}px`, 
+                top: `${row * 20 + 6}px`,
+                transform: 'translate(-50%, -120%)' 
+              }}
+            >
+              <span className="text-aurora-purple font-semibold">max(2x2)</span>
+              <span className="text-white/30">=</span>
+              <span className="text-aurora-mint font-semibold">{outputMap[stepIndex].toFixed(2)}</span>
+            </div>
           </div>
           <span className="text-[10px] font-mono text-white/40">
             Window: ({row * 2}, {col * 2})
