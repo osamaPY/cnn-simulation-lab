@@ -1,6 +1,15 @@
-# CNN Digit Lab — Tensor Aurora: Model Training & Conversion Pipeline
+# CNN Research Lab — Understanding & Training
 
-This directory contains the Python training scripts and instructions required to compile, train, and convert the pre-trained **MNIST Convolutional Neural Network (CNN)** for use in the browser.
+This directory contains the Python research scripts and instructions required to understand, train, and convert the pre-trained **MNIST Convolutional Neural Network (CNN)** for use in the browser visualizer.
+
+---
+
+## 🔬 Learning Deep Learning
+If you are curious about the math behind the scenes, we've included a script that implements the core operations (Convolution, ReLU, Pooling) from scratch using only `numpy`:
+
+```bash
+python research/explain_cnn.py
+```
 
 ---
 
@@ -15,14 +24,12 @@ python -m venv venv
 # 2. Activate virtual environment
 # On Windows (Command Prompt):
 .\venv\Scripts\activate
-# On Windows (PowerShell):
-.\venv\Scripts\activate.ps1
 # On macOS/Linux:
 source venv/bin/activate
 
 # 3. Upgrade pip & install dependencies
 pip install --upgrade pip
-pip install -r train/requirements.txt
+pip install -r research/requirements.txt
 ```
 
 ---
@@ -32,10 +39,10 @@ pip install -r train/requirements.txt
 Run the training script to fetch the MNIST dataset, train a small CNN matching our network layers, evaluate test accuracy, and save the model:
 
 ```bash
-python train/train_mnist.py
+python research/train_mnist.py
 ```
 
-- **Output**: Generates a compiled Keras model file: `train/mnist_model.h5`.
+- **Output**: Generates a compiled Keras model file: `research/mnist_model.h5`.
 - **Performance**: Standard training runs for 5 epochs and achieves **~98.5% validation accuracy**.
 
 ---
@@ -45,7 +52,7 @@ python train/train_mnist.py
 To load the model inside the browser, the H5 Keras model must be converted into JSON shards. Run the converter:
 
 ```bash
-tensorflowjs_converter --input_format=keras train/mnist_model.h5 public/model/
+tensorflowjs_converter --input_format=keras research/mnist_model.h5 public/model/
 ```
 
 - **Destination**: The output files are saved directly to `public/model/`.

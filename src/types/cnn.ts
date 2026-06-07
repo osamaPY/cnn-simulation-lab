@@ -16,86 +16,86 @@ export interface PredictionResult {
 export const CNN_STAGES: StageInfo[] = [
   {
     id: 1,
-    name: "Input Image Normalization",
+    name: "Standardizing the Image",
     shortName: "Input",
-    description: "Crops and centers your drawing.",
+    description: "Computers need things to be consistent. We crop and center your sketch so the network knows where to look.",
     shapeLabel: "28 × 28"
   },
   {
     id: 2,
-    name: "CNN Architecture Overview",
-    shortName: "VGG-Style",
-    description: "The full macro-structure of the network. Watch how tensors flow through repeated blocks.",
+    name: "The 'Brain' Blueprint",
+    shortName: "Architecture",
+    description: "This is the full map of the network. Tensors (data blocks) flow through these layers to find meaning in pixels.",
     shapeLabel: "Full View"
   },
   {
     id: 3,
-    name: "Pixel Grid Discretization",
+    name: "Turning Ink into Numbers",
     shortName: "Grid",
-    description: "Converts the drawing to a 28x28 grid. Hover to inspect values.",
+    description: "We turn your drawing into a 28x28 grid of numbers. Hover over the cells to see the 'ink' values.",
     shapeLabel: "28 × 28"
   },
   {
     id: 4,
-    name: "3x3 Convolution Filter",
+    name: "Hunting for Patterns",
     shortName: "Convolution",
-    description: "Slides a 3x3 filter to extract local features.",
+    description: "A 3x3 filter slides over the grid, acting like a specialized flashlight looking for edges and curves.",
     shapeLabel: "26 × 26"
   },
   {
     id: 5,
-    name: "Multi-Filter Stack",
+    name: "The Multi-Tasking Team",
     shortName: "Filters",
-    description: "Runs multiple filters in parallel to extract different features.",
+    description: "One filter isn't enough. We run several in parallel—some look for horizontal lines, others for loops.",
     shapeLabel: "26 × 26 × 8"
   },
   {
     id: 6,
-    name: "ReLU Activation",
+    name: "Cleaning Up the Signal",
     shortName: "ReLU",
-    description: "Clips negative feature values to zero.",
+    description: "Neurons either fire or they don't. This step (ReLU) simply deletes any negative 'distractions' by turning them to zero.",
     shapeLabel: "26 × 26 × 8"
   },
   {
     id: 7,
-    name: "Max Pooling Downsampling",
+    name: "Summarizing Features",
     shortName: "Pooling",
-    description: "Downsamples grid dimensions to 13x13.",
+    description: "To save space and focus on what matters, we shrink the grid. We keep only the strongest signal in every 2x2 area.",
     shapeLabel: "13 × 13 × 8"
   },
   {
     id: 8,
-    name: "Tensor Flattening",
+    name: "Unrolling the Data",
     shortName: "Flatten",
-    description: "Unrolls 3D feature grids to a 1D vector.",
+    description: "We take all those 2D pattern maps and unroll them into one long list of numbers, ready for final judgment.",
     shapeLabel: "400"
   },
   {
     id: 9,
-    name: "Dense Connected Layer",
+    name: "Making Connections",
     shortName: "Dense",
-    description: "Weighs features globally to evaluate candidates.",
+    description: "Every pattern we found is weighed together. This is where the network finally asks: 'Which digit does this look like?'",
     shapeLabel: "64"
   },
   {
     id: 10,
-    name: "Softmax Normalization",
+    name: "Calculating Certainty",
     shortName: "Softmax",
-    description: "Normalizes scores into probability percentages.",
+    description: "Raw scores are hard to read, so we normalize them into percentages. This creates a clear 'confidence' profile.",
     shapeLabel: "10"
   },
   {
     id: 11,
-    name: "Final Classification Result",
+    name: "The Final Verdict",
     shortName: "Output",
-    description: "Yields predicted digit and model confidence.",
+    description: "The digit with the highest percentage wins. Here is the AI's final answer and how confident it feels.",
     shapeLabel: "1"
   },
   {
     id: 12,
-    name: "Backpropagation Learning",
+    name: "Learning from Mistakes",
     shortName: "Learning",
-    description: "Visualizes how error gradients flow backward to adjust weights and learn.",
+    description: "If the AI was wrong, it looks back and adjusts its weights. This 'backward flow' is how machines actually learn.",
     shapeLabel: "1"
   }
 ];

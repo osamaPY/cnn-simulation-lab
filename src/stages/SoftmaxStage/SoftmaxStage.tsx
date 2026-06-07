@@ -2,7 +2,6 @@ import React, { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { useLabStore } from '../../hooks/useLabStore'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { sceneTransition } from '../../animations/motion'
 import { useScrubTimeline } from '../../animations/useScrubTimeline'
 import { remap } from '../../animations/mathUtils'
 
@@ -147,8 +146,8 @@ export const SoftmaxStage: React.FC = () => {
              <p className="text-[11px] leading-relaxed text-white/40 font-sans">
                Softmax turns raw 'logit' scores into a probability distribution. It exponentiates each score (making them all positive) and divides by the sum.
              </p>
-             <div className="mt-2 p-3 rounded-lg bg-black/60 border border-white/5 font-mono text-[11px] text-aurora-purple/90">
-                σ(z)_i = e^{z_i} / Σ e^{z_j}
+             <div className="mt-2 p-3 rounded-lg bg-black/60 border border-white/5 font-mono text-[11px] text-aurora-purple/90 italic">
+                σ(z)ᵢ = eᶻⁱ / Σ eᶻʲ
              </div>
           </div>
 
