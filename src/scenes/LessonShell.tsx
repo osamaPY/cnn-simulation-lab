@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Header } from '../components/Header';
 import { DrawCanvas } from '../stages/DrawingStage/DrawCanvas';
 import { StageViewer } from '../stages/StageViewer';
@@ -77,7 +77,8 @@ function DrawScreen() {
 export const LessonShell: React.FC = () => {
   const preprocessedData = useLabStore(state => state.preprocessedData);
   const currentStageId   = useLabStore(state => state.currentStageId);
-  const [showDetails, setShowDetails] = useState(false);
+  const showDetails      = useLabStore(state => state.showDetails);
+  const setShowDetails   = useLabStore(state => state.setShowDetails);
 
   const activeStage = CNN_STAGES.find(s => s.id === currentStageId) || CNN_STAGES[0];
 
@@ -99,7 +100,7 @@ export const LessonShell: React.FC = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [setShowDetails]);
 
   return (
     <div
@@ -173,16 +174,6 @@ export const LessonShell: React.FC = () => {
                 style={{ padding: isFullScreenStage ? '8px 24px' : '4px 16px 6px', zIndex: 40 }}
               >
                 <PlayerControls />
-                {isFullScreenStage && (
-                  <button
-                    onClick={() => setShowDetails(true)}
-                    className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-[0.2em] border border-white/10 bg-black/60 backdrop-blur-md hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer text-white/60 font-bold flex items-center gap-2 shadow-xl whitespace-nowrap"
-                    type="button"
-                  >
-                    <span>Explanations & Formulas</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-aurora-teal animate-pulse" />
-                  </button>
-                )}
               </div>
             </motion.div>
           )}

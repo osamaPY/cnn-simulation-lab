@@ -14,6 +14,7 @@ export const PlayerControls: React.FC = () => {
   const setCurrentStageId = useLabStore((state) => state.setCurrentStageId);
   const preprocessedData = useLabStore((state) => state.preprocessedData);
   const clearAll = useLabStore(state => state.clearAll);
+  const setShowDetails = useLabStore(state => state.setShowDetails);
 
   const [kbHint, setKbHint] = useState(false);
 
@@ -41,11 +42,11 @@ export const PlayerControls: React.FC = () => {
   return (
     <div
       className="flex flex-col gap-2 w-full mx-auto pointer-events-auto select-none"
-      style={{ maxWidth: '960px', padding: '0 8px' }}
+      style={{ maxWidth: '1000px', padding: '0 8px' }}
     >
       {/* Progress bar */}
-      <div className="relative flex items-center w-full" style={{ height: '3px' }}>
-        <div className="absolute inset-0 bg-white/5 rounded-full" />
+      <div className="relative flex items-center w-full mb-1" style={{ height: '2px' }}>
+        <div className="absolute inset-0 bg-white/10 rounded-full" />
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full pointer-events-none"
           style={{ background: activeColor }}
@@ -72,13 +73,13 @@ export const PlayerControls: React.FC = () => {
             >
               <motion.div
                 animate={{
-                  width: isActive ? 5 : 3,
-                  height: isActive ? 5 : 3,
-                  backgroundColor: isActive ? '#fff' : isCompleted ? stageColor : 'rgba(255,255,255,0.15)',
+                  width: isActive ? 6 : 3,
+                  height: isActive ? 6 : 3,
+                  backgroundColor: isActive ? '#fff' : isCompleted ? stageColor : 'rgba(255,255,255,0.2)',
                   rotate: isActive ? 45 : 0,
                 }}
                 transition={{ duration: 0.4 }}
-                className={`${isActive ? 'rounded-none' : 'rounded-full'}`}
+                className={`${isActive ? 'rounded-none shadow-[0_0_10px_rgba(255,255,255,0.5)]' : 'rounded-full'}`}
               />
             </button>
           );
@@ -86,115 +87,77 @@ export const PlayerControls: React.FC = () => {
       </div>
 
       {/* Controls row */}
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-0.5">
+      <div className="flex items-center justify-between w-full px-4">
+        <div className="flex items-center gap-6">
           {/* PREV */}
           <button
             onClick={() => canGoBack && setCurrentStageId(currentStageId - 1)}
             disabled={!canGoBack}
-            aria-label="Previous stage"
-            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all text-[8.5px] font-mono tracking-widest ${
+            className={`flex items-center gap-1 transition-all text-[10px] font-mono tracking-widest font-bold ${
               canGoBack
-                ? 'text-white/70 hover:text-white hover:bg-white/5 cursor-pointer'
-                : 'text-white/15 cursor-not-allowed'
+                ? 'text-white/60 hover:text-white cursor-pointer'
+                : 'text-white/10 cursor-not-allowed'
             }`}
             type="button"
           >
             ← PREV
           </button>
 
-          {/* Keyboard hint toggle */}
-          <div className="relative">
+          <div className="flex items-center gap-4">
+            {/* Explanations Toggle */}
             <button
-              className="px-1 py-0.5 rounded text-[7.5px] font-mono text-white/20 hover:text-white/40 transition-colors"
-              onMouseEnter={() => setKbHint(true)}
-              onMouseLeave={() => setKbHint(false)}
-              onFocus={() => setKbHint(true)}
-              onBlur={() => setKbHint(false)}
+              onClick={() => setShowDetails(true)}
+              className="w-5 h-5 flex items-center justify-center rounded-full border border-white/10 text-white/30 hover:text-white hover:border-white/30 transition-all text-[10px] bg-white/5"
               type="button"
-              aria-label="Keyboard shortcuts"
+              title="Explanations & Formulas"
             >
-              <kbd className="px-1 py-0.2 rounded border border-white/10 text-[7px]">?</kbd>
+              ?
             </button>
-            <AnimatePresence>
-              {kbHint && (
-                <motion.div
-                  initial={{ opacity: 0, y: 4, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 rounded bg-[#1e1e1e] border border-white/10 shadow-xl z-50 whitespace-nowrap"
-                >
-                  <div className="flex flex-col gap-0.5">
-                    <div className="flex items-center gap-1 text-[7.5px] font-mono">
-                      <kbd className="px-1 py-0.2 rounded border border-white/10 text-white/50">←</kbd>
-                      <span className="text-white/40">Previous stage</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[7.5px] font-mono">
-                      <kbd className="px-1 py-0.2 rounded border border-white/10 text-white/50">→</kbd>
-                      <span className="text-white/40">Next stage</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-[7.5px] font-mono">
-                      <kbd className="px-1 py-0.2 rounded border border-white/10 text-white/50">Space</kbd>
-                      <span className="text-white/40">Also next stage</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
 
-          {/* NEXT */}
-          <button
-            onClick={() => canGoNext && setCurrentStageId(currentStageId + 1)}
-            disabled={!canGoNext}
-            aria-label="Next stage"
-            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-all text-[8.5px] font-mono tracking-widest ${
-              canGoNext
-                ? 'text-white/80 hover:text-white hover:bg-white/5 cursor-pointer'
-                : 'text-white/15 cursor-not-allowed'
-            }`}
-            type="button"
-          >
-            NEXT →
-          </button>
+            {/* NEXT */}
+            <button
+              onClick={() => canGoNext && setCurrentStageId(currentStageId + 1)}
+              disabled={!canGoNext}
+              className={`flex items-center gap-1 transition-all text-[10px] font-mono tracking-widest font-bold ${
+                canGoNext
+                  ? 'text-white/80 hover:text-white cursor-pointer'
+                  : 'text-white/10 cursor-not-allowed'
+              }`}
+              type="button"
+            >
+              NEXT →
+            </button>
+          </div>
         </div>
 
-        {/* Right side: stage label or finish */}
-        <div className="flex items-center gap-2">
+        {/* Right side: stage label */}
+        <div className="flex items-center gap-3">
           <AnimatePresence mode="wait">
             {isLastStage ? (
-              <motion.div
+              <motion.button
                 key="finish-prompt"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
-                className="flex items-center gap-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onClick={clearAll}
+                className="text-[10px] font-mono text-aurora-purple uppercase tracking-widest font-bold hover:brightness-125 transition-all"
               >
-                <span className="text-[9px] font-mono text-aurora-purple/60 uppercase tracking-widest animate-pulse font-bold">
-                  Complete!
-                </span>
-                <button
-                  onClick={clearAll}
-                  className="px-3 py-1 rounded bg-aurora-purple/20 border border-aurora-purple/40 text-aurora-purple text-[8.5px] font-mono uppercase tracking-[0.2em] hover:bg-aurora-purple/40 transition-all cursor-pointer"
-                >
-                  Restart
-                </button>
-              </motion.div>
+                FINISH & RESTART
+              </motion.button>
             ) : (
               <motion.div
                 key={currentStageId}
-                className="flex items-center gap-2"
-                initial={{ opacity: 0, x: 8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.4 }}
+                className="flex items-center gap-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
               >
-                <span className="text-[8.5px] font-mono text-white/30 uppercase tracking-[0.2em]">
-                  Stage {currentStageId.toString().padStart(2, '0')}
+                <span className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] font-bold">
+                  STAGE {currentStageId.toString().padStart(2, '0')}
                 </span>
-                <div className="w-[1px] h-2.5 bg-white/10" />
-                <span className="text-[8.5px] font-serif italic text-white/60">{activeStage?.name}</span>
+                <div className="w-[1px] h-3 bg-white/10" />
+                <span className="text-[11px] font-serif italic text-white/70 font-medium">
+                  {activeStage?.name}
+                </span>
               </motion.div>
             )}
           </AnimatePresence>
