@@ -73,37 +73,54 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
   const currentRecord = records.find(r => r.layerName === selectedLayer) || records[0];
   const shape = currentRecord.shape;
   const numChannels = shape.length === 4 ? shape[3] : 0;
+  const dim = shape.length === 4 ? shape[1] : 0;
   
   return (
-    <div className="relative h-[400px] w-full flex items-center justify-center perspective-[1000px]">
-      <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-75">
-        {Array.from({ length: Math.min(numChannels, 8) }).map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ translateZ: -i * 40, opacity: 0 }}
-            animate={{ translateZ: i * 40, opacity: 1 - i * 0.1 }}
-            transition={{ delay: i * 0.1, duration: 0.8, ease: "easeOut" }}
-            className="absolute inset-0 w-64 h-64 border-2 border-aurora-purple/30 bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden shadow-[0_0_30px_rgba(80,201,230,0.1)]"
-            style={{ 
-              transform: `translateZ(${i * 30}px)`,
-              borderColor: `rgba(80, 201, 230, ${0.5 - i * 0.05})`
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-tr from-aurora-purple/10 to-transparent" />
-            <div className="w-full h-full p-4 flex items-center justify-center">
-               <div className="w-full h-full border border-white/5 rounded-lg opacity-40 overflow-hidden">
-                  <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-px">
-                    {Array.from({ length: 64 }).map((_, j) => (
-                      <div key={j} className="bg-aurora-purple/20 rounded-[1px]" style={{ opacity: Math.random() }} />
-                    ))}
-                  </div>
-               </div>
-            </div>
-            <div className="absolute top-2 left-2 text-[10px] font-mono text-aurora-purple/60">
-              LAYER_MAP_{i}
-            </div>
-          </motion.div>
-        ))}
+    <div className="relative h-[450px] w-full flex items-center justify-center perspective-[1200px]">
+      <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-90">
+        {Array.from({ length: Math.min(numChannels, 12) }).map((_, i) => {
+          // Sample a small grid from the actual feature map
+          const channelData = new Float32Array(dim * dim);
+          for(let j=0; j<dim*dim; j++) channelData[j] = currentRecord.values[j * numChannels + i];
+          
+          return (
+            <motion.div
+              key={i}
+              initial={{ translateZ: -i * 50, opacity: 0 }}
+              animate={{ translateZ: i * 35, opacity: 1 - i * 0.06 }}
+              transition={{ delay: i * 0.08, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 w-56 h-56 border-2 bg-black/60 backdrop-blur-md rounded-lg overflow-hidden shadow-[0_0_40px_rgba(88,196,221,0.15)]"
+              style={{ 
+                transform: `translateZ(${i * 35}px)`,
+                borderColor: i === 0 ? 'rgba(245, 205, 71, 0.6)' : 'rgba(88, 196, 221, 0.3)'
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-aurora-purple/5 to-transparent" />
+              <div className="w-full h-full p-2 flex items-center justify-center">
+                 <div className="w-full h-full grid grid-cols-10 grid-rows-10 gap-[1px] opacity-80">
+                    {Array.from({ length: 100 }).map((_, j) => {
+                      const r = Math.floor(j / 10);
+                      const c = j % 10;
+                      const val = channelData[Math.floor(r * (dim/10)) * dim + Math.floor(c * (dim/10))] || 0;
+                      const norm = (val - currentRecord.min) / (currentRecord.max - currentRecord.min || 1);
+                      return (
+                        <div 
+                          key={j} 
+                          className="rounded-[0.5px]" 
+                          style={{ 
+                            backgroundColor: i === 0 ? `rgba(245, 205, 71, ${0.1 + norm * 0.9})` : `rgba(88, 196, 221, ${0.05 + norm * 0.95})` 
+                          }} 
+                        />
+                      );
+                    })}
+                 </div>
+              </div>
+              <div className="absolute bottom-1 right-2 text-[8px] font-mono text-white/30 uppercase tracking-tighter">
+                Channel {i}
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
@@ -201,15 +218,12 @@ export const FeatureMapGrid: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-text-secondary px-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="font-mono py-0.5 px-1.5 rounded bg-bg-deep border border-border-muted text-[10px]">
-            Type: {currentRecord.layerType}
+            {currentRecord.layerType}
           </span>
           <span className="font-mono py-0.5 px-1.5 rounded bg-bg-deep border border-border-muted text-[10px]">
-            Shape: [{shape.join(', ')}]
+            [{shape.join(', ')}]
           </span>
         </div>
-        <span className="text-[10px] font-mono text-text-muted">
-          Range: [{currentRecord.min.toFixed(2)}, {currentRecord.max.toFixed(2)}]
-        </span>
       </div>
 
       {is2D ? (

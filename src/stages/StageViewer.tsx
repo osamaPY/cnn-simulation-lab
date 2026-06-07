@@ -140,9 +140,9 @@ export function StageViewer() {
         <motion.div
           className="w-full h-full flex flex-col items-center justify-center"
           key={`${currentStageId}-${Boolean(preprocessedData)}-${activations.length}-${Boolean(prediction)}`}
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={shouldReduceMotion ? undefined : { opacity: 0, y: -30 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0, y: -40, scale: 1.05 }}
           transition={shouldReduceMotion ? { duration: 0 } : slideTransition}
         >
           <Suspense fallback={<StageLoadingState />}>{renderStage()}</Suspense>
