@@ -10,6 +10,12 @@ const DEFAULT_HYPERPARAMS = {
   numFilters: 8,
 };
 
+const STAGE_COLORS: Record<number, string> = {
+  1: '#58C4DD', 2: '#58C4DD', 3: '#58C4DD', 4: '#F5CD47', 5: '#83C167',
+  6: '#9C27B0', 7: '#FF6666', 8: '#E07A5F', 9: '#9C27B0',
+  10: '#58C4DD', 11: '#83C167', 12: '#FF6666',
+};
+
 export const HyperparamControls: React.FC = () => {
   const hyperparams = useLabStore(state => state.hyperparams);
   const updateHyperparams = useLabStore(state => state.updateHyperparams);
@@ -66,18 +72,25 @@ export const HyperparamControls: React.FC = () => {
         {visibleControls.map((ctrl) => {
           const pct = ((hyperparams[ctrl.key] - ctrl.min) / (ctrl.max - ctrl.min)) * 100;
           const isActiveForStage = 
+            currentStageId === 2 ||
             (currentStageId === 4 && ['kernelSize', 'stride', 'padding'].includes(ctrl.key)) ||
             (currentStageId === 5 && ctrl.key === 'numFilters') ||
             (currentStageId === 7 && ctrl.key === 'poolingSize');
+
+          const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
 
           return (
             <div
               key={ctrl.key}
               className={`flex flex-col gap-1.5 p-2.5 rounded-lg bg-white/[0.03] border transition-all duration-300 group relative ${
                 isActiveForStage 
-                  ? 'border-aurora-purple bg-aurora-purple/[0.02] shadow-[0_0_12px_rgba(88,196,221,0.1)]' 
-                  : 'border-white/5 hover:border-aurora-purple/20'
+                  ? 'bg-white/[0.01] shadow-lg' 
+                  : 'border-white/5 hover:border-white/10'
               }`}
+              style={{
+                borderColor: isActiveForStage ? activeColor : 'rgba(255,255,255,0.05)',
+                boxShadow: isActiveForStage ? `0 0 12px ${activeColor}15` : undefined
+              }}
               onMouseEnter={() => setActiveInfo(ctrl.description)}
               onMouseLeave={() => setActiveInfo(null)}
             >
@@ -85,10 +98,10 @@ export const HyperparamControls: React.FC = () => {
                 <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">{ctrl.label}</span>
                 <motion.span
                   key={hyperparams[ctrl.key]}
-                  initial={{ scale: 1.4, color: '#58C4DD' }}
-                  animate={{ scale: 1, color: '#58C4DD' }}
+                  initial={{ scale: 1.4, color: activeColor }}
+                  animate={{ scale: 1, color: activeColor }}
                   transition={{ duration: 0.25 }}
-                  className="text-[10px] font-mono font-bold text-aurora-purple"
+                  className="text-[10px] font-mono font-bold"
                 >
                   {hyperparams[ctrl.key]}
                 </motion.span>
@@ -115,7 +128,8 @@ export const HyperparamControls: React.FC = () => {
                   }}
                   className="hyperparam-slider w-full h-1 rounded-lg appearance-none cursor-pointer"
                   style={{
-                    background: `linear-gradient(to right, #58C4DD ${pct}%, rgba(255,255,255,0.08) ${pct}%)`,
+                    color: activeColor,
+                    background: `linear-gradient(to right, ${activeColor} ${pct}%, rgba(255,255,255,0.08) ${pct}%)`,
                   }}
                 />
               </div>

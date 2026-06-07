@@ -97,8 +97,10 @@ export function ReluStage() {
   }, [shouldReduceMotion, stats.maxMagnitude, stepIndex, values, outputDim])
 
   // Pick a sample value for the probe line on the graph (~middle of scan)
-  const sampleRawValue = values[Math.floor(sweepProgress * outputDim) * outputDim + Math.floor(outputDim/2)] ?? 0
-  const normalised = sampleRawValue / (stats.maxMagnitude || 1)
+  const rowIndex = Math.min(outputDim - 1, Math.floor(sweepProgress * outputDim));
+  const colIndex = Math.floor(outputDim / 2);
+  const sampleRawValue = values[rowIndex * outputDim + colIndex] ?? 0;
+  const normalised = sampleRawValue / (stats.maxMagnitude || 1);
 
   return (
     <div className="flex w-full flex-col items-center gap-6 px-4">

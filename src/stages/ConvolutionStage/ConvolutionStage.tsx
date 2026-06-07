@@ -128,10 +128,13 @@ export const ConvolutionStage: React.FC = () => {
   const CELL = 10;
   const BUBBLE_W = 110;
   const BUBBLE_H = 28;
-  const rawLeft = col * CELL + 6 + CELL / 2;
-  const rawTop  = row * CELL + 6;
+  const frameWidth = hyperparams.kernelSize * CELL;
+  const x = col * hyperparams.stride * CELL;
+  const y = row * hyperparams.stride * CELL;
+  const rawLeft = x + frameWidth / 2;
+  const rawTop  = y;
   const bubbleLeft = Math.min(Math.max(rawLeft - BUBBLE_W / 2, 2), CANVAS_PX - BUBBLE_W - 2);
-  const bubbleTop  = rawTop < BUBBLE_H + 8 ? rawTop + CELL + 4 : rawTop - BUBBLE_H - 4;
+  const bubbleTop  = rawTop < BUBBLE_H + 8 ? rawTop + frameWidth + 4 : rawTop - BUBBLE_H - 4;
 
   return (
     <div className="flex flex-col items-center gap-4 w-full max-w-5xl px-4 py-2">

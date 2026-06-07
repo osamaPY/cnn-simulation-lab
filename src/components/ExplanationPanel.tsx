@@ -33,6 +33,13 @@ const GLOSSARY_MAP: Record<number, { symbol: string; label: string; desc: string
     { symbol: "μ", label: "Mean (Centering)", desc: "Average brightness of the active bounds" },
     { symbol: "σ", label: "StdDev (Scaling)", desc: "Standard deviation to normalize contrast" },
   ],
+  2: [
+    { symbol: "Input", label: "Image Grid", desc: "Raw pixel grid (e.g. 28x28x1 grayscale)" },
+    { symbol: "Conv", label: "Convolution Layer", desc: "Learns spatial filters to detect local features" },
+    { symbol: "ReLU", label: "Activation Layer", desc: "Introduces non-linearity to keep positive activations" },
+    { symbol: "Pool", label: "Pooling Layer", desc: "Downsamples grid resolution to reduce parameters" },
+    { symbol: "Dense", label: "Fully Connected", desc: "Combines local features to score global classes" },
+  ],
   3: [
     { symbol: "[r, c]", label: "Pixel Coordinates", desc: "Row and column index in the 28x28 grid" },
     { symbol: "v", label: "Activation value", desc: "Normalized floating point intensity [0.0, 1.0]" },
@@ -69,6 +76,11 @@ const GLOSSARY_MAP: Record<number, { symbol: string; label: string; desc: string
     { symbol: "z_i", label: "Raw Score (Logit)", desc: "Raw weighted sum output for class digit i" },
     { symbol: "e^{z_i}", label: "Exponentiation", desc: "Amplifies highest scores and ensures positive value" },
     { symbol: "Σ e^{z_j}", label: "Sum (Normalization)", desc: "Sum of all exponents; normalizes total to 100%" },
+  ],
+  11: [
+    { symbol: "ŷ", label: "Predicted Class", desc: "The class digit index (0-9) chosen by the network" },
+    { symbol: "argmax", label: "Maximum Argument", desc: "Operator that selects the index of the highest probability" },
+    { symbol: "σ(z)_i", label: "Class Probability", desc: "Normalized likelihood score for each individual digit i" },
   ],
   12: [
     { symbol: "W", label: "Weights matrix", desc: "Learnable filter values being optimized" },

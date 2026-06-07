@@ -49,7 +49,7 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
   return (
     <div 
       onClick={onFocus}
-      className={`relative flex min-w-0 flex-col items-center p-2 rounded-lg bg-bg-deep/40 border transition-all duration-300 cursor-pointer ${
+      className={`relative flex min-w-0 flex-col items-center p-2 rounded-lg bg-bg-deep/40 border transition-all duration-300 cursor-pointer group ${
         isFocused 
           ? 'border-text-accent bg-text-accent/5'
           : 'border-border-subtle hover:border-border-muted bg-transparent'

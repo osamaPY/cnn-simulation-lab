@@ -90,10 +90,11 @@ export const TensorGridPreview: React.FC = () => {
     if (row >= 0 && row < 28 && col >= 0 && col < 28) {
       const val = preprocessedData[row * 28 + col];
       
-      // Calculate tooltip position relative to client container
-      const containerRect = containerRef.current?.getBoundingClientRect();
-        const tooltipX = pendingEvent.clientX - (containerRect?.left || 0);
-        const tooltipY = pendingEvent.clientY - (containerRect?.top || 0) - 40;
+      // Calculate tooltip position relative to canvas to ensure absolute stability and prevent container overflow
+      const BUBBLE_W = 85;
+      const BUBBLE_H = 36;
+      const tooltipX = x + BUBBLE_W + 12 > 280 ? x - BUBBLE_W - 8 : x + 8;
+      const tooltipY = y - BUBBLE_H - 8 < 0 ? y + 15 : y - BUBBLE_H - 8;
 
       setTooltip({
         x: tooltipX,

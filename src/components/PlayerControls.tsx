@@ -209,6 +209,7 @@ export const PlayerControls: React.FC = () => {
               className="w-20 sm:w-28 md:w-36 h-1 bg-white/15 rounded-lg appearance-none cursor-pointer accent-white hover:accent-aurora-purple transition-all"
               style={{
                 outline: 'none',
+                color: '#58C4DD',
               }}
               title="Drag to scrub animation"
             />

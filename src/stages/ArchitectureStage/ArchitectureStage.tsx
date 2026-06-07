@@ -80,7 +80,7 @@ export const ArchitectureStage: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-4 overflow-hidden bg-[#1c1c1c]">
+    <div className="w-full h-full flex flex-col items-center justify-center p-4 overflow-hidden bg-transparent">
       <div className="w-full overflow-x-auto no-scrollbar py-12 flex items-center justify-start lg:justify-center">
         <div className="flex items-center gap-6 px-12 min-w-max">
           {layers.map((layer, i) => (
