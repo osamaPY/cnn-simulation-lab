@@ -88,7 +88,7 @@ export const LessonShell: React.FC = () => {
   };
   const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
 
-  const isFullScreenStage = currentStageId === 9 || currentStageId === 10;
+  const isFullScreenStage = true;
 
   // Listen to Escape key to close details modal
   useEffect(() => {
@@ -147,29 +147,6 @@ export const LessonShell: React.FC = () => {
                   >
                     <StageViewer />
                   </div>
-
-                  {/* Compact Stage Summary Bottom Bar */}
-                  <div
-                    className={`${isFullScreenStage ? 'absolute bottom-20 left-4 z-40 bg-black/60 backdrop-blur-sm rounded-full px-4 border border-white/10' : 'flex-shrink-0 flex items-center justify-between bg-black/45 border-t border-white/5'} subtitle-explanation-wrapper`}
-                    style={{ minHeight: '34px', zIndex: 30 }}
-                  >
-                    <div className="flex items-center gap-2 text-[10px] font-mono text-white/50 py-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: activeColor, boxShadow: `0 0 8px ${activeColor}bb` }} />
-                      <span>Stage {currentStageId.toString().padStart(2, '0')}:</span>
-                      <span className="text-white/80 font-bold uppercase tracking-wide">{activeStage?.name}</span>
-                    </div>
-
-                    {!isFullScreenStage && (
-                      <button
-                        onClick={() => setShowDetails(true)}
-                        className="px-2.5 py-0.5 rounded text-[8.5px] font-mono uppercase tracking-widest border border-aurora-teal/30 hover:border-aurora-teal hover:bg-aurora-teal/10 transition-all cursor-pointer text-aurora-teal font-bold flex items-center gap-1.5 shadow-[0_0_8px_rgba(88,196,221,0.05)] bg-[#161616]"
-                        type="button"
-                      >
-                        <span>Explanations & Formulas</span>
-                        <span className="text-[7.5px] text-white/40">↵</span>
-                      </button>
-                    )}
-                  </div>
                 </div>
 
                 {/* Right sidebar: glossary + hyperparams */}
@@ -196,6 +173,16 @@ export const LessonShell: React.FC = () => {
                 style={{ padding: isFullScreenStage ? '8px 24px' : '4px 16px 6px', zIndex: 40 }}
               >
                 <PlayerControls />
+                {isFullScreenStage && (
+                  <button
+                    onClick={() => setShowDetails(true)}
+                    className="absolute -top-12 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full text-[9px] font-mono uppercase tracking-[0.2em] border border-white/10 bg-black/60 backdrop-blur-md hover:bg-white/5 hover:border-white/20 transition-all cursor-pointer text-white/60 font-bold flex items-center gap-2 shadow-xl whitespace-nowrap"
+                    type="button"
+                  >
+                    <span>Explanations & Formulas</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-aurora-teal animate-pulse" />
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
