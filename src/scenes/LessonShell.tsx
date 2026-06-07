@@ -121,8 +121,8 @@ export const LessonShell: React.FC = () => {
 
                   {/* Unified Learning Cockpit: Concept, Math, and Technical specs */}
                   <div
-                    className="flex-shrink-0 flex items-center justify-center bg-black/25 border-t border-white/5 subtitle-explanation-wrapper"
-                    style={{ minHeight: '84px', padding: '8px 16px', zIndex: 30, overflowY: 'auto' }}
+                    className="flex-shrink-0 flex items-start justify-center bg-black/25 border-t border-white/5 subtitle-explanation-wrapper"
+                    style={{ minHeight: '110px', padding: '10px 16px', zIndex: 30, overflowY: 'auto' }}
                   >
                     <ExplanationPanel mode="subtitles" />
                   </div>
