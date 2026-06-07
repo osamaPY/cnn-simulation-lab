@@ -180,11 +180,8 @@ export const TensorGridPreview: React.FC = () => {
       </div>
       {currentStageId === 2 && (
         <button className="btn-secondary mt-3 text-[10px]" onClick={() => setShowValues((value) => !value)} type="button">
-          {showValues ? 'Show intensity heatmap' : 'Show numeric values'}
+          {showValues ? 'Intensity map' : 'Show values'}
         </button>
-      )}
-      {currentStageId === 3 && (
-        <p className="mt-3 text-center text-[10px] text-text-muted">Hover or tap a cell to inspect its coordinate and exact value.</p>
       )}
     </motion.div>
   );

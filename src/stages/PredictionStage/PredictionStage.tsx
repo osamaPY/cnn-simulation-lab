@@ -86,7 +86,7 @@ export const PredictionStage: React.FC = () => {
   const spring = { type: 'spring' as const, damping: 14, stiffness: 240, mass: 0.9 };
 
   return (
-    <div className="relative flex flex-col gap-8 w-full max-w-xl items-center py-6 px-4">
+    <div className="relative flex flex-col gap-6 w-full max-w-xl items-center py-6 px-4">
       {/* Confetti canvas — absolutely positioned, pointer-events-none */}
       <canvas
         ref={confettiRef}
@@ -100,7 +100,6 @@ export const PredictionStage: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-center justify-center gap-10 w-full">
         {/* Draw Input Thumbnail */}
         <div className="flex flex-col items-center gap-2.5">
-          <span className="text-[10px] font-mono text-text-secondary uppercase tracking-widest">Your Ink</span>
           <div className="w-28 h-28 bg-black border border-white/10 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-2xl">
             {originalCanvasThumbnail ? (
               <img
@@ -130,7 +129,6 @@ export const PredictionStage: React.FC = () => {
 
         {/* Prediction Card */}
         <div className="flex flex-col items-center gap-2.5">
-          <span className="text-[10px] font-mono text-text-secondary uppercase tracking-widest">Prediction</span>
           <AnimatePresence mode="wait">
             <motion.div
               key={prediction.digit}

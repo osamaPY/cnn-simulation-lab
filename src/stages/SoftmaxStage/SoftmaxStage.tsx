@@ -43,14 +43,6 @@ export const SoftmaxStage: React.FC = () => {
           color="#a78bfa"
           fontSize="1.05rem"
         />
-        <motion.p
-          className="text-[10px] font-mono text-white/35 mt-0.5"
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          Raw logit scores → normalised probabilities summing to 1.0
-        </motion.p>
       </div>
 
       <div className="flex flex-col overflow-hidden rounded border border-border-muted bg-bg-panel">

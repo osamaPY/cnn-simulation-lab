@@ -134,13 +134,9 @@ export const ConvolutionStage: React.FC = () => {
   const bubbleTop  = rawTop < BUBBLE_H + 8 ? rawTop + CELL + 4 : rawTop - BUBBLE_H - 4;
 
   return (
-    <div className="flex flex-col items-center gap-10 w-full max-w-5xl px-8">
+    <div className="flex flex-col items-center gap-6 w-full max-w-5xl px-8">
       {/* Kernel Selection */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 w-full border-b border-white/5 pb-8">
-        <div className="flex flex-col gap-1">
-          <h3 className="text-lg font-serif font-bold text-[#FFFEF0] italic">Filter Geometry</h3>
-          <p className="text-xs text-white/30 font-sans tracking-wide">The kernel extracts local features by calculating element-weighted sums.</p>
-        </div>
+      <div className="flex flex-col sm:flex-row items-center justify-end gap-6 w-full border-b border-white/5 pb-4">
         <div className="flex gap-1.5 p-1 bg-black/20 rounded-lg">
           {(Object.keys(KERNEL_PRESETS) as KernelPreset[]).map((preset) => (
             <button

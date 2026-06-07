@@ -79,13 +79,6 @@ export const BackpropStage: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-5 w-full max-w-[820px] items-center px-4">
-      <div className="flex justify-between w-full items-center">
-        <span className="text-xs font-semibold text-signal-coral bg-signal-coral/10 border border-signal-coral/25 px-2.5 py-1 rounded-full shadow-[0_0_15px_rgba(255,128,102,0.15)]">
-          Backward Gradient Flow Active
-        </span>
-        <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">Backpropagation</span>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-5 w-full">
         {/* Network SVG */}
         <div className="relative w-full bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl" style={{ aspectRatio: '800/400' }}>

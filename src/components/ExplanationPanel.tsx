@@ -39,7 +39,7 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
   const showSubtitles = (mode === 'all' || mode === 'subtitles');
 
   return (
-    <div className={`relative w-full pointer-events-none ${mode === 'all' ? 'h-full flex flex-col' : ''}`}>
+    <div className="relative w-full pointer-events-none">
       {showFormula && (
         <AnimatePresence mode="wait">
           <motion.div
@@ -71,25 +71,24 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
       )}
 
       {showSubtitles && (
-        <div className={`${mode === 'all' ? 'absolute bottom-0 left-0 right-0 pb-10' : 'w-full'} flex justify-center pointer-events-none`}>
+        <div className="w-full flex justify-center pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.div
               key={`subtitle-box-${currentStageId}`}
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -10 }}
+              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -5 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-4xl w-full"
+              className="max-w-3xl w-full"
             >
               <div
-                className="bg-[#161616] p-10 border-l-2 border-white/10 text-center mx-4 pointer-events-auto"
+                className="bg-[#161616]/40 backdrop-blur-sm p-6 border-l-[3px] border-white/10 text-center mx-4 pointer-events-auto"
                 style={{
                   borderLeftColor: stageColor,
-                  boxShadow: '0 25px 70px rgba(0,0,0,0.5)',
                 }}
               >
                 {shouldReduceMotion ? (
-                  <p className="text-lg md:text-xl text-[#FFFEF0] leading-relaxed font-serif italic">
+                  <p className="text-base md:text-lg text-[#FFFEF0]/90 leading-relaxed font-serif italic">
                     {explanation.body}
                   </p>
                 ) : (
@@ -97,7 +96,7 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
                     variants={subtitleContainerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="text-lg md:text-xl text-[#FFFEF0] leading-relaxed font-serif italic flex flex-wrap gap-x-1.5 justify-center"
+                    className="text-base md:text-lg text-[#FFFEF0]/90 leading-relaxed font-serif italic flex flex-wrap gap-x-1.5 justify-center"
                   >
                     {words.map((word, i) => (
                       <motion.span key={`${currentStageId}-w-${i}`} variants={wordVariants}>

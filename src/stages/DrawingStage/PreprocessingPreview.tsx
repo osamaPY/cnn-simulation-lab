@@ -58,10 +58,10 @@ export const PreprocessingPreview: React.FC = () => {
       className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 flex flex-col gap-5 shadow-2xl"
     >
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
-        <h4 className="text-sm font-semibold text-white flex items-center gap-2 font-display">
+        <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-aurora-mint shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-          Spatial Centering & Normalization
-        </h4>
+          <span className="text-xs font-mono text-white/50 uppercase tracking-widest">Pre-activation Centering</span>
+        </div>
         <span className="text-[10px] font-mono text-white/50 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
           Active Pixels: {nonzeroPixelCount}
         </span>

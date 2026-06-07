@@ -106,7 +106,7 @@ export function ReluStage() {
         {/* Canvas panel */}
         <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-2xl">
           <div className="mb-3 flex items-center justify-between text-[10px] font-mono uppercase text-white/50">
-            <span>Pre-activation to ReLU output</span>
+            <span>ReLU mapping</span>
             <span>{outputDim}×{outputDim}</span>
           </div>
           <canvas ref={canvasRef} width={312} height={312} className="mx-auto block h-auto w-full max-w-[312px] rounded-xl bg-black border border-white/5" />
@@ -115,8 +115,6 @@ export function ReluStage() {
         {/* Right panel: animated graph + formula */}
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl border border-white/10 bg-black/30 p-4 shadow-xl">
-            <p className="text-[10px] font-mono uppercase text-aurora-mint tracking-wider mb-2">ReLU Function</p>
-
             {/* 3b1b animated graph */}
             <ReluGraphCanvas
               progress={sweepProgress}

@@ -72,9 +72,9 @@ export function FlattenStage() {
     <div className="flex w-full flex-col items-center gap-6 px-4">
       <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-black/40 p-6 shadow-2xl">
         <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono uppercase text-white/50">
-          <span>Real final pooled activation</span>
+          <span>Unrolling activation</span>
           <span className="rounded border border-aurora-purple/30 bg-aurora-purple/10 px-2 py-1 text-text-accent">
-            [1, 5, 5, 16] to [1, 400]
+            [1, 5, 5, 16] → [1, 400]
           </span>
         </div>
 

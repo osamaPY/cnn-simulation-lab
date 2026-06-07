@@ -150,7 +150,7 @@ export const DenseStage: React.FC = () => {
   return (
     <div className="flex flex-col gap-4 w-full max-w-[800px] items-center px-4">
       {/* Top Controls */}
-      <div className="flex justify-between w-full items-center">
+      <div className="flex justify-start w-full items-center">
         <button
           onClick={() => setTopKOnly(!topKOnly)}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
@@ -161,9 +161,6 @@ export const DenseStage: React.FC = () => {
         >
           {topKOnly ? 'Showing: Strongest Signals' : 'Show: All Sampled Weights'}
         </button>
-        <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">
-          Sampled Connection Graph
-        </span>
       </div>
 
       {/* Main Graph Area */}

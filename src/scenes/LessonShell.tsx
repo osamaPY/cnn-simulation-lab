@@ -97,8 +97,14 @@ export const LessonShell: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <div className="flex-1 min-h-0 relative flex flex-col md:grid md:grid-cols-[1fr_300px] overflow-hidden">
-                <div className="relative flex-1 min-h-0 flex items-center justify-center overflow-hidden">
-                  <StageViewer />
+                <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden">
+                  <div className="flex-[3] min-h-0 flex items-center justify-center overflow-hidden">
+                    <StageViewer />
+                  </div>
+                  
+                  <div className="flex-1 min-h-[160px] flex items-center justify-center p-6 bg-[#161616]/50 border-t border-white/5 z-30">
+                    <ExplanationPanel mode="subtitles" />
+                  </div>
                 </div>
                 
                 <div className="hidden md:flex flex-col border-l border-white/5 bg-[#161616] p-8 overflow-y-auto gap-10">
@@ -112,10 +118,6 @@ export const LessonShell: React.FC = () => {
                       </div>
                     </>
                   )}
-                </div>
-
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-2xl px-8 pointer-events-none z-30">
-                  <ExplanationPanel mode="subtitles" />
                 </div>
               </div>
 

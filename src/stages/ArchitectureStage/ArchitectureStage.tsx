@@ -69,15 +69,6 @@ export const ArchitectureStage: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-8 overflow-hidden bg-[#1c1c1c]">
-      <div className="flex flex-col items-center gap-3 mb-16">
-        <h2 className="text-4xl font-serif font-bold text-[#FFFEF0] italic">Macro Architecture</h2>
-        <div className="flex items-center gap-3">
-          <div className="h-[1px] w-8 bg-white/10" />
-          <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-white/30">VGG-Inspired Sequential Flow</span>
-          <div className="h-[1px] w-8 bg-white/10" />
-        </div>
-      </div>
-
       <div className="relative flex items-center justify-center gap-6 w-full max-w-6xl h-64">
         {layers.map((layer, i) => (
           <React.Fragment key={layer.name}>
@@ -106,17 +97,6 @@ export const ArchitectureStage: React.FC = () => {
           </React.Fragment>
         ))}
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 1 }}
-        className="mt-20 max-w-2xl text-center"
-      >
-        <p className="text-base font-serif text-white/50 leading-relaxed italic">
-          "The network is a series of repeated <span className="text-[#F5CD47] font-bold">Convolution + ReLU + Pooling</span> blocks. As data flows deeper, spatial dimensions decrease while the number of filters increases, allowing the network to recognize complex semantic patterns from simple edges."
-        </p>
-      </motion.div>
     </div>
   );
 };

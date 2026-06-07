@@ -114,10 +114,10 @@ export const PoolingStage: React.FC = () => {
   const frameWidth = poolSize * frameCellSize;
 
   return (
-    <div className="flex flex-col items-center gap-10 w-full max-w-4xl px-8">
+    <div className="flex flex-col items-center gap-6 w-full max-w-4xl px-8">
       <div className="flex flex-col md:flex-row items-center justify-center gap-16 w-full py-4">
         <div className="flex flex-col items-center gap-4">
-          <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input Plane: {inputDim}×{inputDim}</span>
+          <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input {inputDim}×{inputDim}</span>
           <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
             <canvas ref={inputCanvasRef} width={260} height={260} className="rounded-sm bg-black block" />
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 260 260">
@@ -138,7 +138,7 @@ export const PoolingStage: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Reduced Plane: {outputDim}×{outputDim}</span>
+          <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Output {outputDim}×{outputDim}</span>
           <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
             <canvas ref={outputCanvasRef} width={260} height={260} className="rounded-sm bg-black block" />
           </div>

@@ -105,10 +105,6 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
           </motion.div>
         ))}
       </div>
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
-        <span className="text-xs font-mono text-aurora-purple uppercase tracking-widest animate-pulse">3D Tensor Visualization</span>
-        <span className="text-[10px] font-mono text-white/30 text-center max-w-[240px]">Showing top {Math.min(numChannels, 8)} feature activation maps in a spatial stack</span>
-      </div>
     </div>
   );
 };
