@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { createTimeline, stagger, svg } from 'animejs';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const pixels = Array.from({ length: 36 }, (_, index) => index);
 const maps = Array.from({ length: 6 }, (_, index) => index);
@@ -10,11 +9,10 @@ export function PipelineFilm() {
   const sceneRef = useRef<HTMLDivElement | null>(null);
   const timelineRef = useRef<ReturnType<typeof createTimeline> | null>(null);
   const [replayKey, setReplayKey] = useState(0);
-  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     const scene = sceneRef.current;
-    if (!scene || shouldReduceMotion) return;
+    if (!scene) return;
     const kernel = scene.querySelector<HTMLElement>('.pipeline-film__kernel');
     const path = scene.querySelector<SVGPathElement>('.pipeline-film__path');
     const result = scene.querySelector<HTMLElement>('.pipeline-film__result');
@@ -72,7 +70,7 @@ export function PipelineFilm() {
       timeline.pause();
       timelineRef.current = null;
     };
-  }, [replayKey, shouldReduceMotion]);
+  }, [replayKey]);
 
   return (
     <section className="pipeline-film" aria-label="Animated CNN pipeline overview">

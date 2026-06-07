@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLessonDirector, type LessonPace } from '../animations/useLessonDirector';
 import { useLabStore } from '../hooks/useLabStore';
-import { useReducedMotion } from '../hooks/useReducedMotion';
 import { CNN_STAGES } from '../types/cnn';
 import { scrollToStageViewer } from '../utils/scrollToStage';
 import { useTimelineStore } from '../animations/useTimeline';
@@ -24,12 +23,11 @@ export function LessonDirector() {
   const pause = useLessonDirector((state) => state.pause);
   const toggleFocusMode = useLessonDirector((state) => state.toggleFocusMode);
   const setPace = useLessonDirector((state) => state.setPace);
-  const shouldReduceMotion = useReducedMotion();
   const stage = CNN_STAGES[currentStageId - 1];
   const canPlay = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
 
   useEffect(() => {
-    if (!isPlaying || !canPlay || shouldReduceMotion) return;
+    if (!isPlaying || !canPlay) return;
 
     const timer = window.setTimeout(() => {
       const nextStage = Math.min(CNN_STAGES.length, currentStageId + 1);
@@ -39,11 +37,9 @@ export function LessonDirector() {
     }, pace);
 
     return () => window.clearTimeout(timer);
-  }, [canPlay, currentStageId, isPlaying, pace, pause, setCurrentStageId, shouldReduceMotion]);
+  }, [canPlay, currentStageId, isPlaying, pace, pause, setCurrentStageId]);
 
   useEffect(() => {
-    if (shouldReduceMotion) return;
-
     if (!isPlaying) {
       useTimelineStore.getState().pause();
       return;
@@ -57,11 +53,11 @@ export function LessonDirector() {
     }, 80);
 
     return () => window.clearTimeout(timer);
-  }, [currentStageId, isPlaying, pace, shouldReduceMotion]);
+  }, [currentStageId, isPlaying, pace]);
 
   useEffect(() => {
-    if ((!canPlay || shouldReduceMotion) && isPlaying) pause();
-  }, [canPlay, isPlaying, pause, shouldReduceMotion]);
+    if (!canPlay && isPlaying) pause();
+  }, [canPlay, isPlaying, pause]);
 
   const moveTo = (stageId: number) => {
     pause();
@@ -130,7 +126,7 @@ export function LessonDirector() {
 
       <div className="lesson-director__track" aria-hidden="true">
         <div className="lesson-director__track-complete" style={{ transform: `scaleX(${(currentStageId - 1) / (CNN_STAGES.length - 1)})` }} />
-        {isPlaying && !shouldReduceMotion && (
+        {isPlaying && (
           <motion.div
             animate={{ scaleX: 1 }}
             className="lesson-director__track-current"
