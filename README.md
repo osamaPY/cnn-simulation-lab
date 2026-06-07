@@ -10,7 +10,7 @@ CNN Digit Lab is a free interactive lesson combining real TensorFlow.js
 inference, intermediate activation maps, step-driven explanations, and three
 teaching modes inside a responsive Tensor Aurora interface.
 
-> **Live demo:** Coming soon. The repository includes the exported TensorFlow.js model and is ready for deployment.
+> **Live demo:** [https://osamaPY.github.io/cnn_simulation/](https://osamaPY.github.io/cnn_simulation/)
 >
 > **Demo GIF:** Pending final deployment capture. The screenshots below show the current application.
 

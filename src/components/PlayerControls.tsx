@@ -52,15 +52,18 @@ export const PlayerControls: React.FC = () => {
           const pct = ((stage.id - 1) / (CNN_STAGES.length - 1)) * 100;
           const isCompleted = stage.id <= currentStageId;
           const isActive = stage.id === currentStageId;
+          const isLocked = !preprocessedData && stage.id > 1;
+
           return (
             <button
               key={stage.id}
-              onClick={() => { if (preprocessedData) setCurrentStageId(stage.id); }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 group flex items-center justify-center"
+              onClick={() => { if (!isLocked) setCurrentStageId(stage.id); }}
+              className={`absolute -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 group flex items-center justify-center ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
               style={{ left: `${pct}%` }}
-              title={`${stage.id}. ${stage.shortName ?? stage.name}`}
+              title={isLocked ? `${stage.id}. ${stage.shortName ?? stage.name} (Requires drawing)` : `${stage.id}. ${stage.shortName ?? stage.name}`}
               type="button"
               aria-label={`Go to stage ${stage.id}: ${stage.name}`}
+              disabled={isLocked}
             >
               <motion.div
                 animate={{
@@ -70,15 +73,17 @@ export const PlayerControls: React.FC = () => {
                     ? '#34d399'
                     : isCompleted
                     ? '#0d9488'
-                    : 'rgba(255,255,255,0.15)',
+                    : isLocked
+                    ? 'rgba(255,255,255,0.08)'
+                    : 'rgba(255,255,255,0.25)',
                   boxShadow: isActive ? '0 0 12px 3px rgba(52,211,153,0.55)' : 'none',
                 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="rounded-full cursor-pointer"
+                className="rounded-full"
               />
               {/* Tooltip on hover */}
               <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded-lg bg-black/90 border border-white/10 text-[9px] font-mono text-white/80 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl">
-                {stage.id}. {stage.name}
+                {stage.id}. {stage.name} {isLocked && '🔒'}
               </span>
             </button>
           );

@@ -9,6 +9,7 @@ import { PlayerControls } from '../components/PlayerControls';
 
 export const LessonShell: React.FC = () => {
   const preprocessedData = useLabStore(state => state.preprocessedData);
+  const currentStageId = useLabStore(state => state.currentStageId);
 
   return (
     <div className="relative h-screen w-screen flex flex-col bg-[#050508] text-text-primary overflow-hidden font-sans">
@@ -20,7 +21,7 @@ export const LessonShell: React.FC = () => {
         role="main"
       >
         <AnimatePresence mode="wait" initial={false}>
-          {!preprocessedData ? (
+          {!preprocessedData && currentStageId === 1 ? (
             /* ── Drawing screen ── */
             <motion.div
               key="draw"
@@ -43,7 +44,7 @@ export const LessonShell: React.FC = () => {
               </div>
             </motion.div>
           ) : (
-            /* ── Simulation active ── */
+            /* ── Simulation or stage preview active ── */
             <motion.div
               key="sim"
               className="flex-1 flex flex-col min-h-0 overflow-hidden relative"
@@ -56,9 +57,11 @@ export const LessonShell: React.FC = () => {
               <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden px-4">
                 <StageViewer />
                 {/* Floating formula overlay */}
-                <div className="absolute top-4 right-4 pointer-events-none z-30">
-                  <ExplanationPanel mode="formula" />
-                </div>
+                {preprocessedData && (
+                  <div className="absolute top-4 right-4 pointer-events-none z-30">
+                    <ExplanationPanel mode="formula" />
+                  </div>
+                )}
               </div>
 
               {/* Subtitles */}

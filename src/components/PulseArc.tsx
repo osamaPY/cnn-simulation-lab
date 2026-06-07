@@ -31,7 +31,6 @@ export const PulseArc: React.FC<PulseArcProps> = ({
   const cx = (x1 + x2) / 2;
   const cy = Math.min(y1, y2) - curvature;
   const path = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
-  const pathId = `path-${id}`;
 
   // Approximate point along quadratic bezier at t=progress
   const t = progress;

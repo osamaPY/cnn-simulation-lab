@@ -61,6 +61,8 @@ export function StageViewer() {
   const preprocessedData = useLabStore((state) => state.preprocessedData)
   const activations = useLabStore((state) => state.activations)
   const prediction = useLabStore((state) => state.prediction)
+  const modelStatus = useLabStore((state) => state.modelStatus)
+  const inferenceError = useLabStore((state) => state.inferenceError)
   const setSelectedActivationLayer = useLabStore((state) => state.setSelectedActivationLayer)
   const shouldReduceMotion = useReducedMotion()
   const stage = CNN_STAGES.find((item) => item.id === currentStageId) ?? CNN_STAGES[0]
@@ -83,9 +85,15 @@ export function StageViewer() {
   const missingState = !preprocessedData
     ? 'Draw a digit and click Run Simulation to generate the real preprocessing data.'
     : (currentStageId === 4 || (currentStageId >= 6 && currentStageId <= 8)) && activations.length === 0
-      ? 'This stage requires intermediate activations from the exported TensorFlow.js model. Add the model under public/model and run the simulation again.'
+      ? modelStatus === 'error' 
+        ? `Model failed to load: ${inferenceError}. Please check if model.json exists in public/model/.`
+        : modelStatus === 'loading'
+          ? 'The model is still loading. Please wait a moment...'
+          : 'This stage requires intermediate activations. If the model is loaded, try running the simulation again.'
       : currentStageId >= 9 && currentStageId !== 11 && !prediction
-        ? 'This stage requires a successful model prediction. Add the exported model, then draw a digit and run the simulation again.'
+        ? modelStatus === 'error'
+          ? `Inference failed: ${inferenceError}.`
+          : 'This stage requires a successful model prediction. Run the simulation again.'
         : null
 
   const renderStage = () => {

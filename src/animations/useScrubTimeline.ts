@@ -31,7 +31,7 @@ export function useScrubTimeline(
 
   useEffect(() => {
     if (reducedMotion) {
-      setProgress(1);
+      rafRef.current = requestAnimationFrame(() => setProgress(1));
       return;
     }
 

@@ -12,7 +12,6 @@ interface NeuronNodeProps {
   label?: string;
   isHighlighted?: boolean;
   color?: string;
-  dimColor?: string;
   onClick?: () => void;
 }
 
@@ -22,7 +21,6 @@ export const NeuronNode: React.FC<NeuronNodeProps> = ({
   label,
   isHighlighted = false,
   color = '#34d399',
-  dimColor = 'rgba(255,255,255,0.12)',
   onClick,
 }) => {
   const clampedValue = Math.min(1, Math.max(0, value));
