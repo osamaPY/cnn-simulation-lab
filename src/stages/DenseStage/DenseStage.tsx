@@ -158,7 +158,7 @@ export const DenseStage: React.FC = () => {
   };
 
   return (
-    <div className="relative flex-1 w-full dense-stage-wrapper overflow-hidden">
+    <div className="relative flex-1 w-full h-full dense-stage-wrapper overflow-hidden">
       {/* Top Controls - Absolutely positioned to the edge */}
       <div className="absolute top-4 left-4 z-20">
         <button
