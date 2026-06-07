@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLabStore } from '../hooks/useLabStore';
 import { CNN_STAGES } from '../types/cnn';
@@ -14,6 +14,9 @@ export const PlayerControls: React.FC = () => {
   const currentStageId = useLabStore((state) => state.currentStageId);
   const setCurrentStageId = useLabStore((state) => state.setCurrentStageId);
   const preprocessedData = useLabStore((state) => state.preprocessedData);
+  const clearAll = useLabStore(state => state.clearAll);
+
+  const [kbHint, setKbHint] = useState(false);
 
   const canGoNext = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
   const canGoBack = Boolean(preprocessedData) && currentStageId > 1;
@@ -41,7 +44,6 @@ export const PlayerControls: React.FC = () => {
   const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
   const activeStage = CNN_STAGES.find(s => s.id === currentStageId);
   const isLastStage = currentStageId === CNN_STAGES.length;
-  const clearAll = useLabStore(state => state.clearAll);
 
   return (
     <div
@@ -63,12 +65,11 @@ export const PlayerControls: React.FC = () => {
           const isActive = stage.id === currentStageId;
           const isLocked = !preprocessedData && stage.id > 1;
           const stageColor = STAGE_COLORS[stage.id] || '#58C4DD';
-
           return (
             <button
               key={stage.id}
               onClick={() => { if (!isLocked) setCurrentStageId(stage.id); }}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 group flex items-center justify-center ${
+              className={`absolute -translate-x-1/2 -translate-y-1/2 top-1/2 z-20 group flex items-center justify-center p-2 ${
                 isLocked ? 'cursor-not-allowed' : 'cursor-pointer'
               }`}
               style={{ left: `${pct}%` }}
@@ -93,36 +94,84 @@ export const PlayerControls: React.FC = () => {
 
       {/* Controls row */}
       <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-5">
-          <motion.button
+        <div className="flex items-center gap-1">
+          {/* PREV */}
+          <button
             onClick={() => canGoBack && setCurrentStageId(currentStageId - 1)}
             disabled={!canGoBack}
-            className={`text-[11px] font-mono tracking-widest transition-all ${
-              canGoBack ? 'text-white/40 hover:text-white cursor-pointer' : 'text-white/5 cursor-not-allowed'
+            aria-label="Previous stage"
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-md transition-all text-[11px] font-mono tracking-widest ${
+              canGoBack
+                ? 'text-white/70 hover:text-white hover:bg-white/5 cursor-pointer'
+                : 'text-white/15 cursor-not-allowed'
             }`}
             type="button"
           >
             ← PREV
-          </motion.button>
+          </button>
 
-          <div className="flex items-center gap-2 text-[10px] font-mono text-white/20">
-            <kbd className="opacity-40">←</kbd>
-            <span className="opacity-20">/</span>
-            <kbd className="opacity-40">→</kbd>
+          {/* Keyboard hint toggle */}
+          <div className="relative">
+            <button
+              className="px-2 py-2 rounded-md text-[9px] font-mono text-white/20 hover:text-white/40 transition-colors"
+              onMouseEnter={() => setKbHint(true)}
+              onMouseLeave={() => setKbHint(false)}
+              onFocus={() => setKbHint(true)}
+              onBlur={() => setKbHint(false)}
+              type="button"
+              aria-label="Keyboard shortcuts"
+            >
+              <kbd className="px-1 py-0.5 rounded border border-white/15 text-[9px]">?</kbd>
+            </button>
+            <AnimatePresence>
+              {kbHint && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 6, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg bg-[#1e1e1e] border border-white/10 shadow-xl z-50 whitespace-nowrap"
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-[9px] font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded border border-white/15 text-white/50">←</kbd>
+                      <span className="text-white/40">Previous stage</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[9px] font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded border border-white/15 text-white/50">→</kbd>
+                      <span className="text-white/40">Next stage</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[9px] font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded border border-white/15 text-white/50">Space</kbd>
+                      <span className="text-white/40">Also next stage</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[9px] font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded border border-white/15 text-white/50">Ctrl+Z</kbd>
+                      <span className="text-white/40">Undo stroke (draw)</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          <motion.button
+          {/* NEXT */}
+          <button
             onClick={() => canGoNext && setCurrentStageId(currentStageId + 1)}
             disabled={!canGoNext}
-            className={`text-[11px] font-mono tracking-widest transition-all ${
-              canGoNext ? 'text-white/60 hover:text-white cursor-pointer' : 'text-white/5 cursor-not-allowed'
+            aria-label="Next stage"
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-md transition-all text-[11px] font-mono tracking-widest ${
+              canGoNext
+                ? 'text-white/80 hover:text-white hover:bg-white/5 cursor-pointer'
+                : 'text-white/15 cursor-not-allowed'
             }`}
             type="button"
           >
             NEXT →
-          </motion.button>
+          </button>
         </div>
 
+        {/* Right side: stage label or finish */}
         <div className="flex items-center gap-4">
           <AnimatePresence mode="wait">
             {isLastStage ? (
@@ -138,7 +187,7 @@ export const PlayerControls: React.FC = () => {
                 </span>
                 <button
                   onClick={clearAll}
-                  className="px-4 py-1.5 rounded-md bg-aurora-purple/20 border border-aurora-purple/40 text-aurora-purple text-[10px] font-mono uppercase tracking-[0.2em] hover:bg-aurora-purple/40 transition-all shadow-[0_0_20px_rgba(156,39,176,0.1)]"
+                  className="px-4 py-1.5 rounded-md bg-aurora-purple/20 border border-aurora-purple/40 text-aurora-purple text-[10px] font-mono uppercase tracking-[0.2em] hover:bg-aurora-purple/40 transition-all"
                 >
                   Try another number
                 </button>
@@ -152,7 +201,9 @@ export const PlayerControls: React.FC = () => {
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.4 }}
               >
-                <span className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em]">Stage {currentStageId.toString().padStart(2, '0')}</span>
+                <span className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em]">
+                  Stage {currentStageId.toString().padStart(2, '0')}
+                </span>
                 <div className="w-[1px] h-3 bg-white/10" />
                 <span className="text-[10px] font-serif italic text-white/70">{activeStage?.name}</span>
               </motion.div>
