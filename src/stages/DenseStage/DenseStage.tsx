@@ -176,7 +176,7 @@ export const DenseStage: React.FC = () => {
       {/* Main Graph Area — fills available space, centers the SVG */}
       <div className="w-full h-full flex items-center justify-center dense-graph-container">
         <svg
-          viewBox="0 0 1400 890"
+          viewBox="55 30 1290 830"
           className="w-full h-full select-none"
           preserveAspectRatio="xMidYMid meet"
         >
@@ -198,7 +198,6 @@ export const DenseStage: React.FC = () => {
             </filter>
           </defs>
 
-          <g transform="translate(700, 445) scale(1.3) translate(-700, -445)">
           {/* Connection Lines: Input -> Hidden */}
           {INPUT_SAMPLES.map((inputIdx, sampleIdx) => {
             const inPt = [150, IN_Y0 + sampleIdx * IN_STEP];
@@ -317,7 +316,7 @@ export const DenseStage: React.FC = () => {
             return (
               <g key={`inNode-${sampleIdx}`}>
                 <circle cx={150} cy={y} r={30} fill={`rgb(${r}, ${g}, ${b})`} stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" />
-                <text x={112} y={y + 5} fill="rgba(255,255,255,0.65)" fontSize="18" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="end">x[{inputIdx}]</text>
+                <text x={118} y={y + 5} fill="rgba(255,255,255,0.65)" fontSize="18" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="end">x[{inputIdx}]</text>
               </g>
             );
           })}
@@ -401,7 +400,6 @@ export const DenseStage: React.FC = () => {
           <text x={150} y={40} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">1. Input Vector</text>
           <text x={700} y={40} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">2. Hidden Layer</text>
           <text x={1250} y={40} fill="rgba(255,255,255,0.5)" fontSize="20" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">3. Output Classes</text>
-          </g>
         </svg>
 
         {/* Floating details overlay */}
