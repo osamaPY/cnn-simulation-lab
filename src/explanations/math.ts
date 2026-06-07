@@ -11,7 +11,7 @@ export const mathExplanations: Record<number, ExplanationContent> = {
   2: {
     headline: "Macro-Structure Overview",
     body: "Modern CNNs like VGG are built from repeated modular blocks. Each block typically contains multiple Convolutions, non-linear Activations, and a Pooling layer for downsampling. This hierarchy allows the network to build simple features into complex ones: first edges, then textures, then parts, and finally objects. By stacking these blocks, we create a deep network that can understand the world through layers of abstraction.",
-    focusFormula: "\\text{Output} = \\text{Pool}(\\text{ReLU}(\\text{Conv}(\\text{Input})))",
+    focusFormula: "\\text{Architecture} = \\text{Input} \\rightarrow [\\text{Conv} \\rightarrow \\text{ReLU} \\rightarrow \\text{Pool}]^n \\rightarrow \\text{Dense} \\rightarrow \\text{Softmax}",
     interactiveGoal: "Grasp the sequential flow and repetitive nature of deep feature extraction.",
     keyTakeaway: "Deep learning succeeds by stacking simple operations into complex hierarchical models."
   },
