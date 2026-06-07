@@ -26,7 +26,13 @@ export const Header: React.FC = () => {
       <div className="flex w-full items-center justify-between gap-4" style={{ minWidth: 0 }}>
         {/* Brand */}
         <div className="flex items-center gap-4" style={{ flexShrink: 0 }}>
-          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: activeColor }} />
+          <div 
+            className="w-2.5 h-2.5 rounded-full animate-pulse transition-all duration-500" 
+            style={{ 
+              backgroundColor: activeColor,
+              boxShadow: `0 0 10px ${activeColor}bb`
+            }} 
+          />
           <div className="flex flex-col">
             <h1 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/90 leading-none font-sans">CNN Visual Lab</h1>
             <AnimatePresence mode="wait">
