@@ -11,23 +11,20 @@ You need to install the `tensorflowjs` converter utility. We recommend using a P
 pip install tensorflowjs
 ```
 
-> [!NOTE]
-> If you encounter dependency version conflicts (especially with Numpy or protobuf), you can install a specific version or install it in a clean virtual environment:
-> ```bash
-> python -m venv venv
-> # On Windows:
-> .\venv\Scripts\activate
-> # On macOS/Linux:
-> source venv/bin/activate
-> 
-> pip install --upgrade pip
-> pip install tensorflowjs
-> ```
+**Note**: If you encounter dependency version conflicts (especially with Numpy or protobuf), you can install a specific version or install it in a clean virtual environment:
 
-> [!IMPORTANT]
-> The TensorFlow.js Python converter's optional decision-forests dependency is unreliable on
-> native Windows. Use Linux, WSL, or Colab for the cleanest conversion path. The training script
-> enables TensorFlow's legacy Keras H5 schema so the exported LayersModel loads correctly in TF.js.
+```bash
+python -m venv venv
+# On Windows:
+.\venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+pip install --upgrade pip
+pip install tensorflowjs
+```
+
+**Warning**: The TensorFlow.js Python converter's optional decision-forests dependency is unreliable on native Windows. Use Linux, WSL, or Colab for the cleanest conversion path. The training script enables TensorFlow's legacy Keras H5 schema so the exported LayersModel loads correctly in TF.js.
 
 ---
 
@@ -37,7 +34,7 @@ Run the following command from the project root directory to compile and place t
 
 ```bash
 # Execute conversion from h5 to tfjs layers format
-tensorflowjs_converter --input_format=keras train/mnist_model.h5 public/model/
+tensorflowjs_converter --input_format=keras research/mnist_model.h5 public/model/
 ```
 
 ### Expected Output Files

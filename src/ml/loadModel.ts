@@ -4,17 +4,11 @@ let loadedModel: tf.LayersModel | null = null;
 let modelLoadPromise: Promise<tf.LayersModel> | null = null;
 
 /**
- * Loads and caches the exported LayersModel relative to Vite's deployment
- * base, then rejects models that do not match the lesson's public contract.
+ * Loads and caches the LayersModel. Validates input/output shapes.
  */
 export async function loadCNNModel(): Promise<tf.LayersModel> {
-  if (loadedModel) {
-    return loadedModel;
-  }
-
-  if (modelLoadPromise) {
-    return modelLoadPromise;
-  }
+  if (loadedModel) return loadedModel;
+  if (modelLoadPromise) return modelLoadPromise;
 
   const modelUrl = `${import.meta.env.BASE_URL}model/model.json`;
 
@@ -25,12 +19,12 @@ export async function loadCNNModel(): Promise<tf.LayersModel> {
     const outputShape = model.outputs[0]?.shape;
     const validInput = inputShape?.slice(-3).join(',') === '28,28,1';
     const validOutput = outputShape?.at(-1) === 10;
+
     if (!validInput || !validOutput) {
       model.dispose();
-      throw new Error(
-        `Unexpected model contract. Expected input [28,28,1] and 10 output classes; received input [${inputShape?.join(', ')}] and output [${outputShape?.join(', ')}].`,
-      );
+      throw new Error(`Invalid model contract: Input ${inputShape}, Output ${outputShape}`);
     }
+    
     loadedModel = model;
     return model;
   })();
@@ -39,14 +33,11 @@ export async function loadCNNModel(): Promise<tf.LayersModel> {
     return await modelLoadPromise;
   } catch (error) {
     modelLoadPromise = null;
-    console.error('Failed to load layers model from:', modelUrl, error);
+    console.error('Failed to load model:', modelUrl, error);
     throw error;
   }
 }
 
-/**
- * Gets the currently loaded model instance, if available.
- */
 export function getModelInstance(): tf.LayersModel | null {
   return loadedModel;
 }

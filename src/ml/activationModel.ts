@@ -13,26 +13,19 @@ let activationModelInstance: tf.LayersModel | null = null;
 let supportedLayerNames: string[] = [];
 
 /**
- * Builds a multi-output model using the loaded LayersModel.
- * It maps the outputs of Conv2D, MaxPooling2D, Flatten, and Dense layers.
+ * Constructs a multi-output model to capture intermediate layer activations.
  */
 export function buildActivationModel(model: tf.LayersModel): tf.LayersModel {
-  if (activationModelInstance) {
-    return activationModelInstance;
-  }
+  if (activationModelInstance) return activationModelInstance;
 
   const inputs = model.inputs;
   const outputs: tf.SymbolicTensor[] = [];
   supportedLayerNames = [];
 
+  const TARGET_LAYERS = ['Conv2D', 'MaxPooling2D', 'Flatten', 'Dense'];
+
   model.layers.forEach((layer) => {
-    const className = layer.getClassName();
-    if (
-      className === 'Conv2D' ||
-      className === 'MaxPooling2D' ||
-      className === 'Flatten' ||
-      className === 'Dense'
-    ) {
+    if (TARGET_LAYERS.includes(layer.getClassName())) {
       if (Array.isArray(layer.output)) {
         outputs.push(...(layer.output as tf.SymbolicTensor[]));
       } else {
@@ -47,54 +40,38 @@ export function buildActivationModel(model: tf.LayersModel): tf.LayersModel {
 }
 
 /**
- * Extracts intermediate activations for the current input tensor.
- * Runs prediction on the multi-output model and formats statistics.
+ * Computes activations and descriptive statistics for intermediate layers.
  */
 export function extractActivations(
   model: tf.LayersModel,
   inputTensor: tf.Tensor4D
 ): ActivationRecord[] {
   const actModel = buildActivationModel(model);
-  
-  // Run prediction (predict outputs an array of Tensors)
   const layerOutputs = actModel.predict(inputTensor);
   const outputsArray = Array.isArray(layerOutputs) ? layerOutputs : [layerOutputs];
 
   try {
-    const records: ActivationRecord[] = [];
-
-    outputsArray.forEach((tensor, index) => {
+    return outputsArray.map((tensor, index) => {
       const layerName = supportedLayerNames[index];
       const layer = model.getLayer(layerName);
-
-      // dataSync copies values out of TensorFlow-managed memory before disposal.
       const values = tensor.dataSync() as Float32Array;
-      const shape = tensor.shape;
-
-      let min = 0;
-      let max = 0;
+      
+      let min = 0, max = 0;
       if (values.length > 0) {
-        min = values[0];
-        max = values[0];
-        for (let i = 1; i < values.length; i++) {
-          const val = values[i];
-          if (val < min) min = val;
-          if (val > max) max = val;
-        }
+        min = Math.min(...values);
+        max = Math.max(...values);
       }
 
-      records.push({
+      return {
         layerName,
         layerType: layer.getClassName(),
-        shape,
+        shape: tensor.shape,
         values,
         min,
         max
-      });
+      };
     });
-
-    return records;
   } finally {
-    outputsArray.forEach((tensor) => tensor.dispose());
+    outputsArray.forEach(t => t.dispose());
   }
 }

@@ -16,86 +16,86 @@ export interface PredictionResult {
 export const CNN_STAGES: StageInfo[] = [
   {
     id: 1,
-    name: "Standardizing the Image",
+    name: "Input Normalization",
     shortName: "Input",
-    description: "Computers need things to be consistent. We crop and center your sketch so the network knows where to look.",
+    description: "The raw user drawing is cropped to its bounding box, centered by its center of mass, and rescaled to a canonical 28x28 grayscale coordinate system.",
     shapeLabel: "28 × 28"
   },
   {
     id: 2,
-    name: "The 'Brain' Blueprint",
+    name: "Model Architecture",
     shortName: "Architecture",
-    description: "This is the full map of the network. Tensors (data blocks) flow through these layers to find meaning in pixels.",
+    description: "Visualization of the sequential LayersModel topology. Tensors pass through convolutional blocks and pooling operations to extract hierarchical features.",
     shapeLabel: "Full View"
   },
   {
     id: 3,
-    name: "Turning Ink into Numbers",
+    name: "Grid Discretization",
     shortName: "Grid",
-    description: "We turn your drawing into a 28x28 grid of numbers. Hover over the cells to see the 'ink' values.",
+    description: "The normalized image is converted into a 2D intensity matrix (Tensor). Each cell represents a normalized pixel value between 0.0 and 1.0.",
     shapeLabel: "28 × 28"
   },
   {
     id: 4,
-    name: "Hunting for Patterns",
+    name: "Convolutional Feature Extraction",
     shortName: "Convolution",
-    description: "A 3x3 filter slides over the grid, acting like a specialized flashlight looking for edges and curves.",
+    description: "A 3x3 kernel performs a sliding window dot product (cross-correlation) to identify local spatial features like edges and textures.",
     shapeLabel: "26 × 26"
   },
   {
     id: 5,
-    name: "The Multi-Tasking Team",
+    name: "Parallel Channel Projection",
     shortName: "Filters",
-    description: "One filter isn't enough. We run several in parallel—some look for horizontal lines, others for loops.",
+    description: "Multiple independent filters are applied in parallel to generate a stack of feature maps, capturing diverse visual motifs simultaneously.",
     shapeLabel: "26 × 26 × 8"
   },
   {
     id: 6,
-    name: "Cleaning Up the Signal",
+    name: "Non-Linear Activation (ReLU)",
     shortName: "ReLU",
-    description: "Neurons either fire or they don't. This step (ReLU) simply deletes any negative 'distractions' by turning them to zero.",
+    description: "The Rectified Linear Unit (f(x)=max(0,x)) introduces non-linearity by zeroing out negative activations, emphasizing positive feature responses.",
     shapeLabel: "26 × 26 × 8"
   },
   {
     id: 7,
-    name: "Summarizing Features",
+    name: "Spatial Downsampling (Max Pooling)",
     shortName: "Pooling",
-    description: "To save space and focus on what matters, we shrink the grid. We keep only the strongest signal in every 2x2 area.",
+    description: "A 2x2 max-pooling operation reduces spatial dimensionality while maintaining translation invariance by retaining only the peak activation in each window.",
     shapeLabel: "13 × 13 × 8"
   },
   {
     id: 8,
-    name: "Unrolling the Data",
+    name: "Tensor Flattening",
     shortName: "Flatten",
-    description: "We take all those 2D pattern maps and unroll them into one long list of numbers, ready for final judgment.",
+    description: "The 3D feature volume is reshaped into a 1D feature vector, transitioning from spatial representations to a format suitable for dense layer processing.",
     shapeLabel: "400"
   },
   {
     id: 9,
-    name: "Making Connections",
+    name: "Dense Layer Integration",
     shortName: "Dense",
-    description: "Every pattern we found is weighed together. This is where the network finally asks: 'Which digit does this look like?'",
+    description: "A fully connected layer performs a global linear transformation (Wx + b) to correlate local features into high-level semantic class scores.",
     shapeLabel: "64"
   },
   {
     id: 10,
-    name: "Calculating Certainty",
+    name: "Softmax Normalization",
     shortName: "Softmax",
-    description: "Raw scores are hard to read, so we normalize them into percentages. This creates a clear 'confidence' profile.",
+    description: "Logits are transformed via exponentiation and normalization into a probability distribution over the discrete 0-9 class space.",
     shapeLabel: "10"
   },
   {
     id: 11,
-    name: "The Final Verdict",
+    name: "Class Inference",
     shortName: "Output",
-    description: "The digit with the highest percentage wins. Here is the AI's final answer and how confident it feels.",
+    description: "The final prediction is determined by selecting the class index with the maximum probability (Argmax) from the Softmax distribution.",
     shapeLabel: "1"
   },
   {
     id: 12,
-    name: "Learning from Mistakes",
+    name: "Gradient Backpropagation",
     shortName: "Learning",
-    description: "If the AI was wrong, it looks back and adjusts its weights. This 'backward flow' is how machines actually learn.",
+    description: "Error gradients are calculated using the chain rule and propagated backward to optimize weights, minimizing the categorical cross-entropy loss.",
     shapeLabel: "1"
   }
 ];

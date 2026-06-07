@@ -142,7 +142,7 @@ export const ConvolutionStage: React.FC = () => {
   }, [outputMapVertical, outputMapHorizontal, outputMapSharpen]);
 
   // Helper to draw output pixels
-  const drawOutput = (
+  const drawOutput = useCallback((
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
     lastDrawnRef: React.MutableRefObject<number>,
     map: Float32Array,
@@ -168,14 +168,14 @@ export const ConvolutionStage: React.FC = () => {
       ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
     }
     lastDrawnRef.current = stepIndex;
-  };
+  }, [stepIndex, outputDim]);
 
   // Run draws for all three in parallel
   useEffect(() => {
     drawOutput(verticalCanvasRef, lastDrawnVertical, outputMapVertical, verticalRange);
     drawOutput(horizontalCanvasRef, lastDrawnHorizontal, outputMapHorizontal, horizontalRange);
     drawOutput(sharpenCanvasRef, lastDrawnSharpen, outputMapSharpen, sharpenRange);
-  }, [stepIndex, outputMapVertical, outputMapHorizontal, outputMapSharpen, verticalRange, horizontalRange, sharpenRange, outputDim]);
+  }, [drawOutput, outputMapVertical, outputMapHorizontal, outputMapSharpen, verticalRange, horizontalRange, sharpenRange]);
 
   if (!preprocessedData) return null;
 

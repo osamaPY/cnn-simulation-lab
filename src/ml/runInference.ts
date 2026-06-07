@@ -11,31 +11,22 @@ export interface InferenceResult {
 }
 
 /**
- * Runs inference on the preprocessed Float32Array digit grid,
- * extracting both prediction outputs and intermediate layer activation tensors.
+ * Runs inference on preprocessed digit data and extracts layer activations.
  */
 export async function runModelInference(preprocessedData: Float32Array): Promise<InferenceResult> {
   const model = getModelInstance();
   if (!model) {
-    throw new Error('Model has not been initialized. Call loadCNNModel first.');
+    throw new Error('Model not initialized.');
   }
 
   let prediction: PredictionResult | null = null;
   let activations: ActivationRecord[] = [];
 
-  // Execute operations inside tf.tidy. It automatically disposes inputTensor, 
-  // outputTensor, and intermediate tensors within extractActivations.
   tf.tidy(() => {
-    // 1. Reshape the 784-element array into a 4D tensor: [batch, height, width, channels]
     const inputTensor = tf.tensor4d(preprocessedData, [1, 28, 28, 1]);
-
-    // 2. Perform prediction (outputs a probability distribution)
     const outputTensor = model.predict(inputTensor) as tf.Tensor;
-
-    // 3. Extract output values synchronously
     const probabilitiesArray = Array.from(outputTensor.dataSync());
     
-    // 4. Compute argmax predicted digit
     const predictedDigit = argmax(probabilitiesArray);
     const confidence = probabilitiesArray[predictedDigit];
 
@@ -45,7 +36,6 @@ export async function runModelInference(preprocessedData: Float32Array): Promise
       probabilities: probabilitiesArray,
     };
 
-    // 5. Extract intermediate layer activations
     activations = extractActivations(model, inputTensor);
   });
 

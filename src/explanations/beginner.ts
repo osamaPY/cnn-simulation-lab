@@ -2,75 +2,75 @@ import type { ExplanationContent } from './index';
 
 export const beginnerExplanations: Record<number, ExplanationContent> = {
   1: {
-    headline: "Center & Resize",
-    body: "Standardizes your drawing by cropping empty space and centering the digit. This ensures the model sees the numbers in a consistent size and position, making predictions highly reliable.",
-    interactiveGoal: "Draw a digit on the left and run the simulation.",
-    keyTakeaway: "Enforces scale and translation consistency so the network is not confused by position."
+    headline: "Centering & Resizing",
+    body: "Standardizes input data by cropping white space and centering the digit. This ensures the model processes the digit at a consistent scale and position, improving inference reliability.",
+    interactiveGoal: "Draw a digit on the left and start the simulation.",
+    keyTakeaway: "Enforces scale and translation invariance prior to feature extraction."
   },
   2: {
-    headline: "CNN Architecture Overview",
-    body: "Visualizes the macro-structure of the neural network. Tensors flow from the input through a series of blocks—Convolution, ReLU, and Pooling—before being flattened and passed to dense layers for final classification.",
-    interactiveGoal: "Grasp how layers are stacked sequentially to build visual representations.",
-    keyTakeaway: "Hierarchical layers help the network learn from simple edges to complex shapes."
+    headline: "Network Topology",
+    body: "Visualizes the global structure of the neural network. Tensors flow through sequential blocks—Convolution, ReLU, and Pooling—before final classification in the dense layers.",
+    interactiveGoal: "Observe how layers are stacked to build hierarchical visual representations.",
+    keyTakeaway: "Successive layers transition from low-level edges to high-level semantic shapes."
   },
   3: {
-    headline: "Rasterize to Grid",
-    body: "Converts the drawing into a 28x28 grid of brightness values from 0 (black background) to 1 (white stroke). You can hover over individual grid cells to probe their numeric values.",
-    interactiveGoal: "Hover or tap on cells to view coordinates and values.",
-    keyTakeaway: "A computer sees an image as a matrix of intensity values, not lines."
+    headline: "Grid Discretization",
+    body: "Converts the continuous drawing into a 28x28 discrete grid of intensity values. Each cell corresponds to a pixel value between 0.0 (background) and 1.0 (foreground).",
+    interactiveGoal: "Probe individual cells to view their underlying coordinates and values.",
+    keyTakeaway: "Input is represented as a structured matrix of intensity values."
   },
   4: {
-    headline: "Convolutional Scan",
-    body: "A 3x3 filter slides across the image grid. It multiplies the 3x3 patch values by the filter weights element-by-element and sums them up (adding a bias) to detect local features like edges.",
-    interactiveGoal: "Watch the kernel sweep spatially and compute local scores.",
-    keyTakeaway: "Convolution detects local patterns consistently across the image."
+    headline: "Spatial Convolution",
+    body: "A sliding kernel performs local operations across the image. It computes the dot product of the kernel weights and local pixel patches to identify spatial features like edges.",
+    interactiveGoal: "Track the kernel as it computes local responses across the input space.",
+    keyTakeaway: "Convolution detects local patterns consistently using shared weights."
   },
   5: {
-    headline: "Parallel Filters",
-    body: "Multiple filters scan the image in parallel to extract different feature maps. One filter might specialize in vertical edges, another in horizontal strokes, creating a stack of features.",
-    interactiveGoal: "Click different filter cards to see their extracted feature maps.",
-    keyTakeaway: "Running filters in parallel creates depth channels, capturing diverse details."
+    headline: "Channel Parallelism",
+    body: "Multiple filters are applied concurrently to extract distinct feature maps. Each filter specializes in a specific motif, such as vertical edges or curved segments.",
+    interactiveGoal: "Select different channels to visualize the specific features they highlight.",
+    keyTakeaway: "Parallel filter application enables multi-dimensional feature extraction."
   },
   6: {
-    headline: "ReLU Activation",
-    body: "Replaces all negative values with zero while keeping positive values unchanged. This introduces non-linearity, helping the network capture complex, curved shapes rather than just flat lines.",
-    interactiveGoal: "Observe negative values turning to zero (black).",
-    keyTakeaway: "ReLU clips negative responses to highlight positive feature matches."
+    headline: "ReLU Non-linearity",
+    body: "Applies a thresholding operation that sets all negative values to zero. This introduces non-linearity, allowing the network to model complex non-linear relationships.",
+    interactiveGoal: "Observe how negative activations are suppressed to zero.",
+    keyTakeaway: "ReLU emphasizes significant activations while enabling non-linear representation."
   },
   7: {
-    headline: "Max Pooling",
-    body: "Slides a 2x2 window with a stride of 2 across the feature map, keeping only the maximum value in each window. This shrinks the grid size by half to make the model faster and less sensitive to small movements.",
-    interactiveGoal: "Step the window to watch the grid shrink to 13x13.",
-    keyTakeaway: "Pooling downsamples spatial size, discarding redundant data."
+    headline: "Spatial Pooling",
+    body: "Reduces feature map resolution by selecting the maximum value within a 2x2 local window. This downsampling increases computational efficiency and provides local translation tolerance.",
+    interactiveGoal: "Observe the spatial reduction as the feature map is downsampled.",
+    keyTakeaway: "Pooling discards redundant spatial data while preserving critical features."
   },
   8: {
     headline: "Vector Flattening",
-    body: "Unrolls the 3D feature grids (5x5x16) into a long 1D list of 400 numbers. This prepares the spatial features to be fed into the classic fully connected neurons for decision-making.",
-    interactiveGoal: "Trace vector entries back to their original spatial and channel positions.",
-    keyTakeaway: "Flattening converts grids into a flat list that dense layers can read globally."
+    body: "Reshapes the 3D feature volume into a 1D vector. This transforms spatial feature maps into a format compatible with fully connected layers.",
+    interactiveGoal: "Observe the transition from spatial grids to a linear feature vector.",
+    keyTakeaway: "Flattening links spatial feature extraction with global decision-making."
   },
   9: {
-    headline: "Dense Connections",
-    body: "Hidden neurons weigh all 400 features globally. Each neuron is connected to every feature and learns to vote for digit features, combining local clues like loops and strokes into global concepts.",
-    interactiveGoal: "Hover output digits to see contributing active features.",
-    keyTakeaway: "Dense layers perform global reasoning by combining all features."
+    headline: "Global Integration",
+    body: "Neurons in the dense layer compute weighted sums of the entire feature vector. This stage integrates local features into global concepts to determine class membership.",
+    interactiveGoal: "Inspect how global features contribute to specific digit activations.",
+    keyTakeaway: "Dense layers perform high-level reasoning across all combined features."
   },
   10: {
-    headline: "Softmax Probabilities",
-    body: "Normalizes the raw neuron scores into percentage probabilities that sum up to 100%. This represents the model's confidence distribution for each digit candidate (0 to 9).",
-    interactiveGoal: "Observe raw scores convert to probabilities.",
-    keyTakeaway: "Softmax translates raw evidence scores into interpretable confidences."
+    headline: "Probability Normalization",
+    body: "Converts raw class scores into a normalized probability distribution using the Softmax function. All outputs sum to 1.0, representing the model's relative confidence.",
+    interactiveGoal: "Watch as raw scores are transformed into a competitive probability distribution.",
+    keyTakeaway: "Softmax provides an interpretable confidence score for each class."
   },
   11: {
-    headline: "Final Prediction",
-    body: "Chooses the digit with the highest probability. If you draw unusual shapes, the model will still confidently choose the closest digit class from 0 to 9.",
-    interactiveGoal: "Compare the predicted class against the full probability distribution.",
-    keyTakeaway: "Prediction chooses the highest-probability class after the full pipeline has spoken."
+    headline: "Class Selection",
+    body: "Identifies the final prediction by selecting the digit with the highest probability score. The system outputs the most likely class based on the cumulative pipeline evidence.",
+    interactiveGoal: "Compare the predicted digit against the full probability distribution.",
+    keyTakeaway: "Final inference is the result of selecting the maximum likelihood class."
   },
   12: {
-    headline: "Backpropagation & Learning",
-    body: "Calculates how wrong the prediction was and flows the error signal backward through the network. It tweaks the weights of filters and connections step-by-step so the model does better next time.",
-    interactiveGoal: "Follow the error signal backward and see how gradients reshape weights.",
-    keyTakeaway: "Backpropagation is the learning mechanism that adjusts filters to detect meaningful shapes over time."
+    headline: "Backpropagation",
+    body: "Calculates error gradients and propagates them backward through the network to update weights. This iterative process optimizes the model for future predictions.",
+    interactiveGoal: "Trace the error signal backward to see how it adjusts network parameters.",
+    keyTakeaway: "Learning is achieved through iterative weight optimization based on error gradients."
   }
 };

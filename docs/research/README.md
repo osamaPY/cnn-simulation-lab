@@ -4,8 +4,8 @@ This directory contains the Python research scripts and instructions required to
 
 ---
 
-## 🔬 Learning Deep Learning
-If you are curious about the math behind the scenes, we've included a script that implements the core operations (Convolution, ReLU, Pooling) from scratch using only `numpy`:
+## Learning Deep Learning
+To explore the mathematical operations behind the scenes, we've included a script that implements core CNN operations (Convolution, ReLU, Pooling) from scratch using only `numpy`:
 
 ```bash
 python research/explain_cnn.py
@@ -13,7 +13,7 @@ python research/explain_cnn.py
 
 ---
 
-## 🛠️ Step 1: Environment Setup
+## Step 1: Environment Setup
 
 We recommend creating a Python virtual environment to isolate dependencies:
 
@@ -34,7 +34,7 @@ pip install -r research/requirements.txt
 
 ---
 
-## 🏋️ Step 2: Train the MNIST CNN Model
+## Step 2: Train the MNIST CNN Model
 
 Run the training script to fetch the MNIST dataset, train a small CNN matching our network layers, evaluate test accuracy, and save the model:
 
@@ -47,7 +47,7 @@ python research/train_mnist.py
 
 ---
 
-## 🔄 Step 3: Convert to Web-Ready TensorFlow.js Format
+## Step 3: Convert to Web-Ready TensorFlow.js Format
 
 To load the model inside the browser, the H5 Keras model must be converted into JSON shards. Run the converter:
 
@@ -62,7 +62,7 @@ tensorflowjs_converter --input_format=keras research/mnist_model.h5 public/model
 
 ---
 
-## ⚡ Step 4: Run the React Application
+## Step 4: Run the React Application
 
 Once the converted files are placed under `public/model/`, the React dashboard automatically resolves the 404 error and boots the model:
 

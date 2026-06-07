@@ -184,6 +184,19 @@ export const FeatureMapGrid: React.FC = () => {
     return () => cancelAnimationFrame(frameId);
   }, [autoRotate, viewMode, shouldReduceMotion]);
 
+  // Set default selected layer if none is selected or layer is not in filtered list
+  const activeLayerName = convActivations.length > 0 
+    ? (convActivations.some(r => r.layerName === selectedActivationLayer)
+        ? selectedActivationLayer
+        : convActivations[0].layerName)
+    : null;
+
+  useEffect(() => {
+    if (activeLayerName && activeLayerName !== selectedActivationLayer) {
+      setSelectedActivationLayer(activeLayerName);
+    }
+  }, [activeLayerName, selectedActivationLayer, setSelectedActivationLayer]);
+
   // If no activations, return empty state
   if (convActivations.length === 0) {
     return (
@@ -197,17 +210,6 @@ export const FeatureMapGrid: React.FC = () => {
       </div>
     );
   }
-
-  // Set default selected layer if none is selected or layer is not in filtered list
-  const activeLayerName = convActivations.some(r => r.layerName === selectedActivationLayer)
-    ? selectedActivationLayer
-    : convActivations[0].layerName;
-
-  useEffect(() => {
-    if (activeLayerName !== selectedActivationLayer) {
-      setSelectedActivationLayer(activeLayerName);
-    }
-  }, [activeLayerName, selectedActivationLayer, setSelectedActivationLayer]);
 
   const currentRecord = convActivations.find(r => r.layerName === activeLayerName) || convActivations[0];
   const shape = currentRecord.shape;

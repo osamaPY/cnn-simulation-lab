@@ -22,6 +22,7 @@ export const DrawCanvas: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [mode, setMode] = useState<Mode>('draw');
   const [strokeCount, setStrokeCount] = useState(0);
+  const [canUndo, setCanUndo] = useState(false);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export const DrawCanvas: React.FC = () => {
     snapshotsRef.current.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
     // Keep undo stack to 30 entries max
     if (snapshotsRef.current.length > 30) snapshotsRef.current.shift();
+    setCanUndo(true);
   }, []);
 
   const undo = useCallback(() => {
@@ -48,6 +50,7 @@ export const DrawCanvas: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const snap = snapshotsRef.current.pop();
+    setCanUndo(snapshotsRef.current.length > 0);
     if (snap) {
       ctx.putImageData(snap, 0, 0);
       setStrokeCount(c => Math.max(0, c - 1));
@@ -138,6 +141,7 @@ export const DrawCanvas: React.FC = () => {
       if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
     snapshotsRef.current = [];
+    setCanUndo(false);
     setStrokeCount(0);
     clearAll();
   };
@@ -226,7 +230,7 @@ export const DrawCanvas: React.FC = () => {
           onClick={undo}
           type="button"
           title="Undo last stroke (Ctrl+Z)"
-          disabled={snapshotsRef.current.length === 0}
+          disabled={!canUndo}
           className="flex-none px-2.5 py-1.5 rounded-md border border-white/10 text-[10px] font-mono text-white/30 hover:border-white/20 hover:text-white/50 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
         >
           ↩ undo

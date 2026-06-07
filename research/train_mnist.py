@@ -73,9 +73,7 @@ def train_mnist_model():
     print(f"Saving compiled model to: {model_path}...")
     model.save(model_path)
     
-    print("\n--- Training Complete ---")
-    print("Next step: Convert this model using tensorflowjs_converter.")
-    print("Refer to convert_to_tfjs.md for commands.")
+    print("\nTraining execution complete.")
 
 if __name__ == "__main__":
     train_mnist_model()
