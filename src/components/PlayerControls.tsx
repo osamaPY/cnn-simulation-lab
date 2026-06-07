@@ -5,9 +5,9 @@ import { CNN_STAGES } from '../types/cnn';
 import { useTimelineStore } from '../animations/useTimeline';
 
 const STAGE_COLORS: Record<number, string> = {
-  1: '#6366f1', 2: '#0ea5e9', 3: '#22d3ee', 4: '#3b82f6',
-  5: '#f97316', 6: '#a855f7', 7: '#ec4899', 8: '#f59e0b',
-  9: '#8b5cf6', 10: '#34d399', 11: '#f87171',
+  1: '#6366f1', 2: '#8b5cf6', 3: '#0ea5e9', 4: '#22d3ee', 5: '#3b82f6',
+  6: '#f97316', 7: '#a855f7', 8: '#ec4899', 9: '#f59e0b',
+  10: '#8b5cf6', 11: '#34d399', 12: '#f87171',
 };
 
 export const PlayerControls: React.FC = () => {

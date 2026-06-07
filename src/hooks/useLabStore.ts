@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { CNN_STAGES } from '../types/cnn';
-import type { PredictionResult, StageInfo } from '../types/cnn';
+import type { PredictionResult } from '../types/cnn';
 import type { ActivationRecord } from '../ml/activationModel';
 
 interface LabState {
@@ -29,10 +29,17 @@ interface LabState {
   tfMemoryDebug: { numTensors: number; numBytes: number } | null;
   hoveredDigit: number | null;
 
-  // Getters
-  getActiveStageInfo: () => StageInfo;
+  // Hyperparameters
+  hyperparams: {
+    kernelSize: number;
+    stride: number;
+    padding: number;
+    poolingSize: number;
+    numFilters: number;
+  };
   
   // Actions
+  updateHyperparams: (params: Partial<LabState['hyperparams']>) => void;
   setCurrentStageId: (id: number) => void;
   setHasDrawing: (hasDrawing: boolean) => void;
   setPrediction: (prediction: PredictionResult | null) => void;
@@ -77,7 +84,21 @@ export const useLabStore = create<LabState>((set, get) => ({
   tfMemoryDebug: null,
   hoveredDigit: null,
 
-  // Getters
+  hyperparams: {
+    kernelSize: 3,
+    stride: 1,
+    padding: 0,
+    poolingSize: 2,
+    numFilters: 8,
+  },
+
+  updateHyperparams: (params) => {
+    set((state) => ({
+      hyperparams: { ...state.hyperparams, ...params }
+    }));
+  },
+
+  // Actions
   getActiveStageInfo: () => {
     const id = get().currentStageId;
     return CNN_STAGES.find(s => s.id === id) || CNN_STAGES[0];

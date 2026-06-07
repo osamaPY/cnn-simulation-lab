@@ -1,22 +1,24 @@
 import React from 'react';
+import { useLabStore } from '../hooks/useLabStore';
 
 interface KernelFrameProps {
   stepIndex: number;
 }
 
 export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
-  // Translate 1D stepIndex (0 to 675) to 2D coordinates
-  // Stride = 1, valid convolution output size is 26x26
-  const row = Math.floor(stepIndex / 26);
-  const col = stepIndex % 26;
+  const hyperparams = useLabStore(state => state.hyperparams);
+  const { kernelSize, stride, padding } = hyperparams;
 
-  // Grid cell size is 10px, so 3x3 kernel size is 30px
+  const outputDim = Math.floor((28 + 2 * padding - kernelSize) / stride) + 1;
+  const row = Math.floor(stepIndex / outputDim);
+  const col = stepIndex % outputDim;
+
   const cellSize = 10;
-  const frameWidth = 30;
-  const frameHeight = 30;
+  const frameWidth = kernelSize * cellSize;
+  const frameHeight = kernelSize * cellSize;
 
-  const x = col * cellSize;
-  const y = row * cellSize;
+  const x = col * stride * cellSize;
+  const y = row * stride * cellSize;
 
   return (
     <svg 
@@ -49,8 +51,8 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
 
       {/* Target output cell highlighted in the center */}
       <rect
-        x={x + cellSize}
-        y={y + cellSize}
+        x={x + Math.floor(kernelSize / 2) * cellSize}
+        y={y + Math.floor(kernelSize / 2) * cellSize}
         width={cellSize}
         height={cellSize}
         fill="rgba(16, 185, 129, 0.25)"
@@ -61,8 +63,8 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
 
       {/* Crosshair dot at the center */}
       <circle
-        cx={x + cellSize + cellSize / 2}
-        cy={y + cellSize + cellSize / 2}
+        cx={x + Math.floor(kernelSize / 2) * cellSize + cellSize / 2}
+        cy={y + Math.floor(kernelSize / 2) * cellSize + cellSize / 2}
         r="1.2"
         fill="#10b981"
         className="transition-all duration-150 ease-out"

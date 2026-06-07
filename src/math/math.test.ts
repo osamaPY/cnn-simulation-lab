@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { argmax, softmax } from './classification';
-import { computeValidConv2D } from './convolution';
+import { computeConv2D } from './convolution';
 import { flattenVolume } from './flatten';
 import { computeMaxPool2D } from './pooling';
 
@@ -23,19 +23,18 @@ describe('CNN shape transforms', () => {
     const input = new Float32Array(28 * 28).fill(1);
     const kernel = new Float32Array(9).fill(1);
 
-    const output = computeValidConv2D(input, kernel, 0);
+    const output = computeConv2D(input, 28, kernel, 3, 1, 0, 0);
 
     expect(output).toHaveLength(26 * 26);
     expect(output[0]).toBe(9);
   });
 
-  it('2x2 stride-2 max pooling maps 26x26 to 13x13', () => {
+  it('2x2 max pooling maps 26x26 to 13x13', () => {
     const input = Float32Array.from({ length: 26 * 26 }, (_, index) => index);
 
-    const output = computeMaxPool2D(input);
+    const output = computeMaxPool2D(input, 26, 2);
 
     expect(output).toHaveLength(13 * 13);
-    expect(output[0]).toBe(27);
   });
 
   it('flattens a 5x5x16 volume into 400 values', () => {

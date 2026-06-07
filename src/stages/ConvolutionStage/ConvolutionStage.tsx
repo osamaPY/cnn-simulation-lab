@@ -5,7 +5,7 @@ import { KernelFrame } from '../../animations/KernelFrame';
 import { getAuroraColor } from '../../canvas/heatScale';
 import { KernelZoomPanel } from './KernelZoomPanel';
 import {
-  computeValidConv2D,
+  computeConv2D,
   REPRESENTATIVE_BIAS
 } from '../../math/convolution';
 import { remap } from '../../animations/mathUtils';
@@ -20,25 +20,46 @@ type KernelPreset = keyof typeof KERNEL_PRESETS;
 
 export const ConvolutionStage: React.FC = () => {
   const preprocessedData = useLabStore(state => state.preprocessedData);
+  const hyperparams = useLabStore(state => state.hyperparams);
   const inputCanvasRef  = useRef<HTMLCanvasElement | null>(null);
   const outputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastDrawnStepRef = useRef(-1);
 
   const [kernelPreset, setKernelPreset] = useState<KernelPreset>('vertical');
-  const activeKernel = useMemo(() => Array.from(KERNEL_PRESETS[kernelPreset].values), [kernelPreset]);
+  
+  const activeKernel = useMemo(() => {
+    const base = KERNEL_PRESETS[kernelPreset].values;
+    // Adapt kernel to size
+    const size = hyperparams.kernelSize;
+    const values = new Float32Array(size * size).fill(0.1);
+    // Copy base into center if possible, or just repeat
+    for (let i = 0; i < Math.min(base.length, values.length); i++) {
+      values[i] = base[i];
+    }
+    return values;
+  }, [kernelPreset, hyperparams.kernelSize]);
 
-  const totalSteps = 676;
+  const outputDim = Math.floor((28 + 2 * hyperparams.padding - hyperparams.kernelSize) / hyperparams.stride) + 1;
+  const totalSteps = outputDim * outputDim;
   const { stepIndex } = useTimeline(totalSteps, true);
 
   const outputMap = useMemo(() => {
     if (!preprocessedData) return new Float32Array(totalSteps);
-    return computeValidConv2D(preprocessedData, activeKernel, REPRESENTATIVE_BIAS);
-  }, [activeKernel, preprocessedData]);
+    return computeConv2D(
+      preprocessedData, 
+      28, 
+      activeKernel, 
+      hyperparams.kernelSize, 
+      hyperparams.stride, 
+      hyperparams.padding, 
+      REPRESENTATIVE_BIAS
+    );
+  }, [activeKernel, preprocessedData, hyperparams, totalSteps]);
 
   const { row, col } = useMemo(() => ({
-    row: Math.floor(stepIndex / 26),
-    col: stepIndex % 26,
-  }), [stepIndex]);
+    row: Math.floor(stepIndex / outputDim),
+    col: stepIndex % outputDim,
+  }), [stepIndex, outputDim]);
 
   const { outMin, outMax } = useMemo(() => {
     let min = Infinity, max = -Infinity;
@@ -50,7 +71,7 @@ export const ConvolutionStage: React.FC = () => {
     return { outMin: min, outMax: max };
   }, [outputMap]);
 
-  const zoomProgress = remap(stepIndex % 26, 0, 25, 0, 1);
+  const zoomProgress = remap(stepIndex % outputDim, 0, outputDim - 1, 0, 1);
 
   // Render Input Canvas
   useEffect(() => {
@@ -89,8 +110,8 @@ export const ConvolutionStage: React.FC = () => {
       start = 0;
     }
     for (let i = start; i <= stepIndex; i++) {
-      const r = Math.floor(i / 26);
-      const c = i % 26;
+      const r = Math.floor(i / outputDim);
+      const c = i % outputDim;
       const val = outputMap[i];
       const norm = (val - outMin) / (outMax - outMin || 1);
       const { r: cr, g: cg, b: cb } = getAuroraColor(norm);
@@ -160,7 +181,7 @@ export const ConvolutionStage: React.FC = () => {
               >
                 <span className="text-aurora-mint">Σ(x·w)+b</span>
                 <span className="text-white/30">=</span>
-                <span className="text-text-accent font-semibold">{outputMap[stepIndex].toFixed(2)}</span>
+                <span className="text-text-accent font-semibold">{outputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
               </div>
             </div>
             <span className="text-[10px] font-mono text-white/40">Scanning: ({row + 1}, {col + 1})</span>
@@ -175,9 +196,9 @@ export const ConvolutionStage: React.FC = () => {
 
           {/* Output canvas */}
           <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Output: 26×26</span>
+            <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Output: {outputDim}×{outputDim}</span>
             <div className="relative w-[260px] h-[260px] p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
-              <canvas ref={outputCanvasRef} width={260} height={260}
+              <canvas ref={outputCanvasRef} width={outputDim * 10} height={outputDim * 10}
                 className="block h-full w-full rounded-xl bg-black border border-white/5"
               />
             </div>

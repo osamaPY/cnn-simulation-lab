@@ -14,6 +14,9 @@ const FeatureMapGrid = lazy(() =>
 const ConvolutionStage = lazy(() =>
   import('./ConvolutionStage/ConvolutionStage').then((module) => ({ default: module.ConvolutionStage })),
 )
+const ArchitectureStage = lazy(() =>
+  import('./ArchitectureStage/ArchitectureStage').then((module) => ({ default: module.ArchitectureStage })),
+)
 const PoolingStage = lazy(() =>
   import('./PoolingStage/PoolingStage').then((module) => ({ default: module.PoolingStage })),
 )
@@ -68,10 +71,7 @@ export function StageViewer() {
   const stage = CNN_STAGES.find((item) => item.id === currentStageId) ?? CNN_STAGES[0]
 
   const [prevStageId, setPrevStageId] = useState(currentStageId)
-  const [direction, setDirection] = useState(1)
-
   if (currentStageId !== prevStageId) {
-    setDirection(currentStageId >= prevStageId ? 1 : -1)
     setPrevStageId(currentStageId)
   }
 
@@ -103,24 +103,26 @@ export function StageViewer() {
       case 1:
         return <div className="flex flex-col items-center justify-center w-full h-full max-w-xl mx-auto"><PreprocessingPreview /></div>
       case 2:
-        return <div className="flex w-full h-full items-center justify-center"><TensorGridPreview /></div>
+        return <div className="flex w-full h-full items-center justify-center"><ArchitectureStage /></div>
       case 3:
-        return <div className="flex w-full h-full items-center justify-center"><ConvolutionStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><TensorGridPreview /></div>
       case 4:
-        return <div className="flex w-full h-full items-center justify-center"><FeatureMapGrid /></div>
+        return <div className="flex w-full h-full items-center justify-center"><ConvolutionStage /></div>
       case 5:
-        return <div className="flex w-full h-full items-center justify-center"><ReluStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><FeatureMapGrid /></div>
       case 6:
-        return <div className="flex w-full h-full items-center justify-center"><PoolingStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><ReluStage /></div>
       case 7:
-        return <div className="flex w-full h-full items-center justify-center"><FlattenStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><PoolingStage /></div>
       case 8:
-        return <div className="flex w-full h-full items-center justify-center"><DenseStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><FlattenStage /></div>
       case 9:
-        return <div className="flex w-full h-full items-center justify-center"><SoftmaxStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><DenseStage /></div>
       case 10:
-        return <div className="flex w-full h-full items-center justify-center"><PredictionStage /></div>
+        return <div className="flex w-full h-full items-center justify-center"><SoftmaxStage /></div>
       case 11:
+        return <div className="flex w-full h-full items-center justify-center"><PredictionStage /></div>
+      case 12:
         return <div className="flex w-full h-full items-center justify-center"><BackpropStage /></div>
       default:
         return null
@@ -128,19 +130,19 @@ export function StageViewer() {
   }
 
   const slideTransition = {
-    duration: 0.6,
-    ease: [0.16, 1, 0.3, 1] as const, // Ultra smooth mathematical easeOut
+    duration: 0.8,
+    ease: [0.19, 1, 0.22, 1] as const, // Cinematic Expo Out
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 pointer-events-auto" id="stage-viewer">
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 pointer-events-auto overflow-hidden" id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           className="w-full h-full flex flex-col items-center justify-center"
           key={`${currentStageId}-${Boolean(preprocessedData)}-${activations.length}-${Boolean(prediction)}`}
-          initial={shouldReduceMotion ? false : { opacity: 0, x: direction * 60, scale: 0.98 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          exit={shouldReduceMotion ? undefined : { opacity: 0, x: -direction * 60, scale: 0.98 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+          animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
           transition={shouldReduceMotion ? { duration: 0 } : slideTransition}
         >
           <Suspense fallback={<StageLoadingState />}>{renderStage()}</Suspense>

@@ -5,6 +5,7 @@
  * the Σ = sum line being written.
  */
 import React, { useMemo } from 'react';
+import { useLabStore } from '../../hooks/useLabStore';
 import { AnimatedFormula } from '../../components/AnimatedFormula';
 import { remap, smoothstep } from '../../animations/mathUtils';
 
@@ -12,7 +13,7 @@ interface KernelZoomPanelProps {
   row: number;
   col: number;
   inputData: Float32Array;
-  kernel: number[];
+  kernel: Float32Array | number[];
   outputValue: number;
   progress: number;   // 0..1 (timeline driven)
 }
@@ -20,42 +21,46 @@ interface KernelZoomPanelProps {
 export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
   row, col, inputData, kernel, outputValue, progress
 }) => {
-  // Extract the 3x3 patch around current position
+  const hyperparams = useLabStore(state => state.hyperparams);
+  const kernelSize = hyperparams.kernelSize;
+  const stride = hyperparams.stride;
+
+  // Extract the patch around current position
   const patch = useMemo(() => {
     const cells: number[] = [];
-    for (let dr = 0; dr < 3; dr++) {
-      for (let dc = 0; dc < 3; dc++) {
-        const r = row + dr;
-        const c = col + dc;
-        cells.push(inputData[r * 28 + c] ?? 0);
+    const dim = Math.sqrt(inputData.length);
+    for (let dr = 0; dr < kernelSize; dr++) {
+      for (let dc = 0; dc < kernelSize; dc++) {
+        const r = row * stride + dr;
+        const c = col * stride + dc;
+        cells.push(inputData[r * dim + c] ?? 0);
       }
     }
     return cells;
-  }, [row, col, inputData]);
+  }, [row, col, inputData, kernelSize, stride]);
 
   // Phase breakdown:
-  //   0.00 – 0.30  patch + kernel appear
-  //   0.30 – 0.70  element-wise highlight sweep
-  //   0.70 – 1.00  formula Σ draws on
-  const cellHighlightIdx = Math.floor(remap(progress, 0.30, 0.70, 0, 9));
+  const numCells = kernelSize * kernelSize;
+  const cellHighlightIdx = Math.floor(remap(progress, 0.30, 0.70, 0, numCells));
   const formulaProgress = remap(progress, 0.70, 1.0, 0, 1);
   const panelOpacity = smoothstep(remap(progress, 0, 0.15, 0, 1));
 
-  const products = patch.map((p, i) => p * kernel[i]);
+  const kernelArray = Array.from(kernel as number[]);
+  const products = patch.map((p, i) => p * kernelArray[i]);
   const sum = products.reduce((a, b) => a + b, 0);
 
-  const CELL_SIZE = 36;
+  const CELL_SIZE = Math.min(36, 120 / kernelSize);
   const GAP = 2;
 
-  const renderGrid = (values: number[], highlight: number, colorFn: (v: number) => string) => (
+  const renderGrid = (values: number[] | Float32Array, highlight: number, colorFn: (v: number) => string) => (
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(3, ${CELL_SIZE}px)`,
+        gridTemplateColumns: `repeat(${kernelSize}, ${CELL_SIZE}px)`,
         gap: GAP,
       }}
     >
-      {values.map((v, i) => (
+      {Array.from(values).map((v, i) => (
         <div
           key={i}
           style={{
@@ -64,7 +69,7 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 9,
+            fontSize: kernelSize > 5 ? 6 : 8,
             fontFamily: 'monospace',
             fontWeight: 'bold',
             borderRadius: 4,
@@ -79,7 +84,7 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
               : 'none',
           }}
         >
-          {v.toFixed(2)}
+          {v.toFixed(1)}
         </div>
       ))}
     </div>

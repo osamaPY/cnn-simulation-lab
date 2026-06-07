@@ -6,6 +6,7 @@ import { ExplanationPanel } from '../components/ExplanationPanel';
 import { useLabStore } from '../hooks/useLabStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlayerControls } from '../components/PlayerControls';
+import { HyperparamControls } from '../components/HyperparamControls';
 
 // Pre-generated particle data — stable, created once at module load (not inside render)
 const PARTICLE_DATA = Array.from({ length: 20 }, (_, i) => ({
@@ -177,20 +178,30 @@ export const LessonShell: React.FC = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex-1 min-h-0 relative flex items-center justify-center overflow-hidden px-4">
-                <StageViewer />
-                {preprocessedData && (
-                  <div className="absolute top-4 right-4 pointer-events-none z-30">
-                    <ExplanationPanel mode="formula" />
-                  </div>
-                )}
+              <div className="flex-1 min-h-0 relative flex flex-col md:grid md:grid-cols-[1fr_300px] overflow-hidden">
+                <div className="relative flex-1 min-h-0 flex items-center justify-center overflow-hidden px-4 py-8">
+                  <StageViewer />
+                </div>
+                
+                <div className="hidden md:flex flex-col border-l border-white/5 bg-black/20 backdrop-blur-sm p-6 overflow-y-auto gap-8">
+                  {preprocessedData && (
+                    <>
+                      <div className="w-full pointer-events-auto">
+                        <ExplanationPanel mode="formula" />
+                      </div>
+                      <div className="w-full pt-4 border-t border-white/5">
+                        <HyperparamControls />
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6 pointer-events-none z-30">
+                  <ExplanationPanel mode="subtitles" />
+                </div>
               </div>
 
-              <div className="flex-shrink-0 w-full flex justify-center py-2 px-6 z-20 pointer-events-none">
-                <ExplanationPanel mode="subtitles" />
-              </div>
-
-              <div className="flex-shrink-0 w-full pt-2 pb-5 px-8 bg-gradient-to-t from-black via-black/90 to-transparent z-10 flex flex-col justify-end">
+              <div className="flex-shrink-0 w-full pt-4 pb-6 px-8 bg-gradient-to-t from-black via-black/90 to-transparent z-40">
                 <PlayerControls />
               </div>
             </motion.div>

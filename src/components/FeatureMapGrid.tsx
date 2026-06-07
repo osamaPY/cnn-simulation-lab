@@ -4,6 +4,7 @@ import { renderFeatureMap } from '../canvas/FeatureMapRenderer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 import { quickTransition } from '../animations/motion';
+import type { ActivationRecord } from '../ml/activationModel';
 
 // Mini Component to render a single channel canvas
 const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
@@ -58,14 +59,59 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
         ref={canvasRef}
         width={80}
         height={80}
-        className="block h-auto w-full max-w-20 rounded bg-black border border-black/40"
+        className="block h-auto w-full max-w-20 rounded bg-black border border-black/40 group-hover:scale-110 transition-transform duration-500"
       />
-      <span className="text-[9px] font-mono mt-1 text-text-secondary">
+      <div className="absolute inset-0 bg-aurora-purple/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg pointer-events-none" />
+      <span className="text-[9px] font-mono mt-1 text-text-secondary group-hover:text-aurora-purple transition-colors">
         Filter #{channelIndex}
       </span>
     </div>
   );
 });
+
+const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord[], selectedLayer: string }) => {
+  const currentRecord = records.find(r => r.layerName === selectedLayer) || records[0];
+  const shape = currentRecord.shape;
+  const numChannels = shape.length === 4 ? shape[3] : 0;
+  
+  return (
+    <div className="relative h-[400px] w-full flex items-center justify-center perspective-[1000px]">
+      <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-75">
+        {Array.from({ length: Math.min(numChannels, 8) }).map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ translateZ: -i * 40, opacity: 0 }}
+            animate={{ translateZ: i * 40, opacity: 1 - i * 0.1 }}
+            transition={{ delay: i * 0.1, duration: 0.8, ease: "easeOut" }}
+            className="absolute inset-0 w-64 h-64 border-2 border-aurora-purple/30 bg-black/40 backdrop-blur-sm rounded-xl overflow-hidden shadow-[0_0_30px_rgba(80,201,230,0.1)]"
+            style={{ 
+              transform: `translateZ(${i * 30}px)`,
+              borderColor: `rgba(80, 201, 230, ${0.5 - i * 0.05})`
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-tr from-aurora-purple/10 to-transparent" />
+            <div className="w-full h-full p-4 flex items-center justify-center">
+               <div className="w-full h-full border border-white/5 rounded-lg opacity-40 overflow-hidden">
+                  <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-px">
+                    {Array.from({ length: 64 }).map((_, j) => (
+                      <div key={j} className="bg-aurora-purple/20 rounded-[1px]" style={{ opacity: Math.random() }} />
+                    ))}
+                  </div>
+               </div>
+            </div>
+            <div className="absolute top-2 left-2 text-[10px] font-mono text-aurora-purple/60">
+              LAYER_MAP_{i}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1">
+        <span className="text-xs font-mono text-aurora-purple uppercase tracking-widest animate-pulse">3D Tensor Visualization</span>
+        <span className="text-[10px] font-mono text-white/30 text-center max-w-[240px]">Showing top {Math.min(numChannels, 8)} feature activation maps in a spatial stack</span>
+      </div>
+    </div>
+  );
+};
 
 export const FeatureMapGrid: React.FC = () => {
   const activations = useLabStore(state => state.activations);
@@ -73,6 +119,7 @@ export const FeatureMapGrid: React.FC = () => {
   const setSelectedActivationLayer = useLabStore(state => state.setSelectedActivationLayer);
   const selectedChannel = useLabStore(state => state.selectedChannel);
   const setSelectedChannel = useLabStore(state => state.setSelectedChannel);
+  const [viewMode, setViewMode] = useState<'grid' | 'stack'>('stack');
 
   const [page, setPage] = useState(0);
   const shouldReduceMotion = useReducedMotion();
@@ -118,23 +165,40 @@ export const FeatureMapGrid: React.FC = () => {
   return (
     <div className="w-full flex flex-col gap-4">
       {/* Selector Tabs for Layers */}
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-border-subtle pb-3">
-        {activations.map((rec) => (
-          <button
-            key={rec.layerName}
-            onClick={() => {
-              setPage(0);
-              setSelectedActivationLayer(rec.layerName);
-            }}
-            className={`px-2.5 py-1.5 rounded-md text-[10px] font-mono transition-all duration-200 cursor-pointer ${
-              selectedActivationLayer === rec.layerName
-                ? 'bg-aurora-purple/20 text-text-accent border border-aurora-purple/40 shadow-inner'
-                : 'text-text-secondary hover:text-text-primary hover:bg-white/5 border border-transparent'
-            }`}
-          >
-            {rec.layerName}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-border-subtle pb-3">
+        <div className="flex flex-wrap gap-1.5">
+          {activations.map((rec) => (
+            <button
+              key={rec.layerName}
+              onClick={() => {
+                setPage(0);
+                setSelectedActivationLayer(rec.layerName);
+              }}
+              className={`px-2.5 py-1.5 rounded-md text-[10px] font-mono transition-all duration-200 cursor-pointer ${
+                selectedActivationLayer === rec.layerName
+                  ? 'bg-aurora-purple/20 text-text-accent border border-aurora-purple/40 shadow-inner'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-white/5 border border-transparent'
+              }`}
+            >
+              {rec.layerName}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
+           <button 
+             onClick={() => setViewMode('stack')}
+             className={`px-3 py-1 text-[10px] font-mono rounded-md transition-all ${viewMode === 'stack' ? 'bg-aurora-purple text-black font-bold' : 'text-white/40 hover:text-white'}`}
+           >
+             3D Stack
+           </button>
+           <button 
+             onClick={() => setViewMode('grid')}
+             className={`px-3 py-1 text-[10px] font-mono rounded-md transition-all ${viewMode === 'grid' ? 'bg-aurora-purple text-black font-bold' : 'text-white/40 hover:text-white'}`}
+           >
+             Grid
+           </button>
+        </div>
       </div>
 
       {/* Layer metadata bar */}
@@ -184,6 +248,8 @@ export const FeatureMapGrid: React.FC = () => {
             )}
           </div>
         </div>
+      ) : viewMode === 'stack' ? (
+        <FeatureMapStack records={activations} selectedLayer={selectedActivationLayer!} />
       ) : (
         // For Conv2D / MaxPool channels grid
         <div className="flex flex-col gap-3">

@@ -2,37 +2,57 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useTimeline } from '../../animations/useTimeline'
 import { useLabStore } from '../../hooks/useLabStore'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
-import { computeValidConv2D, REPRESENTATIVE_BIAS, REPRESENTATIVE_KERNEL } from '../../math/convolution'
+import { computeConv2D, REPRESENTATIVE_BIAS, REPRESENTATIVE_KERNEL } from '../../math/convolution'
 import { ReluGraphCanvas } from './ReluGraphCanvas'
 import { AnimatedFormula } from '../../components/AnimatedFormula'
 import { remap } from '../../animations/mathUtils'
 
-const SIZE = 26
-
 export function ReluStage() {
   const preprocessedData = useLabStore((state) => state.preprocessedData)
+  const hyperparams = useLabStore((state) => state.hyperparams)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const shouldReduceMotion = useReducedMotion()
-  const totalSteps = SIZE
+
+  const activeKernel = useMemo(() => {
+    const size = hyperparams.kernelSize;
+    const values = new Float32Array(size * size).fill(0.1);
+    for (let i = 0; i < Math.min(REPRESENTATIVE_KERNEL.length, values.length); i++) {
+      values[i] = REPRESENTATIVE_KERNEL[i];
+    }
+    return values;
+  }, [hyperparams.kernelSize]);
+
+  const outputDim = Math.floor((28 + 2 * hyperparams.padding - hyperparams.kernelSize) / hyperparams.stride) + 1;
+  const totalSteps = outputDim;
   const { stepIndex } = useTimeline(totalSteps, true)
 
   const values = useMemo(
     () =>
       preprocessedData
-        ? computeValidConv2D(preprocessedData, REPRESENTATIVE_KERNEL, REPRESENTATIVE_BIAS)
-        : new Float32Array(SIZE * SIZE),
-    [preprocessedData],
+        ? computeConv2D(
+            preprocessedData, 
+            28, 
+            activeKernel, 
+            hyperparams.kernelSize, 
+            hyperparams.stride, 
+            hyperparams.padding, 
+            REPRESENTATIVE_BIAS
+          )
+        : new Float32Array(outputDim * outputDim),
+    [preprocessedData, activeKernel, hyperparams, outputDim],
   )
 
   const stats = useMemo(() => {
     let negative = 0
     let positive = 0
     let maxMagnitude = 0
-    values.forEach((value) => {
+    // Use for loop for compatibility
+    for (let i = 0; i < values.length; i++) {
+      const value = values[i];
       if (value < 0) negative++
       if (value > 0) positive++
       maxMagnitude = Math.max(maxMagnitude, Math.abs(value))
-    })
+    }
     return { negative, positive, maxMagnitude: maxMagnitude || 1 }
   }, [values])
 
@@ -43,13 +63,13 @@ export function ReluStage() {
     const context = canvas?.getContext('2d')
     if (!canvas || !context) return
 
-    const cell = canvas.width / SIZE
-    const completedRows = shouldReduceMotion ? SIZE : stepIndex + 1
+    const cell = canvas.width / outputDim
+    const completedRows = shouldReduceMotion ? outputDim : stepIndex + 1
     context.clearRect(0, 0, canvas.width, canvas.height)
 
-    for (let row = 0; row < SIZE; row++) {
-      for (let col = 0; col < SIZE; col++) {
-        const raw = values[row * SIZE + col]
+    for (let row = 0; row < outputDim; row++) {
+      for (let col = 0; col < outputDim; col++) {
+        const raw = values[row * outputDim + col]
         const value = row < completedRows ? Math.max(0, raw) : raw
         const strength = Math.min(1, Math.abs(value) / stats.maxMagnitude)
         context.fillStyle =
@@ -61,7 +81,7 @@ export function ReluStage() {
     }
 
     // 3b1b-style: glowing sweep line that advances row by row
-    if (completedRows < SIZE) {
+    if (completedRows < outputDim) {
       const y = completedRows * cell
       context.save()
       context.shadowColor = '#34d399'
@@ -77,7 +97,7 @@ export function ReluStage() {
   }, [shouldReduceMotion, stats.maxMagnitude, stepIndex, values])
 
   // Pick a sample value for the probe line on the graph (~middle of scan)
-  const sampleRawValue = values[Math.floor(sweepProgress * SIZE) * SIZE + 10] ?? 0
+  const sampleRawValue = values[Math.floor(sweepProgress * outputDim) * outputDim + Math.floor(outputDim/2)] ?? 0
   const normalised = sampleRawValue / (stats.maxMagnitude || 1)
 
   return (
@@ -87,7 +107,7 @@ export function ReluStage() {
         <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-2xl">
           <div className="mb-3 flex items-center justify-between text-[10px] font-mono uppercase text-white/50">
             <span>Pre-activation to ReLU output</span>
-            <span>{SIZE}×{SIZE}</span>
+            <span>{outputDim}×{outputDim}</span>
           </div>
           <canvas ref={canvasRef} width={312} height={312} className="mx-auto block h-auto w-full max-w-[312px] rounded-xl bg-black border border-white/5" />
         </div>
