@@ -176,21 +176,21 @@ export const DenseStage: React.FC = () => {
       {/* Main Graph Area (Filling available space) */}
       <div className="relative w-full h-full dense-graph-container flex items-center justify-center">
         <svg
-          viewBox="0 0 1400 920"
+          viewBox="0 0 1400 900"
           className="w-full h-full select-none"
           preserveAspectRatio="xMidYMid meet"
         >
           {/* SVG Glow Filter Defs */}
           <defs>
             <filter id="node-glow" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feGaussianBlur stdDeviation="4.5" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
             <filter id="line-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feGaussianBlur stdDeviation="2.8" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
                 <feMergeNode in="SourceGraphic" />
@@ -223,7 +223,7 @@ export const DenseStage: React.FC = () => {
               const opacity = isHoverActive
                 ? (isHighlighted ? 0.95 : 0.05)
                 : (topKOnly ? 0.85 : baseOpacity);
-              const strokeWidth = isHighlighted ? 4.5 : (topKOnly ? 3.5 : 2.5);
+              const strokeWidth = isHighlighted ? 5.5 : (topKOnly ? 4.0 : 3.0);
 
               return (
                 <line
@@ -262,7 +262,7 @@ export const DenseStage: React.FC = () => {
               const opacity = isHoverActive
                 ? (isHighlighted ? 0.95 : 0.05)
                 : (topKOnly ? 0.85 : baseOpacity);
-              const strokeWidth = isHighlighted ? 5.0 : (topKOnly ? 3.8 : 2.8);
+              const strokeWidth = isHighlighted ? 6.0 : (topKOnly ? 4.2 : 3.2);
 
               return (
                 <line
@@ -288,7 +288,7 @@ export const DenseStage: React.FC = () => {
               const hPt = [700, HID_Y0 + HIDDEN_SAMPLES.indexOf(conn.hIndex) * HID_STEP];
               const px = inPt[0] + (hPt[0] - inPt[0]) * t1;
               const py = inPt[1] + (hPt[1] - inPt[1]) * t1;
-              return <circle key={`p1-${idx}`} cx={px} cy={py} r={8} fill="white" stroke="var(--aurora-mint)" strokeWidth="2" filter="url(#line-glow)" />;
+              return <circle key={`p1-${idx}`} cx={px} cy={py} r={10} fill="white" stroke="var(--aurora-mint)" strokeWidth="2.5" filter="url(#line-glow)" />;
             });
           })()}
 
@@ -301,12 +301,12 @@ export const DenseStage: React.FC = () => {
               const outPt = [1250, OUT_Y0 + conn.o * OUT_STEP];
               const px = hPt[0] + (outPt[0] - hPt[0]) * t2;
               const py = hPt[1] + (outPt[1] - hPt[1]) * t2;
-              return <circle key={`p2-${idx}`} cx={px} cy={py} r={8} fill="white" stroke="var(--aurora-mint)" strokeWidth="2" filter="url(#line-glow)" />;
+              return <circle key={`p2-${idx}`} cx={px} cy={py} r={10} fill="white" stroke="var(--aurora-mint)" strokeWidth="2.5" filter="url(#line-glow)" />;
             });
           })()}
 
-          {/* Left Column: Input Vector Nodes (Radii increased from 16 to 20) */}
-          <rect x={140} y={80} width={20} height={800} rx={10} fill="rgba(255, 255, 255, 0.03)" stroke="rgba(255,255,255,0.06)" />
+          {/* Left Column: Input Vector Nodes */}
+          <rect x={140} y={75} width={22} height={815} rx={11} fill="rgba(255, 255, 255, 0.03)" stroke="rgba(255,255,255,0.06)" />
           {INPUT_SAMPLES.map((inputIdx, sampleIdx) => {
             const val = volumeValues[inputIdx];
             const norm = (val - minVal) / (maxVal - minVal || 1);
@@ -315,22 +315,22 @@ export const DenseStage: React.FC = () => {
 
             return (
               <g key={`inNode-${sampleIdx}`}>
-                <circle cx={150} cy={y} r={20} fill={`rgb(${r}, ${g}, ${b})`} stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" />
-                <text x={120} y={y + 5} fill="rgba(255,255,255,0.6)" fontSize="14" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="end">x[{inputIdx}]</text>
+                <circle cx={150} cy={y} r={24} fill={`rgb(${r}, ${g}, ${b})`} stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" />
+                <text x={115} y={y + 5} fill="rgba(255,255,255,0.65)" fontSize="16" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="end">x[{inputIdx}]</text>
               </g>
             );
           })}
 
-          {/* Center Column: Hidden Neurons (Radii increased from 18 to 22) */}
+          {/* Center Column: Hidden Neurons */}
           {HIDDEN_SAMPLES.map((hIndex, hSampleIdx) => {
             const y = HID_Y0 + hSampleIdx * HID_STEP;
             if (hIndex === -1) {
               const midY = HID_Y0 + 5.3 * HID_STEP;
               return (
                 <g key="ellipsis-hidden">
-                  <circle cx={700} cy={midY - 12} r={4.0} fill="rgba(255,255,255,0.5)" />
-                  <circle cx={700} cy={midY} r={4.0} fill="rgba(255,255,255,0.5)" />
-                  <circle cx={700} cy={midY + 12} r={4.0} fill="rgba(255,255,255,0.5)" />
+                  <circle cx={700} cy={midY - 14} r={4.5} fill="rgba(255,255,255,0.5)" />
+                  <circle cx={700} cy={midY} r={4.5} fill="rgba(255,255,255,0.5)" />
+                  <circle cx={700} cy={midY + 14} r={4.5} fill="rgba(255,255,255,0.5)" />
                 </g>
               );
             }
@@ -344,21 +344,21 @@ export const DenseStage: React.FC = () => {
 
             return (
               <g key={`hNode-${hIndex}`}>
-                <circle 
-                  cx={700} 
-                  cy={y} 
-                  r={22} 
-                  fill={`rgb(${r}, ${g}, ${b})`} 
-                  stroke="rgba(255,255,255,0.3)" 
-                  strokeWidth="2" 
+                <circle
+                  cx={700}
+                  cy={y}
+                  r={26}
+                  fill={`rgb(${r}, ${g}, ${b})`}
+                  stroke="rgba(255,255,255,0.3)"
+                  strokeWidth="2"
                   filter={isPulseActive ? "url(#node-glow)" : undefined}
                 />
-                <text x={670} y={y + 5} fill="rgba(255,255,255,0.55)" fontSize="14" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="end">h[{hIndex}]</text>
+                <text x={664} y={y + 5} fill="rgba(255,255,255,0.6)" fontSize="16" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="end">h[{hIndex}]</text>
               </g>
             );
           })}
 
-          {/* Right Column: Output Classes (Radii increased from 26 to 32) */}
+          {/* Right Column: Output Classes */}
           {Array.from({ length: 10 }).map((_, o) => {
             const prob = outputProbabilities[o];
             let displayProb = 0;
@@ -366,40 +366,40 @@ export const DenseStage: React.FC = () => {
               const t2 = (progress - 0.5) * 2;
               displayProb = prob * t2;
             }
-            
+
             const { r, g, b } = getAuroraColor(displayProb);
             const y = OUT_Y0 + o * OUT_STEP;
             const isWinner = prediction ? o === prediction.digit : o === outputProbabilities.indexOf(Math.max(...outputProbabilities));
             const isHovered = o === hoveredDigit;
 
             return (
-              <g 
+              <g
                 key={`outNode-${o}`}
                 className="cursor-pointer"
                 onMouseEnter={() => setHoveredDigit(o)}
                 onMouseLeave={() => setHoveredDigit(null)}
               >
                 {(isHovered || (isWinner && progress >= 0.9)) && (
-                  <circle cx={1250} cy={y} r={42} fill="none" stroke={isWinner ? 'var(--aurora-mint)' : 'var(--aurora-teal)'} strokeWidth="3" filter="url(#node-glow)" />
+                  <circle cx={1250} cy={y} r={48} fill="none" stroke={isWinner ? 'var(--aurora-mint)' : 'var(--aurora-teal)'} strokeWidth="3" filter="url(#node-glow)" />
                 )}
-                
-                <circle cx={1250} cy={y} r={32} fill={`rgb(${r}, ${g}, ${b})`} stroke="rgba(255,255,255,0.3)" strokeWidth={isWinner ? '3' : '1.5'} />
-                
-                <text x={1250} y={y} fill="var(--text-primary)" fontSize="28" fontWeight="bold" textAnchor="middle" dominantBaseline="central">
+
+                <circle cx={1250} cy={y} r={38} fill={`rgb(${r}, ${g}, ${b})`} stroke="rgba(255,255,255,0.3)" strokeWidth={isWinner ? '3' : '1.5'} />
+
+                <text x={1250} y={y} fill="var(--text-primary)" fontSize="34" fontWeight="bold" textAnchor="middle" dominantBaseline="central">
                   {o}
                 </text>
-                
-                <text x={1295} y={y + 5} fill={isWinner ? 'var(--aurora-mint)' : 'rgba(255,255,255,0.5)'} fontSize="14" fontFamily="var(--font-mono)" fontWeight={isWinner ? 'bold' : 'normal'}>
+
+                <text x={1295} y={y + 5} fill={isWinner ? 'var(--aurora-mint)' : 'rgba(255,255,255,0.5)'} fontSize="16" fontFamily="var(--font-mono)" fontWeight={isWinner ? 'bold' : 'normal'}>
                   {(prob * 100).toFixed(1)}%
                 </text>
               </g>
             );
           })}
 
-          {/* Headers (Shifted up and simplified) */}
-          <text x={150} y={45} fill="rgba(255,255,255,0.4)" fontSize="14" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">1. Input Vector</text>
-          <text x={700} y={45} fill="rgba(255,255,255,0.4)" fontSize="14" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">2. Hidden Layer</text>
-          <text x={1250} y={45} fill="rgba(255,255,255,0.4)" fontSize="14" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">3. Output Classes</text>
+          {/* Headers */}
+          <text x={150} y={38} fill="rgba(255,255,255,0.45)" fontSize="17" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">1. Input Vector</text>
+          <text x={700} y={38} fill="rgba(255,255,255,0.45)" fontSize="17" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">2. Hidden Layer</text>
+          <text x={1250} y={38} fill="rgba(255,255,255,0.45)" fontSize="17" fontWeight="bold" fontFamily="var(--font-mono)" textAnchor="middle">3. Output Classes</text>
         </svg>
 
         {/* Floating details overlay */}
