@@ -164,10 +164,11 @@ export const DenseStage: React.FC = () => {
       </div>
 
       {/* Main Graph Area */}
-      <div className="relative w-full aspect-[800/460] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+      <div className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
         <svg
           viewBox="0 0 800 460"
-          className="absolute inset-0 w-full h-full select-none z-10"
+          className="w-full h-full select-none z-10"
+          preserveAspectRatio="xMidYMid meet"
         >
           {/* SVG Glow Filter Defs */}
           <defs>

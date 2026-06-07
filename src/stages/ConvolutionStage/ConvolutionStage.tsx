@@ -134,9 +134,9 @@ export const ConvolutionStage: React.FC = () => {
   const bubbleTop  = rawTop < BUBBLE_H + 8 ? rawTop + CELL + 4 : rawTop - BUBBLE_H - 4;
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-5xl px-8">
+    <div className="flex flex-col items-center gap-4 w-full max-w-5xl px-4 py-2">
       {/* Kernel Selection */}
-      <div className="flex flex-col sm:flex-row items-center justify-end gap-6 w-full border-b border-white/5 pb-4">
+      <div className="flex flex-col sm:flex-row items-center justify-end gap-3 w-full border-b border-white/5 pb-2">
         <div className="flex gap-1.5 p-1 bg-black/20 rounded-lg">
           {(Object.keys(KERNEL_PRESETS) as KernelPreset[]).map((preset) => (
             <button
@@ -156,8 +156,8 @@ export const ConvolutionStage: React.FC = () => {
       </div>
 
       {/* Main layout */}
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-20 w-full py-8">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-24">
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full py-2">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
           {/* Input canvas */}
           <div className="flex flex-col items-center gap-4">
             <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input Plane</span>
@@ -199,7 +199,7 @@ export const ConvolutionStage: React.FC = () => {
         </div>
 
         {/* 3b1b zoom panel */}
-        <div className="lg:pl-8 lg:border-l lg:border-white/5">
+        <div className="lg:pl-4 lg:border-l lg:border-white/5">
           <KernelZoomPanel
             row={row}
             col={col}

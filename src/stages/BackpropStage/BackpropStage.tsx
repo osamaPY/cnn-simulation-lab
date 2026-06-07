@@ -80,9 +80,8 @@ export const BackpropStage: React.FC = () => {
   return (
     <div className="flex flex-col gap-5 w-full max-w-[820px] items-center px-4">
       <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-5 w-full">
-        {/* Network SVG */}
-        <div className="relative w-full bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl" style={{ aspectRatio: '800/400' }}>
-          <svg viewBox="0 0 800 400" className="absolute inset-0 w-full h-full select-none z-10">
+        <div className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+          <svg viewBox="0 0 800 400" className="w-full h-full select-none z-10" preserveAspectRatio="xMidYMid meet">
             <defs>
               <filter id="node-glow" x="-35%" y="-35%" width="170%" height="170%">
                 <feGaussianBlur stdDeviation="3.5" result="blur" />

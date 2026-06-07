@@ -76,7 +76,7 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
   const dim = shape.length === 4 ? shape[1] : 0;
   
   return (
-    <div className="relative h-[550px] w-full flex items-center justify-center perspective-[1200px]">
+    <div className="relative h-[280px] sm:h-[340px] md:h-[400px] w-full flex items-center justify-center perspective-[1200px]">
       <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-100">
         {Array.from({ length: Math.min(numChannels, 12) }).map((_, i) => {
           // Sample a small grid from the actual feature map
@@ -89,7 +89,7 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
               initial={{ translateZ: -i * 50, opacity: 0 }}
               animate={{ translateZ: i * 35, opacity: 1 - i * 0.06 }}
               transition={{ delay: i * 0.08, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 w-56 h-56 border-2 bg-black/60 backdrop-blur-md rounded-lg overflow-hidden shadow-[0_0_40px_rgba(88,196,221,0.15)]"
+              className="absolute inset-0 w-44 h-44 sm:w-48 sm:h-48 md:w-56 md:h-56 border-2 bg-black/60 backdrop-blur-md rounded-lg overflow-hidden shadow-[0_0_40px_rgba(88,196,221,0.15)]"
               style={{ 
                 transform: `translateZ(${i * 35}px)`,
                 borderColor: i === 0 ? 'rgba(245, 205, 71, 0.6)' : 'rgba(88, 196, 221, 0.3)'
