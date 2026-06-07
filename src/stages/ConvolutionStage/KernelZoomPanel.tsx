@@ -72,15 +72,15 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
             fontSize: kernelSize > 5 ? 6 : 8,
             fontFamily: 'monospace',
             fontWeight: 'bold',
-            borderRadius: 4,
+            borderRadius: 2,
             background: colorFn(v),
             border: i === highlight && progress >= 0.3
-              ? '2px solid #f2c14e'
-              : '1px solid rgba(255,255,255,0.08)',
-            color: Math.abs(v) > 0.5 ? '#fff' : 'rgba(255,255,255,0.6)',
+              ? '1.5px solid #F5CD47'
+              : '1px solid rgba(255,255,255,0.05)',
+            color: Math.abs(v) > 0.5 ? '#fff' : 'rgba(255,255,255,0.4)',
             transition: 'border 0.1s',
             boxShadow: i === highlight && progress >= 0.3
-              ? '0 0 10px rgba(242,193,78,0.6)'
+              ? '0 0 12px rgba(245,205,71,0.4)'
               : 'none',
           }}
         >
@@ -94,58 +94,57 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
     <div
       style={{
         opacity: panelOpacity,
-        background: 'rgba(10,18,28,0.92)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: 16,
-        padding: '14px 16px',
+        background: '#1c1c1c',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 4,
+        padding: '20px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 10,
-        minWidth: 260,
-        boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
-        backdropFilter: 'blur(12px)',
+        gap: 16,
+        minWidth: 280,
+        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
       }}
     >
-      <div style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-        Kernel × Patch — position ({row + 1}, {col + 1})
+      <div style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+        Kernel × Patch · ({row + 1}, {col + 1})
       </div>
 
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
         {/* Input patch */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>INPUT</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 8, color: '#58C4DD', opacity: 0.5, fontFamily: 'monospace', fontWeight: 'bold' }}>INPUT</span>
           {renderGrid(
             patch,
             cellHighlightIdx,
-            v => `rgba(255,255,255,${0.06 + v * 0.88})`
+            v => `rgba(88,196,221,${0.05 + v * 0.4})`
           )}
         </div>
 
         {/* × */}
-        <div style={{ fontSize: 18, color: '#f2c14e', fontFamily: 'monospace', fontWeight: 'bold', opacity: progress > 0.2 ? 1 : 0, transition: 'opacity 0.3s' }}>×</div>
+        <div style={{ fontSize: 14, color: '#F5CD47', fontFamily: 'monospace', fontWeight: 'bold', opacity: progress > 0.2 ? 0.4 : 0, transition: 'opacity 0.3s' }}>×</div>
 
         {/* Kernel */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>KERNEL</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontSize: 8, color: '#F5CD47', opacity: 0.5, fontFamily: 'monospace', fontWeight: 'bold' }}>KERNEL</span>
           {renderGrid(
             kernel,
             cellHighlightIdx,
-            v => v > 0 ? `rgba(52,211,153,${0.08 + v * 0.45})` : `rgba(255,128,102,${0.08 + Math.abs(v) * 0.45})`
+            v => v > 0 ? `rgba(245,205,71,${0.08 + v * 0.3})` : `rgba(255,102,102,${0.08 + Math.abs(v) * 0.3})`
           )}
         </div>
       </div>
 
       {/* Animated formula */}
       {formulaProgress > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <AnimatedFormula
             formula={`Σ(x·w) + b = ${outputValue.toFixed(3)}`}
             progress={formulaProgress}
-            color="#34d399"
-            fontSize="0.85rem"
+            color="#83C167"
+            fontSize="0.9rem"
           />
-          <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>
-            raw products sum: {sum.toFixed(3)}
+          <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace', letterSpacing: '0.1em' }}>
+            ACCUMULATED SUM: {sum.toFixed(3)}
           </span>
         </div>
       )}

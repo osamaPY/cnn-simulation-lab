@@ -14,31 +14,31 @@
 @tailwind utilities;
 
 :root {
-  --bg-deep: #071018;
-  --bg-canvas: #020609;
-  --bg-card: #0b1720;
-  --bg-panel: #09131c;
+  --bg-deep: #161616;
+  --bg-canvas: #1c1c1c;
+  --bg-card: #242424;
+  --bg-panel: #1e1e1e;
 
-  --border-subtle: rgba(179, 216, 230, 0.10);
-  --border-muted: rgba(179, 216, 230, 0.20);
-  --border-focus: rgba(80, 201, 230, 0.55);
+  --border-subtle: rgba(255, 255, 240, 0.05);
+  --border-muted: rgba(255, 255, 240, 0.12);
+  --border-focus: #58C4DD;
 
-  --text-primary: #f1f5ef;
-  --text-secondary: #b4c5c9;
-  --text-muted: #78909a;
-  --text-accent: #f2c14e;
+  --text-primary: #FFFEF0;
+  --text-secondary: #B4B4B4;
+  --text-muted: #7D7D7D;
+  --text-accent: #F5CD47;
 
-  --aurora-indigo: #123447;
-  --aurora-violet: #24566d;
-  --aurora-purple: #50c9e6;
-  --aurora-teal: #2fa6b8;
-  --aurora-mint: #8be9c1;
-  --signal-coral: #ff8066;
+  --aurora-indigo: #34495e;
+  --aurora-violet: #9C27B0;
+  --aurora-purple: #58C4DD;
+  --aurora-teal: #2980b9;
+  --aurora-mint: #83C167;
+  --signal-coral: #FF6666;
 
   /* Fonts */
-  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Lora', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'STIX Two Text', serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -54,15 +54,27 @@
   }
 
   body {
-    background:
-      linear-gradient(rgba(80, 201, 230, 0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(80, 201, 230, 0.015) 1px, transparent 1px),
-      radial-gradient(circle at 50% 50%, #0a0e1a 0%, #030407 100%);
-    background-size: 40px 40px, 40px 40px, auto;
+    background: var(--bg-deep);
     color: var(--text-primary);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 3B1B KaTeX Theming */
+  .katex-display {
+    margin: 0.5em 0 !important;
+  }
+
+  .katex {
+    font-family: var(--font-serif) !important;
+    font-size: 1.15em !important;
+    color: var(--text-primary);
+  }
+
+  /* Semantic Math Coloring */
+  .katex .mathnormal, .katex .mathbf {
+    color: var(--text-primary);
   }
 
   button,

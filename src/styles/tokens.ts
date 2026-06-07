@@ -7,49 +7,45 @@ export const tokens = {
   colors: {
     // Backgrounds
     background: {
-      deep: '#071018',
-      canvas: '#020609',
-      card: '#0b1720',
-      panel: '#09131c',
+      deep: '#161616',
+      canvas: '#1c1c1c',
+      card: '#242424',
+      panel: '#1e1e1e',
     },
     
     // Borders & Dividers
     border: {
-      subtle: 'rgba(179, 216, 230, 0.10)',
-      muted: 'rgba(179, 216, 230, 0.20)',
-      focus: 'rgba(80, 201, 230, 0.55)',
+      subtle: 'rgba(255, 255, 240, 0.05)',
+      muted: 'rgba(255, 255, 240, 0.12)',
+      focus: '#58C4DD',
     },
 
     // Typography
     text: {
-      primary: '#f1f5ef',
-      secondary: '#b4c5c9',
-      muted: '#78909a',
-      accent: '#f2c14e',
+      primary: '#FFFEF0',
+      secondary: '#B4B4B4',
+      muted: '#7D7D7D',
+      accent: '#F5CD47',
     },
 
     // Mathematical color roles
     aurora: {
-      indigo: '#123447',
-      violet: '#24566d',
-      purple: '#50c9e6',
-      teal: '#2fa6b8',
-      mint: '#8be9c1',
+      indigo: '#34495e',
+      violet: '#9C27B0',
+      purple: '#58C4DD',
+      teal: '#2980b9',
+      mint: '#83C167',
     },
 
     // Activation Heat Scale (Low to High activations for feature maps and predictions)
     heatScale: [
-      '#050811', // Deep blackboard navy (zero activation)
-      '#0f1c3f', // Dark steel blue
-      '#1d4ed8', // Vibrant 3B1B blue
-      '#0284c7', // Slate sky blue
-      '#06b6d4', // Glowing cyan
-      '#0d9488', // Teal highlight
-      '#10b981', // Neon mint/green
-      '#4ade80', // Soft electric green
-      '#fcd34d', // Soft gold
-      '#f59e0b', // Amber
-      '#ef4444', // Hot coral/red (maximum activation)
+      '#1C1C1C', // Deep charcoal (zero activation)
+      '#1e2d4d', // Dark blue
+      '#58C4DD', // Manim Blue
+      '#83C167', // Manim Green
+      '#F5CD47', // Manim Yellow
+      '#E07A5F', // Manim Orange
+      '#FF6666', // Manim Red (maximum activation)
     ]
   },
 

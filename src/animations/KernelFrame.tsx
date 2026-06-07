@@ -35,16 +35,16 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
         </filter>
       </defs>
 
-      {/* Outer 3x3 sliding frame */}
+      {/* Outer sliding frame */}
       <rect
         x={x}
         y={y}
         width={frameWidth}
         height={frameHeight}
-        rx="2"
-        fill="rgba(245, 158, 11, 0.08)"
-        stroke="#f59e0b"
-        strokeWidth="2"
+        rx="1"
+        fill="rgba(245, 205, 71, 0.05)"
+        stroke="#F5CD47"
+        strokeWidth="1.5"
         filter="url(#kernel-glow)"
         className="transition-all duration-150 ease-out"
       />
@@ -55,8 +55,8 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
         y={y + Math.floor(kernelSize / 2) * cellSize}
         width={cellSize}
         height={cellSize}
-        fill="rgba(16, 185, 129, 0.25)"
-        stroke="#10b981"
+        fill="rgba(131, 193, 103, 0.15)"
+        stroke="#83C167"
         strokeWidth="1"
         className="transition-all duration-150 ease-out"
       />
@@ -65,8 +65,8 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
       <circle
         cx={x + Math.floor(kernelSize / 2) * cellSize + cellSize / 2}
         cy={y + Math.floor(kernelSize / 2) * cellSize + cellSize / 2}
-        r="1.2"
-        fill="#10b981"
+        r="1"
+        fill="#83C167"
         className="transition-all duration-150 ease-out"
       />
     </svg>

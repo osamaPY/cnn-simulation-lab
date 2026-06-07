@@ -114,35 +114,34 @@ export const PoolingStage: React.FC = () => {
   const frameWidth = poolSize * frameCellSize;
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-3xl px-4">
-      <div className="flex flex-col md:flex-row items-center justify-center gap-8 w-full py-4">
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Input Map: {inputDim}x{inputDim}</span>
-          <div className="relative p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
-            <canvas ref={inputCanvasRef} width={260} height={260} className="rounded-xl bg-black block border border-white/5 select-none" />
+    <div className="flex flex-col items-center gap-10 w-full max-w-4xl px-8">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-16 w-full py-4">
+        <div className="flex flex-col items-center gap-4">
+          <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input Plane: {inputDim}×{inputDim}</span>
+          <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
+            <canvas ref={inputCanvasRef} width={260} height={260} className="rounded-sm bg-black block" />
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 260 260">
-              <rect x={frameX} y={frameY} width={frameWidth} height={frameWidth} rx="1" fill="rgba(147, 51, 234, 0.15)" stroke="var(--aurora-purple)" strokeWidth="2.5" className="transition-all duration-150 ease-out" />
+              <rect x={frameX} y={frameY} width={frameWidth} height={frameWidth} rx="0" fill="rgba(88, 196, 221, 0.08)" stroke="#58C4DD" strokeWidth="2" className="transition-all duration-150 ease-out" />
             </svg>
-            <div className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2 py-1 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex items-center gap-1.5 transition-all duration-150 ease-out" style={{ left: `${frameX + frameWidth / 2}px`, top: `${frameY}px`, transform: 'translate(-50%, -120%)' }}>
-              <span className="text-aurora-purple font-semibold">max({poolSize}x{poolSize})</span>
-              <span className="text-white/30">=</span>
-              <span className="text-aurora-mint font-semibold">{outputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
+            <div className="absolute pointer-events-none z-30 bg-[#1c1c1c] border border-white/10 rounded-sm px-2 py-1 font-serif italic text-[10px] text-[#58C4DD] shadow-2xl flex items-center gap-2 transition-all duration-150 ease-out" style={{ left: `${frameX + frameWidth / 2}px`, top: `${frameY}px`, transform: 'translate(-50%, -120%)' }}>
+              <span className="text-white opacity-60">max({poolSize}×{poolSize}) =</span>
+              <span className="font-bold">{outputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
             </div>
           </div>
-          <span className="text-[10px] font-mono text-white/40">Window: ({row * poolSize}, {col * poolSize})</span>
         </div>
 
-        <div className="flex flex-col items-center justify-center text-aurora-purple/40" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse"><polyline points="9 18 15 12 9 6" /></svg>
-          <span className="text-[9px] font-mono mt-1 text-white/30 uppercase tracking-widest">Max Pool</span>
+        <div className="flex flex-col items-center justify-center text-[#58C4DD]/30" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="text-[8px] font-mono mt-2 text-white/20 uppercase tracking-[0.4em]">Downsample</span>
         </div>
 
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Output Map: {outputDim}x{outputDim}</span>
-          <div className="relative p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
-            <canvas ref={outputCanvasRef} width={260} height={260} className="rounded-xl bg-black block border border-white/5 select-none" />
+        <div className="flex flex-col items-center gap-4">
+          <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Reduced Plane: {outputDim}×{outputDim}</span>
+          <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
+            <canvas ref={outputCanvasRef} width={260} height={260} className="rounded-sm bg-black block" />
           </div>
-          <span className="text-[10px] font-mono text-white/40">Progress: {Math.round((stepIndex / totalSteps) * 100)}%</span>
         </div>
       </div>
     </div>

@@ -134,21 +134,21 @@ export const ConvolutionStage: React.FC = () => {
   const bubbleTop  = rawTop < BUBBLE_H + 8 ? rawTop + CELL + 4 : rawTop - BUBBLE_H - 4;
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-4xl px-4">
+    <div className="flex flex-col items-center gap-10 w-full max-w-5xl px-8">
       {/* Kernel Selection */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 w-full border-b border-white/10 pb-4">
-        <div>
-          <strong className="block text-sm text-white font-display">Kernel Filter Presets</strong>
-          <p className="text-xs text-white/50">Change the filter to see how different kernels extract different features.</p>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 w-full border-b border-white/5 pb-8">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-lg font-serif font-bold text-[#FFFEF0] italic">Filter Geometry</h3>
+          <p className="text-xs text-white/30 font-sans tracking-wide">The kernel extracts local features by calculating element-weighted sums.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 p-1 bg-black/20 rounded-lg">
           {(Object.keys(KERNEL_PRESETS) as KernelPreset[]).map((preset) => (
             <button
               key={preset}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+              className={`px-4 py-2 rounded-md text-[10px] font-mono tracking-widest uppercase transition-all ${
                 kernelPreset === preset
-                  ? 'border-aurora-mint text-aurora-mint bg-aurora-teal/10 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                  : 'border-white/10 text-white/60 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#1c1c1c] text-[#F5CD47] shadow-lg border border-white/5'
+                  : 'text-white/30 hover:text-white/60'
               }`}
               onClick={() => setKernelPreset(preset)}
               type="button"
@@ -160,61 +160,59 @@ export const ConvolutionStage: React.FC = () => {
       </div>
 
       {/* Main layout */}
-      <div className="flex flex-col lg:flex-row items-start justify-center gap-6 w-full py-2">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-12 w-full py-4">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-16">
           {/* Input canvas */}
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Input: 28×28</span>
-            <div className="relative w-[280px] h-[280px] p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
+          <div className="flex flex-col items-center gap-4">
+            <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input Plane</span>
+            <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
               <canvas ref={inputCanvasRef} width={280} height={280}
-                className="block h-full w-full rounded-xl bg-black border border-white/5"
+                className="block h-[280px] w-[280px] bg-black"
               />
               <KernelFrame stepIndex={stepIndex} />
-              {/* Math bubble — clamped so it never clips outside the canvas */}
+              {/* Math bubble */}
               <div
-                className="absolute pointer-events-none z-30 bg-[#0c141a]/95 border border-white/15 rounded-lg px-2 py-1 font-mono text-[9px] text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex items-center gap-1.5"
+                className="absolute pointer-events-none z-30 bg-[#1c1c1c] border border-white/10 rounded-sm px-3 py-1.5 font-serif italic text-[11px] text-[#F5CD47] shadow-2xl flex items-center gap-2"
                 style={{
                   left: `${bubbleLeft}px`,
                   top:  `${bubbleTop}px`,
-                  width: `${BUBBLE_W}px`,
                 }}
               >
-                <span className="text-aurora-mint">Σ(x·w)+b</span>
-                <span className="text-white/30">=</span>
-                <span className="text-text-accent font-semibold">{outputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
+                <span className="opacity-60 text-white">Σ(x·w) =</span>
+                <span className="font-bold">{outputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-white/40">Scanning: ({row + 1}, {col + 1})</span>
           </div>
 
-          <div className="flex flex-col items-center justify-center text-aurora-mint/40" aria-hidden>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse">
-              <polyline points="9 18 15 12 9 6" />
+          <div className="flex flex-col items-center justify-center text-[#F5CD47]/30" aria-hidden>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span className="text-[9px] font-mono mt-1 text-white/30 uppercase tracking-widest">Convolve</span>
+            <span className="text-[8px] font-mono mt-2 text-white/20 uppercase tracking-[0.4em]">Convolve</span>
           </div>
 
           {/* Output canvas */}
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-mono text-white/50 uppercase tracking-wider">Output: {outputDim}×{outputDim}</span>
-            <div className="relative w-[260px] h-[260px] p-1.5 rounded-2xl border border-white/10 bg-black/40 shadow-2xl">
+          <div className="flex flex-col items-center gap-4">
+            <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Output Plane</span>
+            <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
               <canvas ref={outputCanvasRef} width={outputDim * 10} height={outputDim * 10}
-                className="block h-full w-full rounded-xl bg-black border border-white/5"
+                className="block h-[260px] w-[260px] bg-black"
               />
             </div>
-            <span className="text-[10px] font-mono text-white/40">Progress: {Math.round((stepIndex / totalSteps) * 100)}%</span>
           </div>
         </div>
 
         {/* 3b1b zoom panel */}
-        <KernelZoomPanel
-          row={row}
-          col={col}
-          inputData={preprocessedData}
-          kernel={activeKernel}
-          outputValue={outputMap[stepIndex]}
-          progress={zoomProgress}
-        />
+        <div className="lg:pl-8 lg:border-l lg:border-white/5">
+          <KernelZoomPanel
+            row={row}
+            col={col}
+            inputData={preprocessedData}
+            kernel={activeKernel}
+            outputValue={outputMap[stepIndex]}
+            progress={zoomProgress}
+          />
+        </div>
       </div>
     </div>
   );

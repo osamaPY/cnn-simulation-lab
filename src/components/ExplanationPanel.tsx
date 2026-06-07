@@ -6,24 +6,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const STAGE_COLORS: Record<number, string> = {
-  1: '#6366f1', 2: '#8b5cf6', 3: '#0ea5e9', 4: '#22d3ee', 5: '#3b82f6',
-  6: '#f97316', 7: '#a855f7', 8: '#ec4899', 9: '#f59e0b',
-  10: '#8b5cf6', 11: '#34d399', 12: '#f87171',
+  1: '#58C4DD', 2: '#58C4DD', 3: '#58C4DD', 4: '#F5CD47', 5: '#83C167',
+  6: '#9C27B0', 7: '#FF6666', 8: '#E07A5F', 9: '#9C27B0',
+  10: '#58C4DD', 11: '#83C167', 12: '#FF6666',
 };
 
 const subtitleContainerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.012 }
+    transition: { staggerChildren: 0.015 }
   }
 };
 
 const wordVariants = {
-  hidden: { opacity: 0, y: 6, filter: 'blur(3px)' },
+  hidden: { opacity: 0, y: 4 },
   visible: {
-    opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }
+    opacity: 1, y: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }
   }
 };
 
@@ -33,7 +33,7 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
   const explanation = EXPLANATIONS[currentStageId] || { body: '', focusFormula: null, keyTakeaway: '', headline: '' };
 
   const words = React.useMemo(() => explanation.body.split(' '), [explanation.body]);
-  const stageColor = STAGE_COLORS[currentStageId] || '#50c9e6';
+  const stageColor = STAGE_COLORS[currentStageId] || '#58C4DD';
 
   const showFormula = (mode === 'all' || mode === 'formula') && explanation.focusFormula;
   const showSubtitles = (mode === 'all' || mode === 'subtitles');
@@ -44,29 +44,26 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
         <AnimatePresence mode="wait">
           <motion.div
             key={`formula-${currentStageId}`}
-            initial={shouldReduceMotion ? false : { opacity: 0, x: 30, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, x: -20, scale: 0.94 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-0 right-0 pointer-events-auto scale-90 origin-top-right z-55"
+            initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, x: -10 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute top-0 right-0 pointer-events-auto origin-top-right z-55"
           >
             <div
-              className="bg-[#030306]/90 backdrop-blur-2xl rounded-2xl p-4 px-6 border flex flex-col items-center gap-2"
+              className="bg-[#1c1c1c] rounded-sm p-8 border border-white/5 flex flex-col items-center gap-4"
               style={{
-                borderColor: `${stageColor}30`,
-                boxShadow: `0 0 30px ${stageColor}15, 0 0 60px rgba(0,0,0,0.5)`,
+                boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
               }}
             >
-              <div
-                className="w-full h-px mb-1 opacity-40"
-                style={{ background: `linear-gradient(to right, transparent, ${stageColor}, transparent)` }}
-              />
               <MathFormula formula={explanation.focusFormula!} />
               {explanation.keyTakeaway && (
-                <p className="text-[9px] font-mono text-center max-w-[200px] leading-relaxed mt-1"
-                   style={{ color: `${stageColor}aa` }}>
-                  {explanation.keyTakeaway}
-                </p>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-[1px] bg-white/10" />
+                  <p className="text-[10px] font-mono text-center max-w-[200px] leading-relaxed uppercase tracking-widest text-white/30">
+                    {explanation.keyTakeaway}
+                  </p>
+                </div>
               )}
             </div>
           </motion.div>
@@ -74,33 +71,25 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
       )}
 
       {showSubtitles && (
-        <div className={`${mode === 'all' ? 'absolute bottom-0 left-0 right-0 pb-4' : 'w-full'} flex justify-center pointer-events-none`}>
+        <div className={`${mode === 'all' ? 'absolute bottom-0 left-0 right-0 pb-10' : 'w-full'} flex justify-center pointer-events-none`}>
           <AnimatePresence mode="wait">
             <motion.div
               key={`subtitle-box-${currentStageId}`}
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={shouldReduceMotion ? undefined : { opacity: 0, y: -10 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-3xl w-full"
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="max-w-4xl w-full"
             >
               <div
-                className="bg-[#030306]/80 backdrop-blur-xl rounded-2xl p-4 md:p-5 border text-center shadow-2xl mx-4 pointer-events-auto"
+                className="bg-[#161616] p-10 border-l-2 border-white/10 text-center mx-4 pointer-events-auto"
                 style={{
-                  borderColor: `${stageColor}18`,
-                  boxShadow: `0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px ${stageColor}10`,
+                  borderLeftColor: stageColor,
+                  boxShadow: '0 25px 70px rgba(0,0,0,0.5)',
                 }}
               >
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="h-px flex-1 max-w-12" style={{ background: `linear-gradient(to right, transparent, ${stageColor}50)` }} />
-                  <span className="text-[8px] font-mono uppercase tracking-[0.25em]" style={{ color: `${stageColor}80` }}>
-                    {explanation.headline}
-                  </span>
-                  <div className="h-px flex-1 max-w-12" style={{ background: `linear-gradient(to left, transparent, ${stageColor}50)` }} />
-                </div>
-
                 {shouldReduceMotion ? (
-                  <p className="text-sm md:text-base text-white/85 leading-relaxed">
+                  <p className="text-lg md:text-xl text-[#FFFEF0] leading-relaxed font-serif italic">
                     {explanation.body}
                   </p>
                 ) : (
@@ -108,7 +97,7 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
                     variants={subtitleContainerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="text-sm md:text-base text-white/85 leading-relaxed flex flex-wrap gap-x-1 justify-center"
+                    className="text-lg md:text-xl text-[#FFFEF0] leading-relaxed font-serif italic flex flex-wrap gap-x-1.5 justify-center"
                   >
                     {words.map((word, i) => (
                       <motion.span key={`${currentStageId}-w-${i}`} variants={wordVariants}>

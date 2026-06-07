@@ -46,10 +46,10 @@ function StageLoadingState() {
 function StageEmptyState({ stageName, description }: { stageName: string; description: string }) {
   return (
     <div className="flex h-full w-full items-center justify-center px-6 text-center">
-      <div className="max-w-xl rounded-2xl border border-white/10 bg-black/50 backdrop-blur-md p-10 shadow-2xl">
-        <p className="text-xs font-mono font-semibold uppercase tracking-widest text-aurora-mint">Data required</p>
-        <h3 className="mt-4 text-2xl font-display font-semibold text-white">{stageName}</h3>
-        <p className="mt-4 text-base leading-relaxed text-white/70">{description}</p>
+      <div className="max-w-xl p-10">
+        <p className="text-[10px] font-mono font-bold uppercase tracking-[0.4em] text-[#83C167]">Data required</p>
+        <h3 className="mt-4 text-3xl font-serif font-bold text-[#FFFEF0] italic">{stageName}</h3>
+        <p className="mt-6 text-base leading-relaxed text-white/40 font-sans">{description}</p>
       </div>
     </div>
   )
@@ -140,9 +140,9 @@ export function StageViewer() {
         <motion.div
           className="w-full h-full flex flex-col items-center justify-center"
           key={`${currentStageId}-${Boolean(preprocessedData)}-${activations.length}-${Boolean(prediction)}`}
-          initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-          exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={shouldReduceMotion ? undefined : { opacity: 0, y: -30 }}
           transition={shouldReduceMotion ? { duration: 0 } : slideTransition}
         >
           <Suspense fallback={<StageLoadingState />}>{renderStage()}</Suspense>

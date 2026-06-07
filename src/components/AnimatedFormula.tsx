@@ -21,9 +21,9 @@ interface AnimatedFormulaProps {
 export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
   formula,
   progress,
-  color = '#34d399',
-  fontSize = '1.1rem',
-  durationMs = 1400,
+  color = '#83C167',
+  fontSize = '1.25rem',
+  durationMs = 1800,
   className = '',
 }) => {
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -36,17 +36,16 @@ export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
     spanRef.current.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
   }, [progress]);
 
-  // Compute a softer glow: reduce opacity so it doesn't burn
-  const glowColor = `${color}55`;
-  const strongGlow = `${color}88`;
+  // Compute a softer glow
+  const glowColor = `${color}40`;
 
   return (
     <span
-      className={`relative inline-block font-mono font-bold select-none ${className}`}
-      style={{ fontSize }}
+      className={`relative inline-block font-serif font-bold italic select-none ${className}`}
+      style={{ fontSize, letterSpacing: '0.05em' }}
     >
       {/* Ghost layer — very faint skeleton */}
-      <span style={{ color, opacity: 0.10, letterSpacing: '0.04em', pointerEvents: 'none' }}>
+      <span style={{ color, opacity: 0.04, pointerEvents: 'none' }}>
         {formula}
       </span>
 
@@ -58,14 +57,12 @@ export const AnimatedFormula: React.FC<AnimatedFormulaProps> = ({
           position: 'absolute',
           inset: 0,
           color,
-          letterSpacing: '0.04em',
           clipPath: progress !== undefined ? undefined : 'inset(0 100% 0 0)',
           animation:
             progress !== undefined
               ? 'none'
-              : `formulaReveal ${durationMs}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
-          filter: `drop-shadow(0 0 5px ${glowColor}) drop-shadow(0 0 12px ${strongGlow})`,
-          textShadow: `0 0 8px ${glowColor}`,
+              : `formulaReveal ${durationMs}ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+          filter: `drop-shadow(0 0 8px ${glowColor})`,
         }}
       >
         {formula}
