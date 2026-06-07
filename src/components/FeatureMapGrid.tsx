@@ -67,10 +67,10 @@ const ChannelPlane = memo(function ChannelPlane({
       onMouseLeave={onLeave}
       onClick={onClick}
     >
-      <canvas ref={canvasRef} width={96} height={96} className="w-full h-full bg-black block" />
+      <canvas ref={canvasRef} width={140} height={140} className="w-full h-full bg-black block" />
       
       {/* Small indicator label */}
-      <div className="absolute bottom-1 right-2 text-[7px] font-mono text-white/40 uppercase bg-black/60 px-1 rounded">
+      <div className="absolute bottom-1.5 right-2 text-[8px] font-mono text-white/40 uppercase bg-black/60 px-1.5 py-0.5 rounded">
         Ch {channelIndex}
       </div>
     </div>
@@ -138,11 +138,11 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
     >
       <canvas
         ref={canvasRef}
-        width={72}
-        height={72}
-        className="block h-auto w-full max-w-16 rounded bg-black border border-black/40"
+        width={96}
+        height={96}
+        className="block h-auto w-full max-w-24 rounded bg-black border border-black/40 shadow-md"
       />
-      <span className={`text-[8px] font-mono mt-1 ${isHovered ? 'text-[#f5cd47]' : isFocused ? 'text-aurora-teal' : 'text-white/40'}`}>
+      <span className={`text-[10px] font-mono mt-1 ${isHovered ? 'text-[#f5cd47]' : isFocused ? 'text-aurora-teal' : 'text-white/40'}`}>
         Filter #{channelIndex}
       </span>
     </div>
@@ -266,10 +266,10 @@ export const FeatureMapGrid: React.FC = () => {
         <div className="grid gap-6 lg:grid-cols-[1fr_210px] items-center w-full">
           
           {/* Left Panel: 3D Stack Viewport */}
-          <div className="flex flex-col items-center justify-center p-6 bg-black/30 border border-white/5 rounded-2xl relative overflow-hidden h-[300px] sm:h-[360px] md:h-[400px]">
+          <div className="flex flex-col items-center justify-center p-6 bg-black/30 border border-white/5 rounded-2xl relative overflow-hidden h-[360px] sm:h-[420px] md:h-[480px]">
             
             {/* 3D Perspective Stack Container */}
-            <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48" style={{ perspective: '800px' }}>
+            <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64" style={{ perspective: '800px' }}>
               <div 
                 className="absolute inset-0 transition-transform duration-100"
                 style={{ 

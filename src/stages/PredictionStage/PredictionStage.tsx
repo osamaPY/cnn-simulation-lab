@@ -86,21 +86,21 @@ export const PredictionStage: React.FC = () => {
   const spring = { type: 'spring' as const, damping: 14, stiffness: 240, mass: 0.9 };
 
   return (
-    <div className="relative flex flex-col gap-6 w-full max-w-xl items-center py-6 px-4">
+    <div className="relative flex flex-col gap-6 w-full max-w-3xl items-center py-6 px-4">
       {/* Confetti canvas — absolutely positioned, pointer-events-none */}
       <canvas
         ref={confettiRef}
-        width={500}
-        height={400}
+        width={600}
+        height={450}
         className="absolute inset-0 w-full h-full pointer-events-none z-50"
         aria-hidden="true"
       />
 
       {/* Input vs Prediction row */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-10 w-full">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-14 w-full">
         {/* Draw Input Thumbnail */}
-        <div className="flex flex-col items-center gap-2.5">
-          <div className="w-28 h-28 bg-black border border-white/10 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-2xl">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-40 h-40 bg-black border border-white/10 rounded-2xl flex items-center justify-center relative overflow-hidden shadow-2xl">
             {originalCanvasThumbnail ? (
               <img
                 src={originalCanvasThumbnail}
@@ -108,19 +108,19 @@ export const PredictionStage: React.FC = () => {
                 className="w-full h-full object-contain filter invert opacity-90 scale-95"
               />
             ) : (
-              <div className="text-[9px] text-text-muted">Awaiting Ink</div>
+              <div className="text-[11px] text-text-muted">Awaiting Ink</div>
             )}
-            <div className="absolute inset-1.5 border border-dashed border-white/5 rounded-xl pointer-events-none" />
+            <div className="absolute inset-2 border border-dashed border-white/5 rounded-xl pointer-events-none" />
           </div>
         </div>
 
         {/* Arrow */}
         <div className="hidden sm:flex items-center justify-center" aria-hidden="true">
           <motion.div
-            animate={{ x: [0, 6, 0] }}
+            animate={{ x: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
           >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(52,211,153,0.5)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="5" y1="12" x2="19" y2="12" />
               <polyline points="12 5 19 12 12 19" />
             </svg>
@@ -128,29 +128,29 @@ export const PredictionStage: React.FC = () => {
         </div>
 
         {/* Prediction Card */}
-        <div className="flex flex-col items-center gap-2.5">
+        <div className="flex flex-col items-center gap-3">
           <AnimatePresence mode="wait">
             <motion.div
               key={prediction.digit}
-              className="w-28 h-28 rounded-2xl bg-[#030306]/90 border-2 border-amber-500/60 flex flex-col items-center justify-center relative"
-              style={{ boxShadow: '0 0 40px rgba(245,158,11,0.22), 0 0 80px rgba(245,158,11,0.08)' }}
+              className="w-40 h-40 rounded-2xl bg-[#030306]/90 border-2 border-amber-500/60 flex flex-col items-center justify-center relative"
+              style={{ boxShadow: '0 0 50px rgba(245,158,11,0.25), 0 0 100px rgba(245,158,11,0.1)' }}
               initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.65, rotate: -8 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={shouldReduceMotion ? { duration: 0 } : spring}
             >
               <motion.span
                 className="font-display font-extrabold text-amber-400 leading-none"
-                style={{ fontSize: 'clamp(3rem, 8vw, 4rem)', filter: 'drop-shadow(0 0 14px rgba(245,158,11,0.45))' }}
+                style={{ fontSize: 'clamp(5.5rem, 12vw, 6.5rem)', filter: 'drop-shadow(0 0 16px rgba(245,158,11,0.5))' }}
                 initial={shouldReduceMotion ? false : { scale: 1.5 }}
                 animate={{ scale: 1 }}
                 transition={shouldReduceMotion ? { duration: 0 } : { ...spring, delay: 0.08 }}
               >
                 {prediction.digit}
               </motion.span>
-              <span className="text-[9px] font-mono text-emerald-400 font-bold uppercase tracking-wider mt-1">
+              <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider mt-1">
                 Digit {prediction.digit}
               </span>
-              <div className="absolute inset-1 rounded-xl border border-dashed border-amber-500/10 pointer-events-none" />
+              <div className="absolute inset-1.5 rounded-xl border border-dashed border-amber-500/10 pointer-events-none" />
             </motion.div>
           </AnimatePresence>
         </div>

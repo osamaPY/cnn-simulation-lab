@@ -90,7 +90,7 @@ export const BackpropStage: React.FC = () => {
   }, [progress]);
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-5xl px-4 py-2 backprop-stage-wrapper select-none">
+    <div className="flex flex-col gap-4 w-full max-w-6xl px-4 py-2 backprop-stage-wrapper select-none">
       {/* Title */}
       <div className="flex flex-col items-center gap-1 text-center w-full">
         <h4 className="text-xs font-mono text-signal-coral uppercase tracking-widest">Backpropagation Learning</h4>
@@ -99,10 +99,10 @@ export const BackpropStage: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-6 w-full items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6 w-full items-center">
         
         {/* Left Column: Enlarged Neural Network & Gradient Pulses */}
-        <div className="relative w-full h-[320px] sm:h-[380px] md:h-[430px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl backprop-graph-container">
+        <div className="relative w-full h-[420px] sm:h-[480px] md:h-[530px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl backprop-graph-container">
           <svg viewBox="0 0 500 400" className="w-full h-full select-none z-10" preserveAspectRatio="xMidYMid meet">
             <defs>
               <filter id="node-glow" x="-35%" y="-35%" width="170%" height="170%">
@@ -265,7 +265,7 @@ export const BackpropStage: React.FC = () => {
           {/* Training Loss curve */}
           <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-xl flex flex-col gap-2.5">
             <span className="text-[9px] font-mono uppercase text-white/40 tracking-wider">Training Loss Curve</span>
-            <canvas ref={lossCanvasRef} width={180} height={90}
+            <canvas ref={lossCanvasRef} width={240} height={120}
               className="rounded-lg bg-black/40 border border-white/5 w-full"
             />
           </div>
@@ -279,7 +279,7 @@ export const BackpropStage: React.FC = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-1 p-1 bg-black border border-white/5 rounded-lg w-full h-32">
+            <div className="grid grid-cols-3 gap-1.5 p-1 bg-black border border-white/5 rounded-lg w-full h-40">
               {currentKernel.map((val, idx) => {
                 const isUpdating = progress >= 0.35 && progress < 0.90;
                 const dir = gradientDirections[idx];

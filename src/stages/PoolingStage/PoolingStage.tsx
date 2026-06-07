@@ -66,7 +66,7 @@ export const PoolingStage: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const cellSize = 260 / inputDim;
+    const cellSize = 390 / inputDim;
     for (let r = 0; r < inputDim; r++) {
       for (let c = 0; c < inputDim; c++) {
         const val = inputMap[r * inputDim + c];
@@ -90,7 +90,7 @@ export const PoolingStage: React.FC = () => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    const cellSize = 260 / outputDim;
+    const cellSize = 390 / outputDim;
     let start = lastDrawnStepRef.current + 1;
     if (stepIndex < lastDrawnStepRef.current) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -108,27 +108,27 @@ export const PoolingStage: React.FC = () => {
     lastDrawnStepRef.current = stepIndex;
   }, [stepIndex, outputMap, outMin, outMax, outputDim]);
 
-  const frameCellSize = 260 / inputDim;
+  const frameCellSize = 390 / inputDim;
   const frameX = col * poolSize * frameCellSize;
   const frameY = row * poolSize * frameCellSize;
   const frameWidth = poolSize * frameCellSize;
 
-  // Clamp bubble position so it never overflows the 260×260 canvas container
+  // Clamp bubble position so it never overflows the 390×390 canvas container
   const BUBBLE_W = 110;
   const BUBBLE_H = 24;
   const rawLeft = frameX + frameWidth / 2;
   const rawTop = frameY;
-  const bubbleLeft = Math.min(Math.max(rawLeft - BUBBLE_W / 2, 2), 260 - BUBBLE_W - 2);
+  const bubbleLeft = Math.min(Math.max(rawLeft - BUBBLE_W / 2, 2), 390 - BUBBLE_W - 2);
   const bubbleTop = rawTop < BUBBLE_H + 6 ? rawTop + frameWidth + 4 : rawTop - BUBBLE_H - 4;
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-4xl px-8">
-      <div className="flex flex-col md:flex-row items-center justify-center gap-16 w-full py-4">
+    <div className="flex flex-col items-center gap-6 w-full max-w-5xl px-8">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-20 w-full py-4">
         <div className="flex flex-col items-center gap-4">
           <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input {inputDim}×{inputDim}</span>
           <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
-            <canvas ref={inputCanvasRef} width={260} height={260} className="rounded-sm bg-black block" />
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 260 260">
+            <canvas ref={inputCanvasRef} width={390} height={390} className="rounded-sm bg-black block" />
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-20" viewBox="0 0 390 390">
               <rect x={frameX} y={frameY} width={frameWidth} height={frameWidth} rx="0" fill="rgba(88, 196, 221, 0.08)" stroke="#58C4DD" strokeWidth="2" className="transition-all duration-150 ease-out" />
             </svg>
             <div className="absolute pointer-events-none z-30 bg-[#1c1c1c] border border-white/10 rounded-sm px-2 py-1 font-serif italic text-[10px] text-[#58C4DD] shadow-2xl flex items-center gap-2 transition-all duration-150 ease-out" style={{ left: `${bubbleLeft}px`, top: `${bubbleTop}px` }}>
@@ -148,7 +148,7 @@ export const PoolingStage: React.FC = () => {
         <div className="flex flex-col items-center gap-4">
           <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Output {outputDim}×{outputDim}</span>
           <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
-            <canvas ref={outputCanvasRef} width={260} height={260} className="rounded-sm bg-black block" />
+            <canvas ref={outputCanvasRef} width={390} height={390} className="rounded-sm bg-black block" />
           </div>
         </div>
       </div>

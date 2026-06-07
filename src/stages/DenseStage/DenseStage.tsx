@@ -158,7 +158,7 @@ export const DenseStage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-[960px] items-center px-4 py-2 dense-stage-wrapper">
+    <div className="flex flex-col gap-6 w-full max-w-6xl items-center px-4 py-2 dense-stage-wrapper">
       {/* Top Controls */}
       <div className="flex justify-start w-full items-center mb-1">
         <button
@@ -174,7 +174,7 @@ export const DenseStage: React.FC = () => {
       </div>
 
       {/* Main Graph Area (Increased height and expanded SVG proportions) */}
-      <div className="relative w-full h-[400px] sm:h-[460px] md:h-[520px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl dense-graph-container">
+      <div className="relative w-full h-[480px] sm:h-[540px] md:h-[600px] bg-black/40 rounded-2xl border border-white/10 overflow-hidden shadow-2xl dense-graph-container">
         <svg
           viewBox="0 0 800 460"
           className="w-full h-full select-none z-10"

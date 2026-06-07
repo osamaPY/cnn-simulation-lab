@@ -3,6 +3,7 @@ import { Header } from '../components/Header';
 import { DrawCanvas } from '../stages/DrawingStage/DrawCanvas';
 import { StageViewer } from '../stages/StageViewer';
 import { ExplanationPanel } from '../components/ExplanationPanel';
+import { DimensionalityLedger } from '../components/DimensionalityLedger';
 import { useLabStore } from '../hooks/useLabStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlayerControls } from '../components/PlayerControls';
@@ -234,6 +235,11 @@ export const LessonShell: React.FC = () => {
               {/* Explanations 3-Column Content */}
               <div className="w-full">
                 <ExplanationPanel mode="subtitles" />
+              </div>
+
+              {/* Network shape & math dimension calculator ledger */}
+              <div className="w-full border-t border-white/5 pt-4">
+                <DimensionalityLedger />
               </div>
 
               {/* Footer */}

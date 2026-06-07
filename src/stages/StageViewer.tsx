@@ -108,7 +108,7 @@ export function StageViewer() {
 
     switch (currentStageId) {
       case 1:
-        return <div className="flex flex-col items-center justify-center w-full h-full max-w-xl mx-auto"><PreprocessingPreview /></div>
+        return <div className="flex flex-col items-center justify-center w-full h-full max-w-4xl mx-auto"><PreprocessingPreview /></div>
       case 2:
         return <div className="flex w-full h-full items-center justify-center"><ArchitectureStage /></div>
       case 3:

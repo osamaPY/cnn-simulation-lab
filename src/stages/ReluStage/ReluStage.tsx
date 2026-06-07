@@ -104,14 +104,14 @@ export function ReluStage() {
 
   return (
     <div className="flex w-full flex-col items-center gap-6 px-4">
-      <div className="grid w-full max-w-3xl gap-6 md:grid-cols-[1fr_260px] py-4 items-start">
+      <div className="grid w-full max-w-5xl gap-6 md:grid-cols-[1fr_280px] py-4 items-start">
         {/* Canvas panel */}
         <div className="rounded-2xl border border-white/10 bg-black/40 p-4 shadow-2xl">
           <div className="mb-3 flex items-center justify-between text-[10px] font-mono uppercase text-white/50">
             <span>ReLU mapping</span>
             <span>{outputDim}×{outputDim}</span>
           </div>
-          <canvas ref={canvasRef} width={312} height={312} className="mx-auto block h-auto w-full max-w-[312px] rounded-xl bg-black border border-white/5" />
+          <canvas ref={canvasRef} width={420} height={420} className="mx-auto block h-auto w-full max-w-[420px] rounded-xl bg-black border border-white/5" />
         </div>
 
         {/* Right panel: animated graph + formula */}
@@ -120,8 +120,8 @@ export function ReluStage() {
             {/* 3b1b animated graph */}
             <ReluGraphCanvas
               progress={sweepProgress}
-              width={228}
-              height={148}
+              width={260}
+              height={180}
               currentX={normalised * 3}
             />
 

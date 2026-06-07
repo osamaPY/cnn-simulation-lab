@@ -49,8 +49,8 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
   const products = patch.map((p, i) => p * kernelArray[i]);
   const sum = products.reduce((a, b) => a + b, 0);
 
-  const CELL_SIZE = Math.min(36, 120 / kernelSize);
-  const GAP = 2;
+  const CELL_SIZE = Math.min(48, 180 / kernelSize);
+  const GAP = 3;
 
   const renderGrid = (values: number[] | Float32Array, highlight: number, colorFn: (v: number) => string) => (
     <div
@@ -69,7 +69,7 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: kernelSize > 5 ? 6 : 8,
+            fontSize: kernelSize > 5 ? 8 : 10,
             fontFamily: 'monospace',
             fontWeight: 'bold',
             borderRadius: 2,
@@ -96,23 +96,23 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
         opacity: panelOpacity,
         background: '#1c1c1c',
         border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 4,
-        padding: '20px',
+        borderRadius: 8,
+        padding: '24px',
         display: 'flex',
         flexDirection: 'column',
-        gap: 16,
-        minWidth: 280,
+        gap: 18,
+        minWidth: 340,
         boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
       }}
     >
-      <div style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+      <div style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
         Kernel × Patch · ({row + 1}, {col + 1})
       </div>
 
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'center', justifyContent: 'center' }}>
         {/* Input patch */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 8, color: '#58C4DD', opacity: 0.5, fontFamily: 'monospace', fontWeight: 'bold' }}>INPUT</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 10, color: '#58C4DD', opacity: 0.5, fontFamily: 'monospace', fontWeight: 'bold' }}>INPUT</span>
           {renderGrid(
             patch,
             cellHighlightIdx,
@@ -121,11 +121,11 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
         </div>
 
         {/* × */}
-        <div style={{ fontSize: 14, color: '#F5CD47', fontFamily: 'monospace', fontWeight: 'bold', opacity: progress > 0.2 ? 0.4 : 0, transition: 'opacity 0.3s' }}>×</div>
+        <div style={{ fontSize: 16, color: '#F5CD47', fontFamily: 'monospace', fontWeight: 'bold', opacity: progress > 0.2 ? 0.4 : 0, transition: 'opacity 0.3s' }}>×</div>
 
         {/* Kernel */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <span style={{ fontSize: 8, color: '#F5CD47', opacity: 0.5, fontFamily: 'monospace', fontWeight: 'bold' }}>KERNEL</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 10, color: '#F5CD47', opacity: 0.5, fontFamily: 'monospace', fontWeight: 'bold' }}>KERNEL</span>
           {renderGrid(
             kernel,
             cellHighlightIdx,
@@ -136,14 +136,14 @@ export const KernelZoomPanel: React.FC<KernelZoomPanelProps> = ({
 
       {/* Animated formula */}
       {formulaProgress > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <AnimatedFormula
             formula={`Σ(x·w) + b = ${outputValue.toFixed(3)}`}
             progress={formulaProgress}
             color="#83C167"
-            fontSize="0.9rem"
+            fontSize="0.95rem"
           />
-          <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace', letterSpacing: '0.1em' }}>
+          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace', letterSpacing: '0.1em' }}>
             ACCUMULATED SUM: {sum.toFixed(3)}
           </span>
         </div>

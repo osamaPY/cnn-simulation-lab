@@ -33,7 +33,7 @@ export const TensorGridPreview: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const cellSize = 10; // 28 * 10 = 280px canvas
+    const cellSize = 15; // 28 * 15 = 420px canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let r = 0; r < 28; r++) {
@@ -55,10 +55,10 @@ export const TensorGridPreview: React.FC = () => {
 
         if (showValues && val >= 0.1) {
           ctx.fillStyle = val > 0.55 ? '#071018' : '#f1f5ef';
-          ctx.font = '7px monospace';
+          ctx.font = '8px monospace';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(val.toFixed(1).replace('0.', '.'), c * cellSize + 5, r * cellSize + 5);
+          ctx.fillText(val.toFixed(1).replace('0.', '.'), c * cellSize + 7.5, r * cellSize + 7.5);
         }
       }
     }
@@ -74,39 +74,39 @@ export const TensorGridPreview: React.FC = () => {
       const pendingEvent = pendingHoverRef.current;
       if (!pendingEvent) return;
 
-    const canvas = canvasRef.current;
-    if (!canvas || !preprocessedData) return;
+      const canvas = canvasRef.current;
+      if (!canvas || !preprocessedData) return;
 
-    const rect = canvas.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       const x = pendingEvent.clientX - rect.left;
       const y = pendingEvent.clientY - rect.top;
 
-    // Scale mouse coordinates to [0..27] grid coordinates
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const col = Math.floor((x * scaleX) / 10);
-    const row = Math.floor((y * scaleY) / 10);
+      // Scale mouse coordinates to [0..27] grid coordinates
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const col = Math.floor((x * scaleX) / 15);
+      const row = Math.floor((y * scaleY) / 15);
 
-    if (row >= 0 && row < 28 && col >= 0 && col < 28) {
-      const val = preprocessedData[row * 28 + col];
-      
-      // Calculate tooltip position relative to canvas to ensure absolute stability and prevent container overflow
-      const BUBBLE_W = 85;
-      const BUBBLE_H = 36;
-      const tooltipX = x + BUBBLE_W + 12 > 280 ? x - BUBBLE_W - 8 : x + 8;
-      const tooltipY = y - BUBBLE_H - 8 < 0 ? y + 15 : y - BUBBLE_H - 8;
+      if (row >= 0 && row < 28 && col >= 0 && col < 28) {
+        const val = preprocessedData[row * 28 + col];
+        
+        // Calculate tooltip position relative to canvas to ensure absolute stability and prevent container overflow
+        const BUBBLE_W = 85;
+        const BUBBLE_H = 36;
+        const tooltipX = x + BUBBLE_W + 12 > 420 ? x - BUBBLE_W - 8 : x + 8;
+        const tooltipY = y - BUBBLE_H - 8 < 0 ? y + 15 : y - BUBBLE_H - 8;
 
-      setTooltip({
-        x: tooltipX,
-        y: tooltipY,
-        row,
-        col,
-        val,
-        show: true
-      });
-    } else {
-      setTooltip(t => ({ ...t, show: false }));
-    }
+        setTooltip({
+          x: tooltipX,
+          y: tooltipY,
+          row,
+          col,
+          val,
+          show: true
+        });
+      } else {
+        setTooltip(t => ({ ...t, show: false }));
+      }
     });
   };
 
@@ -141,11 +141,11 @@ export const TensorGridPreview: React.FC = () => {
       className="relative flex flex-col items-center w-full"
     >
       {/* Canvas container */}
-      <div className="relative p-1 rounded border border-border-muted bg-bg-canvas">
+      <div className="relative p-1.5 rounded-lg border border-border-muted bg-bg-canvas shadow-2xl">
         <canvas
           ref={canvasRef}
-          width={280}
-          height={280}
+          width={420}
+          height={420}
           className="rounded-lg cursor-crosshair block bg-black border border-border-subtle select-none"
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
@@ -171,7 +171,7 @@ export const TensorGridPreview: React.FC = () => {
       </div>
 
       {/* Grid footer metrics */}
-      <div className="w-full max-w-[288px] flex items-center justify-between mt-3 px-1">
+      <div className="w-full max-w-[428px] flex items-center justify-between mt-3.5 px-1">
         <span className="text-[10px] font-mono text-text-muted uppercase">
           Grid: 28x28 Pixels
         </span>

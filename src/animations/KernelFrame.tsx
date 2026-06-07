@@ -3,9 +3,15 @@ import { useLabStore } from '../hooks/useLabStore';
 
 interface KernelFrameProps {
   stepIndex: number;
+  cellSize?: number;
+  canvasSize?: number;
 }
 
-export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
+export const KernelFrame: React.FC<KernelFrameProps> = ({
+  stepIndex,
+  cellSize = 10,
+  canvasSize = 280
+}) => {
   const hyperparams = useLabStore(state => state.hyperparams);
   const { kernelSize, stride, padding } = hyperparams;
 
@@ -13,7 +19,6 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
   const row = Math.floor(stepIndex / outputDim);
   const col = stepIndex % outputDim;
 
-  const cellSize = 10;
   const frameWidth = kernelSize * cellSize;
   const frameHeight = kernelSize * cellSize;
 
@@ -23,7 +28,7 @@ export const KernelFrame: React.FC<KernelFrameProps> = ({ stepIndex }) => {
   return (
     <svg 
       className="absolute inset-0 w-full h-full pointer-events-none z-20"
-      viewBox="0 0 280 280"
+      viewBox={`0 0 ${canvasSize} ${canvasSize}`}
     >
       <defs>
         <filter id="kernel-glow" x="-30%" y="-30%" width="160%" height="160%">

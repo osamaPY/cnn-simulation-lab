@@ -12,9 +12,9 @@ interface TensorBlockProps {
 
 const TensorBlock: React.FC<TensorBlockProps> = ({ width, height, depth, color, delay }) => {
   // Scaling factors for visual representation
-  const sw = Math.max(width * 1.5, 4);
-  const sh = Math.max(height * 1.5, 4);
-  const sd = Math.min(Math.max(Math.sqrt(depth) * 8, 4), 160); // Cap depth so it doesn't break layout
+  const sw = Math.max(width * 2.0, 6);
+  const sh = Math.max(height * 2.0, 6);
+  const sd = Math.min(Math.max(Math.sqrt(depth) * 10, 5), 140); // Cap depth so it doesn't break layout
   // Offset to ensure top face fits in view
   const ty = sd / 2;
 
@@ -81,11 +81,11 @@ export const ArchitectureStage: React.FC = () => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-4 overflow-hidden bg-transparent">
-      <div className="w-full overflow-x-auto no-scrollbar py-12 flex items-center justify-start lg:justify-center">
-        <div className="flex items-center gap-6 px-12 min-w-max">
+      <div className="w-full overflow-x-auto no-scrollbar py-12 flex items-center justify-start">
+        <div className="flex items-center gap-8 px-12 min-w-max">
           {layers.map((layer, i) => (
             <React.Fragment key={layer.name}>
-              <div className="flex flex-col items-center gap-6">
+              <div className="flex flex-col items-center gap-8">
                 <TensorBlock
                   width={layer.shape[0]}
                   height={layer.shape[1]}
@@ -93,9 +93,9 @@ export const ArchitectureStage: React.FC = () => {
                   color={layer.color}
                   delay={i * 0.1}
                 />
-                <div className="flex flex-col items-center gap-1">
-                  <span className="text-[10px] font-mono font-bold text-white/90 uppercase tracking-tighter whitespace-nowrap">{layer.name}</span>
-                  <span className="text-[9px] font-mono text-white/30">{layer.shape.join('×')}</span>
+                <div className="flex flex-col items-center gap-1.5">
+                  <span className="text-[12px] font-mono font-bold text-white/90 uppercase tracking-tight whitespace-nowrap">{layer.name}</span>
+                  <span className="text-[11px] font-mono text-white/40">{layer.shape.join('×')}</span>
                 </div>
               </div>
 
@@ -104,7 +104,7 @@ export const ArchitectureStage: React.FC = () => {
                   initial={{ opacity: 0, scaleX: 0 }}
                   animate={{ opacity: 1, scaleX: 1 }}
                   transition={{ delay: i * 0.1 + 0.3, duration: 0.8 }}
-                  className="w-4 h-[1px] bg-white/10 flex-shrink-0"
+                  className="w-6 h-[1px] bg-white/10 flex-shrink-0"
                 />
               )}
             </React.Fragment>

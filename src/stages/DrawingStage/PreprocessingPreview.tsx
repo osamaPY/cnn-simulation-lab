@@ -125,26 +125,26 @@ export const PreprocessingPreview: React.FC = () => {
       initial={shouldReduceMotion ? false : { opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={shouldReduceMotion ? { duration: 0 } : quickTransition}
-      className="w-full bg-black/40 border border-white/10 rounded-2xl p-5 flex flex-col gap-5 shadow-2xl"
+      className="w-full bg-black/40 border border-white/10 rounded-2xl p-6 flex flex-col gap-6 shadow-2xl"
     >
-      <div className="flex items-center justify-between border-b border-white/10 pb-3">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-aurora-mint shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-          <span className="text-xs font-mono text-white/50 uppercase tracking-widest">Pre-activation Centering</span>
+      <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-aurora-mint shadow-[0_0_12px_rgba(16,185,129,0.5)] animate-pulse" />
+          <span className="text-sm font-mono text-white/50 uppercase tracking-widest">Pre-activation Centering</span>
         </div>
-        <span className="text-[10px] font-mono text-white/50 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
+        <span className="text-[11px] font-mono text-white/50 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/5">
           Active Pixels: {nonzeroPixelCount}
         </span>
       </div>
 
       {/* Visual transformation steps comparison */}
-      <div className="grid grid-cols-3 gap-2 justify-items-center py-1">
+      <div className="grid grid-cols-3 gap-6 justify-items-center py-2">
         {/* Step 1: Raw thumbnail */}
-        <div className="flex flex-col items-center gap-1.5">
-          <span className="text-[8px] font-mono text-white/40 uppercase tracking-wider">1. Raw Ink</span>
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">1. Raw Ink</span>
           <div 
             style={chalkboardStyle} 
-            className="w-20 h-20 border border-white/10 rounded-xl flex items-center justify-center overflow-hidden relative shadow-md"
+            className="w-36 h-36 border border-white/10 rounded-xl flex items-center justify-center overflow-hidden relative shadow-md"
           >
             {originalCanvasThumbnail ? (
               <img 
@@ -153,18 +153,18 @@ export const PreprocessingPreview: React.FC = () => {
                 className="w-full h-full object-contain filter invert opacity-90 scale-95"
               />
             ) : (
-              <span className="text-white/20 text-[10px]">-</span>
+              <span className="text-white/20 text-[11px]">-</span>
             )}
             <div className="absolute inset-1 border border-white/5 rounded-lg pointer-events-none" />
           </div>
         </div>
 
         {/* Step 2: Bounding Box Overlay */}
-        <div className="flex flex-col items-center gap-1.5">
-          <span className="text-[8px] font-mono text-white/40 uppercase tracking-wider">2. Bounding Box</span>
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">2. Bounding Box</span>
           <div 
             style={chalkboardStyle} 
-            className="w-20 h-20 border border-white/10 rounded-xl flex items-center justify-center relative overflow-hidden shadow-md"
+            className="w-36 h-36 border border-white/10 rounded-xl flex items-center justify-center relative overflow-hidden shadow-md"
           >
             {originalCanvasThumbnail && (
               <>
@@ -194,23 +194,23 @@ export const PreprocessingPreview: React.FC = () => {
         </div>
 
         {/* Step 3: Shifted Center of Mass */}
-        <div className="flex flex-col items-center gap-1.5">
-          <span className="text-[8px] font-mono text-white/40 uppercase tracking-wider">3. Centered (28x28)</span>
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider">3. Centered (28x28)</span>
           <div 
             style={chalkboardStyle} 
-            className="w-20 h-20 border border-aurora-teal/30 rounded-xl flex items-center justify-center overflow-hidden relative shadow-md"
+            className="w-36 h-36 border border-aurora-teal/30 rounded-xl flex items-center justify-center overflow-hidden relative shadow-md"
           >
             <canvas 
               ref={miniCanvasRef} 
-              width={80} 
-              height={80} 
+              width={140} 
+              height={140} 
               className="w-full h-full block"
             />
             {/* Centroid Crosshair Overlay */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="w-1.5 h-1.5 rounded-full bg-aurora-mint shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              <div className="w-8 h-px bg-aurora-mint/20 absolute" />
-              <div className="h-8 w-px bg-aurora-mint/20 absolute" />
+              <div className="w-2 h-2 rounded-full bg-aurora-mint shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              <div className="w-14 h-px bg-aurora-mint/20 absolute" />
+              <div className="h-14 w-px bg-aurora-mint/20 absolute" />
             </div>
             <div className="absolute inset-1 border border-aurora-teal/10 rounded-lg pointer-events-none" />
           </div>
@@ -218,10 +218,10 @@ export const PreprocessingPreview: React.FC = () => {
       </div>
 
       {/* Equations and details block styled like blackboard card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[9.5px] font-mono bg-[#0c141a] border border-white/5 p-3 rounded-xl text-white/70 shadow-inner">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px] font-mono bg-[#0c141a] border border-white/5 p-4 rounded-xl text-white/70 shadow-inner">
         {/* Left math */}
-        <div className="flex flex-col gap-1 border-b sm:border-b-0 sm:border-r border-white/10 pb-2 sm:pb-0 sm:pr-2">
-          <span className="text-[8px] font-semibold text-text-accent uppercase tracking-wider leading-none">
+        <div className="flex flex-col gap-1.5 border-b sm:border-b-0 sm:border-r border-white/10 pb-3 sm:pb-0 sm:pr-4">
+          <span className="text-[10px] font-semibold text-text-accent uppercase tracking-wider leading-none">
             Bounding Coordinates
           </span>
           {boundingBox ? (
@@ -234,7 +234,7 @@ export const PreprocessingPreview: React.FC = () => {
                 <span>height:</span>
                 <span className="text-white font-semibold">{boundingBox.maxY - boundingBox.minY + 1}px</span>
               </div>
-              <div className="flex justify-between text-[10px] text-white/50 border-t border-white/5 pt-1 mt-0.5">
+              <div className="flex justify-between text-[10px] text-white/50 border-t border-white/5 pt-1.5 mt-1">
                 <span>bounds:</span>
                 <span>X[{boundingBox.minX}, {boundingBox.maxX}] Y[{boundingBox.minY}, {boundingBox.maxY}]</span>
               </div>
@@ -245,8 +245,8 @@ export const PreprocessingPreview: React.FC = () => {
         </div>
 
         {/* Right math */}
-        <div className="flex flex-col gap-1.5 sm:pl-3">
-          <span className="text-[9px] font-semibold text-aurora-mint uppercase tracking-wider leading-none">
+        <div className="flex flex-col gap-1.5 sm:pl-4">
+          <span className="text-[10px] font-semibold text-aurora-mint uppercase tracking-wider leading-none">
             Center of Mass Shift
           </span>
           <div className="flex flex-col gap-1 text-white/80 mt-1">
@@ -260,7 +260,7 @@ export const PreprocessingPreview: React.FC = () => {
                 ({shift?.dx.toFixed(1)}, {shift?.dy.toFixed(1)})
               </span>
             </div>
-            <div className="flex justify-between text-[10px] text-white/50 border-t border-white/5 pt-1 mt-0.5">
+            <div className="flex justify-between text-[10px] text-white/50 border-t border-white/5 pt-1.5 mt-1">
               <span>centering target:</span>
               <span>(14.0, 14.0)</span>
             </div>
@@ -270,7 +270,7 @@ export const PreprocessingPreview: React.FC = () => {
 
       <div className="flex items-center justify-between">
         <button 
-          className="btn-secondary text-[10px] py-1 px-3 border border-white/10 hover:bg-white/5 transition-all text-white/80" 
+          className="btn-secondary text-[11px] py-1.5 px-4 border border-white/10 hover:bg-white/5 transition-all text-white/80" 
           onClick={() => setReplayKey((key) => key + 1)} 
           type="button"
         >
@@ -278,7 +278,7 @@ export const PreprocessingPreview: React.FC = () => {
         </button>
 
         {import.meta.env.DEV && tfMemoryDebug && (
-          <div className="text-[9px] font-mono text-white/40 flex gap-4">
+          <div className="text-[10px] font-mono text-white/40 flex gap-4">
             <span>Tensors: <strong className="text-white/70">{tfMemoryDebug.numTensors}</strong></span>
             <span>GPU Memory: <strong className="text-white/70">{(tfMemoryDebug.numBytes / 1024).toFixed(1)} KB</strong></span>
           </div>

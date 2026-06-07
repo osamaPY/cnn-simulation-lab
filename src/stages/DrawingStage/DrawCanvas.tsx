@@ -163,12 +163,12 @@ export const DrawCanvas: React.FC = () => {
   return (
     <div className="flex w-full flex-col items-center gap-4">
       {/* Canvas */}
-      <div className="relative aspect-square w-full max-w-[280px] rounded-2xl border border-white/10 bg-black/40 p-1.5">
+      <div className="relative aspect-square w-full max-w-[320px] rounded-2xl border border-white/10 bg-black/40 p-1.5">
         <canvas
           aria-label="Digit drawing canvas — draw a number 0 to 9"
           ref={canvasRef}
-          width={280}
-          height={280}
+          width={320}
+          height={320}
           style={{
             backgroundColor: '#0c141a',
             backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px)',
@@ -208,7 +208,7 @@ export const DrawCanvas: React.FC = () => {
       </div>
 
       {/* Tool row */}
-      <div className="flex items-center gap-2 w-full max-w-[280px]">
+      <div className="flex items-center gap-2 w-full max-w-[320px]">
         <button
           onClick={() => setMode(m => m === 'draw' ? 'erase' : 'draw')}
           type="button"
@@ -248,7 +248,7 @@ export const DrawCanvas: React.FC = () => {
         onClick={handleRun}
         disabled={!hasDrawing}
         type="button"
-        className="w-full max-w-[280px] btn-primary text-sm py-2.5 px-4 disabled:opacity-30 disabled:cursor-not-allowed"
+        className="w-full max-w-[320px] btn-primary text-sm py-2.5 px-4 disabled:opacity-30 disabled:cursor-not-allowed"
       >
         Run Simulation →
       </button>

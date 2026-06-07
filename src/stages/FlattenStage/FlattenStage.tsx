@@ -138,37 +138,37 @@ export function FlattenStage() {
         </div>
 
         {/* 3-Column Interactive Area */}
-        <div className="grid gap-6 lg:grid-cols-[260px_240px_1fr] items-start">
+        <div className="grid gap-6 lg:grid-cols-[300px_260px_1fr] items-start">
           
           {/* Column 1: 3D Stacked Spatial Grids */}
           <div className="flex flex-col items-center gap-4 justify-self-center">
             <span className="text-[9px] font-mono uppercase tracking-widest text-white/30">1. Spatial Grids (16 Channels)</span>
             
             {/* The 2.5D Stack Container */}
-            <div className="relative w-44 h-44 mt-6" style={{ perspective: '600px' }}>
+            <div className="relative w-56 h-56 mt-6" style={{ perspective: '600px' }}>
               {/* Back Channel (Grid 3) */}
               <div 
-                className="absolute inset-0 grid grid-cols-5 gap-1 p-1.5 bg-black/40 rounded-lg border border-white/5 pointer-events-none opacity-20 transition-all duration-300"
-                style={{ transform: 'translate(16px, -16px) translateZ(-40px)' }}
+                className="absolute inset-0 grid grid-cols-5 gap-1.5 p-2 bg-black/40 rounded-lg border border-white/5 pointer-events-none opacity-20 transition-all duration-300"
+                style={{ transform: 'translate(20px, -20px) translateZ(-40px)' }}
               >
                 {Array.from({ length: 25 }).map((_, idx) => (
-                  <div key={idx} className="h-6 w-6 rounded bg-aurora-teal/30" />
+                  <div key={idx} className="h-8.5 w-8.5 rounded bg-aurora-teal/30" />
                 ))}
               </div>
 
               {/* Middle Channel (Grid 2) */}
               <div 
-                className="absolute inset-0 grid grid-cols-5 gap-1 p-1.5 bg-black/40 rounded-lg border border-white/5 pointer-events-none opacity-40 transition-all duration-300"
-                style={{ transform: 'translate(8px, -8px) translateZ(-20px)' }}
+                className="absolute inset-0 grid grid-cols-5 gap-1.5 p-2 bg-black/40 rounded-lg border border-white/5 pointer-events-none opacity-40 transition-all duration-300"
+                style={{ transform: 'translate(10px, -10px) translateZ(-20px)' }}
               >
                 {Array.from({ length: 25 }).map((_, idx) => (
-                  <div key={idx} className="h-6 w-6 rounded bg-aurora-teal/40" />
+                  <div key={idx} className="h-8.5 w-8.5 rounded bg-aurora-teal/40" />
                 ))}
               </div>
 
               {/* Front Interactive Channel (Grid 1) */}
               <div 
-                className="absolute inset-0 grid grid-cols-5 gap-1 p-1.5 bg-black/50 rounded-lg border border-white/10 shadow-2xl transition-all duration-300"
+                className="absolute inset-0 grid grid-cols-5 gap-1.5 p-2 bg-black/50 rounded-lg border border-white/10 shadow-2xl transition-all duration-300"
                 style={{ transform: 'translate(0px, 0px) translateZ(0px)' }}
               >
                 {Array.from({ length: 25 }, (_, idx) => {
@@ -186,7 +186,7 @@ export function FlattenStage() {
                   return (
                     <button
                       key={idx}
-                      className={`h-6.5 w-6.5 rounded transition-all relative outline-none flex items-center justify-center ${
+                      className={`h-8.5 w-8.5 rounded transition-all relative outline-none flex items-center justify-center ${
                         isHovered
                           ? 'border-2 border-aurora-teal shadow-[0_0_12px_rgba(88,196,221,0.6)] scale-110 z-20'
                           : isCurrentSweep
@@ -220,7 +220,7 @@ export function FlattenStage() {
           </div>
 
           {/* Column 2: Pixel Depth Explorer (16 Channels Vertical Stack) */}
-          <div className="flex flex-col items-center gap-3 bg-black/20 p-4 rounded-xl border border-white/5 h-[240px] md:h-[280px]">
+          <div className="flex flex-col items-center gap-3 bg-black/20 p-4 rounded-xl border border-white/5 h-[280px] md:h-[320px]">
             <div className="text-center w-full">
               <span className="text-[9px] font-mono uppercase tracking-widest text-white/30 block">2. Pixel Channels</span>
               <span className="text-[8px] font-mono text-aurora-teal mt-0.5 block">
@@ -274,14 +274,14 @@ export function FlattenStage() {
               </span>
               
               <div 
-                className="w-full h-16 bg-black rounded-xl border border-white/10 p-1.5 shadow-inner relative cursor-pointer"
+                className="w-full h-20 bg-black rounded-xl border border-white/10 p-1.5 shadow-inner relative cursor-pointer"
                 onMouseMove={handleCanvasMouseMove}
                 onMouseLeave={handleCanvasMouseLeave}
               >
                 <canvas 
                   ref={vectorCanvasRef} 
-                  width={640} 
-                  height={48} 
+                  width={800} 
+                  height={64} 
                   className="h-full w-full rounded-lg" 
                 />
               </div>
