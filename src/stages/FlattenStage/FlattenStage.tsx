@@ -18,13 +18,19 @@ export function FlattenStage() {
   const progress = shouldReduceMotion ? 1 : stepIndex / 99
 
   const source = useMemo(
-    () =>
-      activations.find((record) => record.layerType === 'MaxPooling2D' && record.shape.join(',') === '1,5,5,16') ??
-      activations.find((record) => record.layerType === 'Flatten' && record.shape.join(',') === '1,400'),
+    () => {
+      // Find the last MaxPooling2D or Flatten record regardless of hardcoded shape strings
+      // Reverse find to get the one closest to the output if there are multiple (unlikely but safer)
+      return [...activations].reverse().find(
+        (record) => record.layerType === 'MaxPooling2D' || record.layerType === 'Flatten'
+      );
+    },
     [activations],
   )
 
   const values = useMemo(() => source?.values ?? new Float32Array(400), [source])
+  const vectorLength = values.length || 400;
+
   const maxValue = useMemo(() => {
     let max = -Infinity;
     for (let i = 0; i < values.length; i++) {
@@ -33,7 +39,7 @@ export function FlattenStage() {
     return Math.max(max, 1e-6);
   }, [values])
 
-  // Active cell in the 5x5 grid (25 cells total, each represents 16 flattened channels)
+  // Active cell in the spatial grid
   const activeGridIndex = useMemo(() => {
     return Math.min(24, Math.floor(progress * 25));
   }, [progress]);
@@ -50,11 +56,11 @@ export function FlattenStage() {
     if (!canvas || !context) return
 
     context.clearRect(0, 0, canvas.width, canvas.height)
-    const visibleCount = Math.round(values.length * progress)
-    const cellWidth = canvas.width / values.length
+    const visibleCount = Math.round(vectorLength * progress)
+    const cellWidth = canvas.width / vectorLength
 
     // Draw flattened values
-    for (let index = 0; index < values.length; index++) {
+    for (let index = 0; index < vectorLength; index++) {
       // Elements are only colored up to the scanning sweep index
       const isScanned = index < visibleCount
       const rawVal = values[index] ?? 0
@@ -62,7 +68,7 @@ export function FlattenStage() {
 
       // Check if this cell is highlighted by hovering
       const isHovered = hoveredIndex === index
-      const belongsToHoveredCell = hoveredGridCell !== null && Math.floor(index / 16) === hoveredGridCell
+      const belongsToHoveredCell = hoveredGridCell !== null && Math.floor(index / (vectorLength / 25)) === hoveredGridCell
 
       if (isHovered) {
         context.fillStyle = '#f5cd47' // Gold highlight for exact element
@@ -78,7 +84,7 @@ export function FlattenStage() {
     }
 
     // Draw scanning laser sweep line
-    if (visibleCount > 0 && visibleCount < values.length) {
+    if (visibleCount > 0 && visibleCount < vectorLength) {
       const x = visibleCount * cellWidth;
       context.shadowColor = '#10b981'; // Mint glow
       context.shadowBlur = 8;
@@ -99,9 +105,9 @@ export function FlattenStage() {
     const rect = canvas.getBoundingClientRect()
     const x = e.clientX - rect.left
     const pct = x / rect.width
-    const idx = Math.min(399, Math.max(0, Math.floor(pct * 400)))
+    const idx = Math.min(vectorLength - 1, Math.max(0, Math.floor(pct * vectorLength)))
     setHoveredIndex(idx)
-    setHoveredGridCell(Math.floor(idx / 16))
+    setHoveredGridCell(Math.floor(idx / (vectorLength / 25)))
   }
 
   const handleCanvasMouseLeave = () => {
@@ -112,13 +118,14 @@ export function FlattenStage() {
   // Parse hovered element coordinates
   const hoveredOrigin = useMemo(() => {
     if (hoveredIndex === null) return null
+    const channelsPerPixel = vectorLength / 25;
     return {
-      row: Math.floor(hoveredIndex / 80),
-      col: Math.floor((hoveredIndex % 80) / 16),
-      channel: hoveredIndex % 16,
+      row: Math.floor(hoveredIndex / (channelsPerPixel * 5)),
+      col: Math.floor((hoveredIndex % (channelsPerPixel * 5)) / channelsPerPixel),
+      channel: hoveredIndex % channelsPerPixel,
       value: values[hoveredIndex] ?? 0,
     }
-  }, [hoveredIndex, values])
+  }, [hoveredIndex, values, vectorLength])
 
   return (
     <div className="flex w-full flex-col items-center gap-6 px-4 py-2 select-none">
