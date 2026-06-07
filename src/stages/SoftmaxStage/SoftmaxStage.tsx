@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { useLabStore } from '../../hooks/useLabStore'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { sceneTransition } from '../../animations/motion'
-import { AnimatedFormula } from '../../components/AnimatedFormula'
 import { useScrubTimeline } from '../../animations/useScrubTimeline'
 import { remap } from '../../animations/mathUtils'
 
@@ -17,7 +16,6 @@ export const SoftmaxStage: React.FC = () => {
     [prediction],
   )
 
-  const formulaProgress = remap(progress, 0.0, 0.45, 0, 1)
   const barsProgress = remap(progress, 0.38, 1.0, 0, 1)
 
   if (!prediction) {
@@ -35,16 +33,6 @@ export const SoftmaxStage: React.FC = () => {
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-3 px-1 softmax-stage-wrapper">
-      {/* Formula draws on first */}
-      <div className="flex flex-col gap-1 px-1">
-        <AnimatedFormula
-          formula="σ(zᵢ) = exp(zᵢ) / Σ exp(zⱼ)"
-          progress={formulaProgress}
-          color="#a78bfa"
-          fontSize="0.95rem"
-        />
-      </div>
-
       <div className="flex flex-col overflow-hidden rounded border border-border-muted bg-bg-panel">
         <div className="grid grid-cols-12 gap-2 border-b border-border-muted p-1.5 sm:p-2 text-[9px] font-mono font-semibold uppercase tracking-wider text-text-secondary">
           <div className="col-span-2 text-center">Digit</div>

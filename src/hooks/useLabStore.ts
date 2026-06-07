@@ -28,6 +28,7 @@ interface LabState {
   selectedChannel: number;
   tfMemoryDebug: { numTensors: number; numBytes: number } | null;
   hoveredDigit: number | null;
+  learningMode: 'beginner' | 'mathematical' | 'examprep';
 
   // Hyperparameters
   hyperparams: {
@@ -48,6 +49,7 @@ interface LabState {
     data: Float32Array | null,
     debug: LabState['preprocessingDebug']
   ) => void;
+  setLearningMode: (mode: 'beginner' | 'mathematical' | 'examprep') => void;
   
   // Activation Actions
   setSelectedActivationLayer: (layerName: string | null) => void;
@@ -83,6 +85,7 @@ export const useLabStore = create<LabState>((set, get) => ({
   selectedChannel: 0,
   tfMemoryDebug: null,
   hoveredDigit: null,
+  learningMode: 'mathematical',
 
   hyperparams: {
     kernelSize: 3,
@@ -97,6 +100,8 @@ export const useLabStore = create<LabState>((set, get) => ({
       hyperparams: { ...state.hyperparams, ...params }
     }));
   },
+
+  setLearningMode: (mode) => set({ learningMode: mode }),
 
   // Actions
   getActiveStageInfo: () => {

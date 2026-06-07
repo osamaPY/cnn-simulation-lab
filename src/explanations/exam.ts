@@ -3,80 +3,74 @@ import type { ExplanationContent } from './index';
 export const examExplanations: Record<number, ExplanationContent> = {
   1: {
     headline: "Spatial Normalization",
-    body: "Translation and scaling ensure input scale-invariance and translation-invariance.",
-    interactiveGoal: "Learn: Centering centroid at (14, 14) prevents spatial shift errors.",
-    keyTakeaway: "Ensures uniform input presentation."
+    body: "Centering the digit's center of mass at coordinate (14, 14) and scaling its bounding box to fit within a canonical 20x20 area inside the 28x28 grid ensures scale-invariance and translation-invariance during network evaluation.",
+    interactiveGoal: "Learn: Centering centroid at (14, 14) prevents spatial shift errors during inference.",
+    keyTakeaway: "Standardizes input coordinates to remove translation and scaling offsets."
   },
   2: {
-    headline: "Min-Max Grayscale Scaling",
-    body: "Grayscale pixels are normalized to [0, 1] by dividing by 255.0 to prevent gradient instability.",
-    interactiveGoal: "Understand: Standard scaling speeds up model convergence.",
-    keyTakeaway: "Maintains numerical stability."
+    headline: "CNN Architecture Overview",
+    body: "Classic VGG-style modular pipeline. Stacking convolutional layers sequentially allows early layers to learn simple Gabor-like filters (edges) while deeper layers combine them into high-level semantic representations.",
+    interactiveGoal: "Analyze layer sequence: Conv -> Activation -> Pooling -> Dense -> Softmax.",
+    keyTakeaway: "Hierarchical stacking enables feature representation learning at increasing abstractions."
   },
   3: {
-    headline: "Tensor Shapes & Rank",
-    body: "Batch image input tensor is 4D of shape [Batch, Height, Width, Channels]. Single input: [1, 28, 28, 1].",
-    interactiveGoal: "Learn: Grayscale has channel 1; RGB has channel 3.",
-    keyTakeaway: "Shape determines parameter compatibility."
+    headline: "Tensor Shapes & Scaling",
+    body: "Continuous input is discretized into a 28x28 grayscale matrix. Intensities are scaled to [0, 1] by dividing by 255.0. Single image input is represented as a 4D tensor of shape [1, 28, 28, 1].",
+    interactiveGoal: "Understand: [Batch, Height, Width, Channels] representation. Normalization prevents gradient instabilities.",
+    keyTakeaway: "Quantizes images into structured tensors normalized for numerical stability."
   },
   4: {
-    headline: "Convolution dimensions",
-    body: "Output dimension formula: (W - K + 2P)/S + 1. For 28x28 input and 3x3 kernel: (28 - 3)/1 + 1 = 26.",
-    interactiveGoal: "Practice: Compute output for kernel=5, stride=1, padding=2 (Ans: 28).",
-    keyTakeaway: "Governed by input size, kernel, padding, and stride."
+    headline: "Convolution Dimensions & Hadamard",
+    body: "Computes output shape: (W - K + 2P)/S + 1. For a 28x28 input with 3x3 kernel, stride 1, padding 0: (28 - 3 + 0)/1 + 1 = 26. Elementwise Hadamard product is summed with a bias term.",
+    interactiveGoal: "Formula: Output = sum(Patch * Kernel) + bias. Parameters: (Kh * Kw * Cin + 1) * Cout.",
+    keyTakeaway: "Governed by input size, kernel dimensions, padding, stride, and weight sharing."
   },
   5: {
-    headline: "Hadamard Dot Product",
-    body: "The elementwise multiplication of matrices of identical size before sum accumulation.",
-    interactiveGoal: "Distinguish elementwise Hadamard from matrix multiplication.",
-    keyTakeaway: "Calculates local alignment scores."
+    headline: "Feature Depth & Channel Stacking",
+    body: "Applying Cout independent filters in parallel produces an output tensor with depth channel dimension Cout. With 8 filters, output shape becomes 26x26x8. Each channel represents a distinct feature projection.",
+    interactiveGoal: "Learn: Output depth is determined solely by the number of parallel filters in the layer.",
+    keyTakeaway: "Depth channels allow concurrent extraction of diverse feature types."
   },
   6: {
-    headline: "Parameter Calculations",
-    body: "Params = (Kh * Kw * Cin + 1) * Cout. For 3x3 kernel, 1 input channel, 8 output filters: (3*3*1 + 1)*8 = 80.",
-    interactiveGoal: "Practice: Calculate params for 5x5 kernel with Cin=8, Cout=16.",
-    keyTakeaway: "Weights are shared across spatial locations."
+    headline: "ReLU Activation & Non-linearity",
+    body: "Computes f(x) = max(0, x). Introduces non-linearity, enabling the network to approximate non-linear decision boundaries. Resolves vanishing gradients but risks 'dying ReLU' if neurons get stuck with negative inputs.",
+    interactiveGoal: "Understand: ReLU derivative is 1 for x > 0, and 0 for x < 0. No exponentiation needed.",
+    keyTakeaway: "Introduces non-linear mapping without high computational overhead."
   },
   7: {
-    headline: "Feature Maps & Channels",
-    body: "Output depth equals the number of filters in the layer. 8 filters yield 8 channels.",
-    interactiveGoal: "Learn: Output depth is independent of input channel count.",
-    keyTakeaway: "Filters determine depth channels."
+    headline: "Max Pooling Dimensions",
+    body: "Slides a 2x2 window with stride 2, extracting the maximum value. Halves spatial dimensions (26x26 -> 13x13) while preserving depth channels (13x13x8). Reduces spatial dimensions to lower parameter count.",
+    interactiveGoal: "Learn: Pooling provides local translation tolerance and reduces overfitting.",
+    keyTakeaway: "Downsamples feature maps to achieve translation-tolerant representations."
   },
   8: {
-    headline: "ReLU & Firing",
-    body: "ReLU computes f(x) = max(0, x). It solves vanishing gradients but can cause dying ReLU.",
-    interactiveGoal: "Practice: Graph ReLU and write its derivative.",
-    keyTakeaway: "Introduces non-linearity to models."
+    headline: "Vector Flattening & Dimensions",
+    body: "Reshapes a 3D feature volume of shape [H, W, C] into a 1D vector of length D = H * W * C. For MaxPooling output [5, 5, 16], this results in a 400-element vector. Memory layout is typically row-major NHWC.",
+    interactiveGoal: "Verify: Flattening alters tensor rank from 3D to 1D without modifying underlying values in memory.",
+    keyTakeaway: "Converts spatial feature representations into flat arrays compatible with dense layers."
   },
   9: {
-    headline: "Max Pooling dims",
-    body: "Max pooling uses 2x2 window with stride 2. Output size is W / 2, reducing dimensions to 13x13.",
-    interactiveGoal: "Learn: Halves spatial width/height but preserves channel depth.",
-    keyTakeaway: "Downsamples features and provides translation tolerance."
+    headline: "Fully Connected Parameters",
+    body: "Computes linear combination a = Wx + b. Parameters calculated as (Inputs * Outputs) + Outputs. From 400 inputs to 64 hidden neurons: (400 * 64) + 64 = 25,664. Learns global representations.",
+    interactiveGoal: "Practice: Calculate weight matrix dimensions and bias vectors for fully connected projections.",
+    keyTakeaway: "Dense layers perform global linear mapping across all combined features."
   },
   10: {
-    headline: "Flatten Calculations",
-    body: "Unrolls 3D tensor to 1D vector. Total elements must match: H * W * C. For 5x5x16: 400 elements.",
-    interactiveGoal: "Verify: Reshapes representation without altering memory contents.",
-    keyTakeaway: "Prepares data layout for dense layers."
+    headline: "Softmax Definition & Probability Simplex",
+    body: "Takes raw logits z_i and computes probabilities: exp(z_i) / sum(exp(z_j)). Ensures outputs lie on the probability simplex (all values in [0, 1] and sum to 1.0). Exponentiation accentuates highest scores.",
+    interactiveGoal: "Formula: p_i = e^{z_i} / sum(e^{z_j}). Softmax is the multi-class generalization of logistic sigmoid.",
+    keyTakeaway: "Maps unbounded real logit vectors into a normalized probability distribution."
   },
   11: {
-    headline: "Dense layer weights",
-    body: "Params = (Inputs * Outputs) + Outputs. From 400 inputs to 64 outputs: (400 * 64) + 64 = 25,664.",
-    interactiveGoal: "Practice: Calculate params from 64 inputs to 10 outputs (Ans: 650).",
-    keyTakeaway: "Performs global linear mapping."
+    headline: "Argmax & Out of Distribution",
+    body: "Applies argmax to probabilities to yield index of predicted class. Note that Softmax models are closed-world classifiers and will confidently output a class 0-9 even for out-of-distribution inputs.",
+    interactiveGoal: "Understand: Argmax is non-differentiable; Softmax is its smooth, differentiable approximation.",
+    keyTakeaway: "Final prediction is the index of maximum probability over the class vector."
   },
   12: {
-    headline: "Softmax Definition",
-    body: "Normalizes raw logits into a probability distribution summing to 1.0.",
-    interactiveGoal: "Understand why Softmax is preferred over linear division.",
-    keyTakeaway: "Maps logits to a probability simplex."
-  },
-  13: {
-    headline: "Argmax & Out of Distribution",
-    body: "Selects the maximum index: argmax(probabilities). Model confidently maps out-of-distribution inputs to 0-9.",
-    interactiveGoal: "Understand why out-of-distribution inputs still map to 0-9.",
-    keyTakeaway: "Argmax returns the relative maximum score index."
+    headline: "Error Gradients & Weight Updates",
+    body: "Calculates the derivative of loss L (e.g. cross-entropy) with respect to weights W using the chain rule: ∂L/∂W = ∂L/∂a * ∂a/∂W. Gradient descent updates weights: W = W - η * ∂L/∂W.",
+    interactiveGoal: "Learn: Chain rule calculates credit assignment backward from prediction error to early filters.",
+    keyTakeaway: "Backpropagation computes error gradients to optimize weights and minimize classification loss."
   }
 };

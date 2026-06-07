@@ -21,24 +21,24 @@ export const Header: React.FC = () => {
   return (
     <header
       className="relative w-full border-b border-white/5 bg-[#161616] z-10"
-      style={{ padding: '10px 16px', flexShrink: 0 }}
+      style={{ padding: '5px 12px', flexShrink: 0 }}
     >
       <div className="flex w-full items-center justify-between gap-4" style={{ minWidth: 0 }}>
         {/* Brand */}
         <div className="flex items-center gap-4" style={{ flexShrink: 0 }}>
           <div 
-            className="w-2.5 h-2.5 rounded-full animate-pulse transition-all duration-500" 
+            className="w-2 h-2 rounded-full animate-pulse transition-all duration-500" 
             style={{ 
               backgroundColor: activeColor,
               boxShadow: `0 0 10px ${activeColor}bb`
             }} 
           />
           <div className="flex flex-col">
-            <h1 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/90 leading-none font-sans">CNN Visual Lab</h1>
+            <h1 className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/90 leading-none font-sans">CNN Visual Lab</h1>
             <AnimatePresence mode="wait">
               <motion.span
                 key={currentStageId}
-                className="text-[10px] font-serif leading-none mt-1.5 italic"
+                className="text-[9px] font-serif leading-none mt-1 italic"
                 style={{ color: '#B4B4B4' }}
                 initial={{ opacity: 0, x: -5 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -91,24 +91,24 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Model status */}
-        <div className="flex items-center gap-5" style={{ flexShrink: 0 }}>
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded border border-white/5 bg-white/2">
+        <div className="flex items-center gap-3" style={{ flexShrink: 0 }}>
+          <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded border border-white/5 bg-white/2">
             {modelStatus === 'loading' && (
               <>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#58C4DD] animate-pulse" />
-                <span className="text-[9px] font-mono text-white/40 uppercase tracking-widest">Inference Engine</span>
+                <div className="w-1 h-1 rounded-full bg-[#58C4DD] animate-pulse" />
+                <span className="text-[8px] font-mono text-white/40 uppercase tracking-widest">Inference Engine</span>
               </>
             )}
             {modelStatus === 'success' && (
               <>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#83C167]" />
-                <span className="text-[9px] font-mono text-white/60 uppercase tracking-widest">Model Loaded</span>
+                <div className="w-1 h-1 rounded-full bg-[#83C167]" />
+                <span className="text-[8px] font-mono text-white/55 uppercase tracking-widest">Model Loaded</span>
               </>
             )}
             {modelStatus === 'error' && (
               <>
-                <div className="w-1.5 h-1.5 rounded-full bg-[#FF6666]" />
-                <span className="text-[9px] font-mono text-red-400 uppercase tracking-widest">Engine Error</span>
+                <div className="w-1 h-1 rounded-full bg-[#FF6666]" />
+                <span className="text-[8px] font-mono text-red-400 uppercase tracking-widest">Engine Error</span>
               </>
             )}
           </div>

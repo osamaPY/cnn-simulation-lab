@@ -1,12 +1,83 @@
-import React, { memo, useState, useEffect, useRef } from 'react';
+import React, { memo, useState, useEffect, useRef, useMemo } from 'react';
 import { useLabStore } from '../hooks/useLabStore';
 import { renderFeatureMap } from '../canvas/FeatureMapRenderer';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
-import { quickTransition } from '../animations/motion';
-import type { ActivationRecord } from '../ml/activationModel';
 
-// Mini Component to render a single channel canvas
+// Individual Canvas Plane in the 3D stack
+const ChannelPlane = memo(function ChannelPlane({
+  values,
+  width,
+  height,
+  channelIndex,
+  numChannels,
+  globalMin,
+  globalMax,
+  zOffset,
+  isFocused,
+  isHovered,
+  onHover,
+  onLeave,
+  onClick
+}: {
+  values: Float32Array;
+  width: number;
+  height: number;
+  channelIndex: number;
+  numChannels: number;
+  globalMin: number;
+  globalMax: number;
+  zOffset: number;
+  isFocused: boolean;
+  isHovered: boolean;
+  onHover: () => void;
+  onLeave: () => void;
+  onClick: () => void;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    renderFeatureMap({
+      canvas,
+      values,
+      width,
+      height,
+      channelIndex,
+      numChannels,
+      globalMin,
+      globalMax
+    });
+  }, [values, width, height, channelIndex, numChannels, globalMin, globalMax]);
+
+  return (
+    <div
+      className={`absolute inset-0 transition-all duration-300 rounded-lg overflow-hidden border cursor-pointer ${
+        isHovered
+          ? 'border-[#f5cd47] shadow-[0_0_20px_rgba(245,205,71,0.5)] scale-105 z-50'
+          : isFocused
+            ? 'border-aurora-teal shadow-[0_0_15px_rgba(88,196,221,0.4)] z-40'
+            : 'border-white/10 opacity-75 hover:opacity-100 z-10'
+      }`}
+      style={{
+        transform: `translateZ(${zOffset + (isHovered ? 20 : 0)}px)`,
+      }}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+      onClick={onClick}
+    >
+      <canvas ref={canvasRef} width={96} height={96} className="w-full h-full bg-black block" />
+      
+      {/* Small indicator label */}
+      <div className="absolute bottom-1 right-2 text-[7px] font-mono text-white/40 uppercase bg-black/60 px-1 rounded">
+        Ch {channelIndex}
+      </div>
+    </div>
+  );
+});
+
+// Flat Thumbnail Component for the Grid view
 const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
   values,
   width,
@@ -16,7 +87,10 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
   globalMin,
   globalMax,
   isFocused,
-  onFocus
+  isHovered,
+  onHover,
+  onLeave,
+  onClick
 }: {
   values: Float32Array;
   width: number;
@@ -26,7 +100,10 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
   globalMin: number;
   globalMax: number;
   isFocused: boolean;
-  onFocus: () => void;
+  isHovered: boolean;
+  onHover: () => void;
+  onLeave: () => void;
+  onClick: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -48,88 +125,29 @@ const FeatureMapThumbnail = memo(function FeatureMapThumbnail({
 
   return (
     <div 
-      onClick={onFocus}
-      className={`relative flex min-w-0 flex-col items-center p-2 rounded-lg bg-bg-deep/40 border transition-all duration-300 cursor-pointer group ${
-        isFocused 
-          ? 'border-text-accent bg-text-accent/5'
-          : 'border-border-subtle hover:border-border-muted bg-transparent'
+      onClick={onClick}
+      onMouseEnter={onHover}
+      onMouseLeave={onLeave}
+      className={`relative flex min-w-0 flex-col items-center p-2 rounded-lg border transition-all duration-200 cursor-pointer group ${
+        isHovered
+          ? 'border-[#f5cd47] bg-[#f5cd47]/5 scale-105'
+          : isFocused 
+            ? 'border-aurora-teal bg-aurora-teal/5'
+            : 'border-white/5 hover:border-white/15 bg-transparent'
       }`}
     >
       <canvas
         ref={canvasRef}
-        width={80}
-        height={80}
-        className="block h-auto w-full max-w-20 rounded bg-black border border-black/40 group-hover:scale-110 transition-transform duration-500"
+        width={72}
+        height={72}
+        className="block h-auto w-full max-w-16 rounded bg-black border border-black/40"
       />
-      <div className="absolute inset-0 bg-aurora-purple/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg pointer-events-none" />
-      <span className="text-[9px] font-mono mt-1 text-text-secondary group-hover:text-aurora-purple transition-colors">
+      <span className={`text-[8px] font-mono mt-1 ${isHovered ? 'text-[#f5cd47]' : isFocused ? 'text-aurora-teal' : 'text-white/40'}`}>
         Filter #{channelIndex}
       </span>
     </div>
   );
 });
-
-const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord[], selectedLayer: string }) => {
-  const currentRecord = records.find(r => r.layerName === selectedLayer) || records[0];
-  const hyperparams = useLabStore(state => state.hyperparams);
-  const shape = currentRecord.shape;
-  const numChannels = shape.length === 4 ? shape[3] : 0;
-  const dim = shape.length === 4 ? shape[1] : 0;
-
-  // Determine target filters based on layer block
-  const isBlock2 = selectedLayer.includes('2') || selectedLayer.includes('Block 2') || selectedLayer.toLowerCase().includes('maxpool2d_1') || selectedLayer.toLowerCase().includes('conv2d_1');
-  const targetNumFilters = isBlock2 ? hyperparams.numFilters * 2 : hyperparams.numFilters;
-  
-  return (
-    <div className="relative h-[280px] sm:h-[340px] md:h-[400px] w-full flex items-center justify-center perspective-1200 feature-map-stack-container">
-      <div className="relative preserve-3d stack-3d-rotate scale-[0.8] sm:scale-90 md:scale-100 w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48">
-        {Array.from({ length: Math.min(targetNumFilters, 12) }).map((_, i) => {
-          // Sample a small grid from the actual feature map
-          const channelData = new Float32Array(dim * dim);
-          const actChannelIdx = i % numChannels;
-          for(let j=0; j<dim*dim; j++) channelData[j] = currentRecord.values[j * numChannels + actChannelIdx];
-          
-          return (
-            <motion.div
-              key={i}
-              initial={{ z: -i * 12, opacity: 0 }}
-              animate={{ z: i * 12, opacity: 1 - i * 0.07 }}
-              transition={{ delay: i * 0.08, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute inset-0 border bg-[#0e141a]/95 backdrop-blur-sm rounded-lg overflow-hidden shadow-[0_0_30px_rgba(88,196,221,0.15)]"
-              style={{ 
-                borderColor: i === 0 ? 'rgba(245, 205, 71, 0.7)' : 'rgba(88, 196, 221, 0.35)'
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-tr from-aurora-purple/5 to-transparent pointer-events-none" />
-              <div className="w-full h-full p-2 flex items-center justify-center">
-                 <div className="w-full h-full grid grid-cols-10 grid-rows-10 gap-[1px] opacity-80">
-                    {Array.from({ length: 100 }).map((_, j) => {
-                      const r = Math.floor(j / 10);
-                      const c = j % 10;
-                      const val = channelData[Math.floor(r * (dim/10)) * dim + Math.floor(c * (dim/10))] || 0;
-                      const norm = (val - currentRecord.min) / (currentRecord.max - currentRecord.min || 1);
-                      return (
-                        <div 
-                          key={j} 
-                          className="rounded-[0.5px]" 
-                          style={{ 
-                            backgroundColor: i === 0 ? `rgba(245, 205, 71, ${0.1 + norm * 0.9})` : `rgba(88, 196, 221, ${0.05 + norm * 0.95})` 
-                          }} 
-                        />
-                      );
-                    })}
-                 </div>
-              </div>
-              <div className="absolute bottom-1 right-2 text-[8px] font-mono text-white/30 uppercase tracking-tighter">
-                Channel {i}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
 export const FeatureMapGrid: React.FC = () => {
   const activations = useLabStore(state => state.activations);
@@ -137,15 +155,39 @@ export const FeatureMapGrid: React.FC = () => {
   const setSelectedActivationLayer = useLabStore(state => state.setSelectedActivationLayer);
   const selectedChannel = useLabStore(state => state.selectedChannel);
   const setSelectedChannel = useLabStore(state => state.setSelectedChannel);
+  
   const [viewMode, setViewMode] = useState<'grid' | 'stack'>('stack');
+  const [hoveredChannel, setHoveredChannel] = useState<number | null>(null);
 
-  const [page, setPage] = useState(0);
+  // Spacing & angle controls for the 3D view
+  const [spacing, setSpacing] = useState(18); // 8px to 30px
+  const [angleX, setAngleX] = useState(62);    // 30deg to 80deg
+  const [angleZ, setAngleZ] = useState(-42);   // -180deg to 180deg
+  const [autoRotate, setAutoRotate] = useState(true);
+
   const shouldReduceMotion = useReducedMotion();
 
-  // If no activations, return empty prompt
-  if (activations.length === 0) {
+  // Filter activations to only show Conv2D layers
+  const convActivations = useMemo(() => {
+    return activations.filter((r) => r.layerType === 'Conv2D' || r.layerType === 'MaxPooling2D');
+  }, [activations]);
+
+  // Handle auto-rotation along Z-axis
+  useEffect(() => {
+    if (!autoRotate || viewMode !== 'stack' || shouldReduceMotion) return;
+    let frameId: number;
+    const tick = () => {
+      setAngleZ((prev) => (prev + 0.15) % 360);
+      frameId = requestAnimationFrame(tick);
+    };
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [autoRotate, viewMode, shouldReduceMotion]);
+
+  // If no activations, return empty state
+  if (convActivations.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 text-center text-text-muted border border-dashed border-border-muted rounded-xl min-h-[320px] bg-bg-card/20">
+      <div className="flex flex-col items-center justify-center p-8 text-center text-text-muted border border-dashed border-border-muted rounded-xl min-h-[320px] bg-bg-card/20 w-full max-w-xl mx-auto">
         <h4 className="text-sm font-display font-semibold uppercase tracking-wider text-text-secondary">
           No Feature Map Data
         </h4>
@@ -156,177 +198,208 @@ export const FeatureMapGrid: React.FC = () => {
     );
   }
 
-  const hyperparams = useLabStore(state => state.hyperparams);
+  // Set default selected layer if none is selected or layer is not in filtered list
+  const activeLayerName = convActivations.some(r => r.layerName === selectedActivationLayer)
+    ? selectedActivationLayer
+    : convActivations[0].layerName;
 
-  // Get active record
-  const currentRecord = activations.find(r => r.layerName === selectedActivationLayer) || activations[0];
-  
-  // Extract dimensions
-  // Tensor shape: [batch, height, width, channels] for 4D, or [batch, features] for 2D
+  useEffect(() => {
+    if (activeLayerName !== selectedActivationLayer) {
+      setSelectedActivationLayer(activeLayerName);
+    }
+  }, [activeLayerName, selectedActivationLayer, setSelectedActivationLayer]);
+
+  const currentRecord = convActivations.find(r => r.layerName === activeLayerName) || convActivations[0];
   const shape = currentRecord.shape;
-  const is2D = shape.length === 2;
-  const height = is2D ? 1 : shape[1];
-  const width = is2D ? 1 : shape[2];
-  const numChannels = is2D ? shape[1] : shape[3];
+  const height = shape[1];
+  const width = shape[2];
+  const numChannels = shape[3];
 
-  // Determine target filters based on layer block
-  const isBlock2 = selectedActivationLayer?.includes('2') || selectedActivationLayer?.includes('Block 2') || selectedActivationLayer?.toLowerCase().includes('maxpool2d_1') || selectedActivationLayer?.toLowerCase().includes('conv2d_1');
-  const targetNumFilters = is2D ? numChannels : (isBlock2 ? hyperparams.numFilters * 2 : hyperparams.numFilters);
-
-  // Grid pagination settings (show 8 maps at a time)
-  const channelsPerPage = 8;
-  const totalPages = Math.ceil(targetNumFilters / channelsPerPage);
-  const safePage = Math.min(page, Math.max(0, totalPages - 1));
-  const startIdx = safePage * channelsPerPage;
-  const endIdx = Math.min(startIdx + channelsPerPage, targetNumFilters);
-
-  // Make list of channels currently on screen
-  const visibleChannelIndices = Array.from(
-    { length: endIdx - startIdx }, 
-    (_, i) => startIdx + i
-  );
+  const targetNumFilters = numChannels;
 
   return (
-    <div className="w-full flex flex-col gap-6 feature-map-grid-wrapper">
-      {/* Selector Tabs for Layers */}
-      <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-border-subtle pb-3">
-        <div className="flex flex-wrap gap-1.5">
-          {activations.map((rec) => (
+    <div className="w-full flex flex-col gap-4 max-w-5xl px-4 py-2 feature-map-grid-wrapper select-none">
+      {/* Top selector row */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 pb-2">
+        <div className="flex flex-wrap gap-1 bg-black/20 p-0.5 rounded-lg border border-white/5">
+          {convActivations.map((rec) => (
             <button
               key={rec.layerName}
               onClick={() => {
-                setPage(0);
                 setSelectedActivationLayer(rec.layerName);
+                setSelectedChannel(0);
               }}
-              className={`px-2.5 py-1.5 rounded-md text-[10px] font-mono transition-all duration-200 cursor-pointer ${
-                selectedActivationLayer === rec.layerName
-                  ? 'bg-aurora-purple/20 text-text-accent border border-aurora-purple/40 shadow-inner'
-                  : 'text-text-secondary hover:text-text-primary hover:bg-white/5 border border-transparent'
+              className={`px-3 py-1.5 rounded-md text-[9px] font-mono font-bold uppercase transition-all duration-200 cursor-pointer ${
+                activeLayerName === rec.layerName
+                  ? 'bg-[#1c1c1c] text-aurora-teal border border-white/5 shadow-md'
+                  : 'text-white/40 hover:text-white/70'
               }`}
             >
-              {rec.layerName}
+              {rec.layerName} ({shape[1]}x{shape[2]})
             </button>
           ))}
         </div>
 
-        <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
-           <button 
-             onClick={() => setViewMode('stack')}
-             className={`px-3 py-1 text-[10px] font-mono rounded-md transition-all ${viewMode === 'stack' ? 'bg-aurora-purple text-black font-bold' : 'text-white/40 hover:text-white'}`}
-           >
-             3D Stack
-           </button>
-           <button 
-             onClick={() => setViewMode('grid')}
-             className={`px-3 py-1 text-[10px] font-mono rounded-md transition-all ${viewMode === 'grid' ? 'bg-aurora-purple text-black font-bold' : 'text-white/40 hover:text-white'}`}
-           >
-             Grid
-           </button>
+        {/* View Mode Toggle */}
+        <div className="flex bg-black/20 p-0.5 rounded-lg border border-white/5">
+          <button 
+            onClick={() => setViewMode('stack')}
+            className={`px-3 py-1 text-[9px] font-mono font-bold uppercase rounded-md transition-all ${
+              viewMode === 'stack' ? 'bg-white/10 text-aurora-teal' : 'text-white/40 hover:text-white'
+            }`}
+          >
+            3D Stack
+          </button>
+          <button 
+            onClick={() => setViewMode('grid')}
+            className={`px-3 py-1 text-[9px] font-mono font-bold uppercase rounded-md transition-all ${
+              viewMode === 'grid' ? 'bg-white/10 text-aurora-teal' : 'text-white/40 hover:text-white'
+            }`}
+          >
+            2D Grid
+          </button>
         </div>
       </div>
 
-      {/* Layer metadata bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-text-secondary px-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-mono py-0.5 px-1.5 rounded bg-bg-deep border border-border-muted text-[10px]">
-            {currentRecord.layerType}
-          </span>
-          <span className="font-mono py-0.5 px-1.5 rounded bg-bg-deep border border-border-muted text-[10px]">
-            [{shape.join(', ')}]
-          </span>
-        </div>
-      </div>
+      {/* Main interactive area */}
+      {viewMode === 'stack' ? (
+        <div className="grid gap-6 lg:grid-cols-[1fr_210px] items-center w-full">
+          
+          {/* Left Panel: 3D Stack Viewport */}
+          <div className="flex flex-col items-center justify-center p-6 bg-black/30 border border-white/5 rounded-2xl relative overflow-hidden h-[300px] sm:h-[360px] md:h-[400px]">
+            
+            {/* 3D Perspective Stack Container */}
+            <div className="relative w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48" style={{ perspective: '800px' }}>
+              <div 
+                className="absolute inset-0 transition-transform duration-100"
+                style={{ 
+                  transformStyle: 'preserve-3d',
+                  transform: `rotateX(${angleX}deg) rotateZ(${angleZ}deg)` 
+                }}
+              >
+                {Array.from({ length: targetNumFilters }).map((_, i) => {
+                  const zOffset = (i - targetNumFilters / 2) * spacing;
+                  const isHovered = hoveredChannel === i;
+                  const isFocused = selectedChannel === i;
 
-      {is2D ? (
-        // For 1D / Flattened Layers, show a vector list instead of grid
-        <div className="p-4 bg-bg-deep/40 border border-border-subtle rounded-lg flex flex-col gap-3">
-          <span className="text-[10px] font-mono text-text-secondary uppercase">
-            1D Feature Vector representation (showing active segments)
-          </span>
-          <div className="flex flex-wrap gap-1 max-h-[160px] overflow-y-auto p-1 border border-border-subtle/50 rounded bg-black/50 scrollbar-thin">
-            {Array.from(currentRecord.values).slice(0, 100).map((val, idx) => {
-              const maxVal = currentRecord.max || 1;
-              const intensity = (val - currentRecord.min) / (maxVal - currentRecord.min);
-              return (
-                <div
-                  key={idx}
-                  className="w-5 h-5 flex items-center justify-center rounded-[2px] text-[7px] font-mono select-none"
-                  style={{
-                    backgroundColor: `rgba(52, 211, 153, ${Math.max(0.05, intensity)})`,
-                    color: intensity > 0.4 ? '#071018' : '#b4c5c9',
-                    border: '1px solid rgba(255,255,255,0.02)'
-                  }}
-                  title={`Index: ${idx} | Val: ${val.toFixed(3)}`}
-                >
-                  {val.toFixed(0)}
-                </div>
-              );
-            })}
-            {currentRecord.values.length > 100 && (
-              <div className="h-5 px-1.5 flex items-center justify-center text-[8px] font-mono text-text-muted border border-border-subtle rounded bg-bg-deep/60">
-                + {currentRecord.values.length - 100} elements truncated
-              </div>
-            )}
-          </div>
-        </div>
-      ) : viewMode === 'stack' ? (
-        <FeatureMapStack records={activations} selectedLayer={selectedActivationLayer!} />
-      ) : (
-        // For Conv2D / MaxPool channels grid
-        <div className="flex flex-col gap-6">
-          {/* Channels Grid */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-            <AnimatePresence mode="popLayout">
-              {visibleChannelIndices.map((chIdx) => (
-                <motion.div
-                  key={`${selectedActivationLayer}-${chIdx}`}
-                  initial={shouldReduceMotion ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={shouldReduceMotion ? undefined : { opacity: 0 }}
-                  transition={shouldReduceMotion ? { duration: 0 } : quickTransition}
-                >
-                  <FeatureMapThumbnail
-                    values={currentRecord.values}
-                    width={width}
-                    height={height}
-                    channelIndex={chIdx % numChannels}
-                    numChannels={numChannels}
-                    globalMin={currentRecord.min}
-                    globalMax={currentRecord.max}
-                    isFocused={selectedChannel === chIdx}
-                    onFocus={() => setSelectedChannel(chIdx)}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-border-subtle pt-3 mt-1">
-              <span className="text-[10px] font-mono text-text-muted">
-                Showing Filters {startIdx}-{endIdx - 1} of {targetNumFilters}
-              </span>
-              <div className="flex gap-2">
-                <button
-                  disabled={safePage === 0}
-                  onClick={() => setPage(p => p - 1)}
-                  className="btn-secondary text-[10px] py-1 px-2.5 disabled:opacity-35 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <button
-                  disabled={safePage === totalPages - 1}
-                  onClick={() => setPage(p => p + 1)}
-                  className="btn-secondary text-[10px] py-1 px-2.5 disabled:opacity-35 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
+                  return (
+                    <ChannelPlane
+                      key={i}
+                      values={currentRecord.values}
+                      width={width}
+                      height={height}
+                      channelIndex={i}
+                      numChannels={numChannels}
+                      globalMin={currentRecord.min}
+                      globalMax={currentRecord.max}
+                      zOffset={zOffset}
+                      isFocused={isFocused}
+                      isHovered={isHovered}
+                      onHover={() => setHoveredChannel(i)}
+                      onLeave={() => setHoveredChannel(null)}
+                      onClick={() => setSelectedChannel(i)}
+                    />
+                  );
+                })}
               </div>
             </div>
-          )}
+
+            {/* Float Info Overlay */}
+            <div className="absolute bottom-3 left-3 p-2 rounded-lg bg-black/80 border border-white/5 font-mono text-[8px] text-white/40 z-20 pointer-events-none select-none">
+              Hover planes to select channels. Drag sliders below to rotate.
+            </div>
+          </div>
+
+          {/* Right Panel: Rotation and Layout Sliders */}
+          <div className="flex flex-col gap-3 bg-black/20 p-4 border border-white/5 rounded-2xl h-full justify-center">
+            <h5 className="text-[9px] font-mono text-white/30 uppercase tracking-widest text-center border-b border-white/5 pb-2 mb-1">
+              3D View Setup
+            </h5>
+
+            {/* Spread Slider */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between text-[8px] font-mono text-white/50 uppercase">
+                <span>Spread</span>
+                <span className="text-aurora-teal font-bold">{spacing}px</span>
+              </div>
+              <input 
+                type="range" min={8} max={32} value={spacing} onChange={e => setSpacing(Number(e.target.value))}
+                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-aurora-teal"
+              />
+            </div>
+
+            {/* Rotation Slider */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between text-[8px] font-mono text-white/50 uppercase">
+                <span>Rotation</span>
+                <span className="text-aurora-teal font-bold">{Math.round(angleZ)}°</span>
+              </div>
+              <input 
+                type="range" min={-180} max={180} value={angleZ} onChange={e => { setAngleZ(Number(e.target.value)); setAutoRotate(false); }}
+                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-aurora-teal"
+              />
+            </div>
+
+            {/* Tilt Slider */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between text-[8px] font-mono text-white/50 uppercase">
+                <span>Tilt</span>
+                <span className="text-aurora-teal font-bold">{angleX}°</span>
+              </div>
+              <input 
+                type="range" min={30} max={80} value={angleX} onChange={e => setAngleX(Number(e.target.value))}
+                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-aurora-teal"
+              />
+            </div>
+
+            {/* Auto Rotate Toggle */}
+            <button
+              onClick={() => setAutoRotate(!autoRotate)}
+              className={`mt-2 py-1.5 rounded-lg border text-[8px] font-mono uppercase tracking-wider font-bold transition-all ${
+                autoRotate
+                  ? 'border-aurora-mint/30 bg-aurora-mint/5 text-aurora-mint'
+                  : 'border-white/5 bg-white/5 text-white/30 hover:text-white/60'
+              }`}
+            >
+              {autoRotate ? '✓ Auto-Rotating' : 'Spin Stack'}
+            </button>
+          </div>
+
+        </div>
+      ) : (
+        // Flat 2D Grid view
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-4 gap-3 md:grid-cols-8">
+            {Array.from({ length: targetNumFilters }).map((_, chIdx) => (
+              <FeatureMapThumbnail
+                key={`${activeLayerName}-${chIdx}`}
+                values={currentRecord.values}
+                width={width}
+                height={height}
+                channelIndex={chIdx}
+                numChannels={numChannels}
+                globalMin={currentRecord.min}
+                globalMax={currentRecord.max}
+                isFocused={selectedChannel === chIdx}
+                isHovered={hoveredChannel === chIdx}
+                onHover={() => setHoveredChannel(chIdx)}
+                onLeave={() => setHoveredChannel(null)}
+                onClick={() => setSelectedChannel(chIdx)}
+              />
+            ))}
+          </div>
         </div>
       )}
+      
+      {/* Bottom Selected Details Panel */}
+      <div className="p-3 bg-black/30 border border-white/5 rounded-xl text-center">
+        <div className="text-[10px] font-mono text-[#f5cd47] font-bold uppercase tracking-wider">
+          Focused Channel: Filter #{selectedChannel} (Shape: {width}x{height})
+        </div>
+        <p className="text-[9px] text-white/50 max-w-lg mx-auto mt-1 leading-normal">
+          This feature map reveals the spatial locations where the filter weights detected matching patterns (e.g. diagonal strokes, outlines, or circles) inside your drawing.
+        </p>
+      </div>
     </div>
   );
 };

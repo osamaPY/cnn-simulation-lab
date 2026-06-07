@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useLabStore } from '../hooks/useLabStore';
-import { EXPLANATIONS } from '../explanations';
+import { EXPLANATIONS_BY_MODE } from '../explanations';
 import { MathFormula } from './MathFormula';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -9,22 +9,6 @@ const STAGE_COLORS: Record<number, string> = {
   1: '#58C4DD', 2: '#58C4DD', 3: '#58C4DD', 4: '#F5CD47', 5: '#83C167',
   6: '#9C27B0', 7: '#FF6666', 8: '#E07A5F', 9: '#9C27B0',
   10: '#58C4DD', 11: '#83C167', 12: '#FF6666',
-};
-
-const subtitleContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.015 }
-  }
-};
-
-const wordVariants = {
-  hidden: { opacity: 0, y: 4 },
-  visible: {
-    opacity: 1, y: 0,
-    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }
-  }
 };
 
 const GLOSSARY_MAP: Record<number, { symbol: string; label: string; desc: string }[]> = {
@@ -92,33 +76,36 @@ const GLOSSARY_MAP: Record<number, { symbol: string; label: string; desc: string
 export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles' | 'glossary' }> = ({ mode = 'all' }) => {
   const currentStageId = useLabStore((state) => state.currentStageId);
   const shouldReduceMotion = useReducedMotion();
-  const explanation = EXPLANATIONS[currentStageId] || { body: '', focusFormula: null, keyTakeaway: '', headline: '' };
 
-  const words = React.useMemo(() => explanation.body.split(' '), [explanation.body]);
+  // Resolve explanation content for all three learning modes
+  const beginnerExp = useMemo(() => EXPLANATIONS_BY_MODE.beginner[currentStageId], [currentStageId]);
+  const mathExp = useMemo(() => EXPLANATIONS_BY_MODE.mathematical[currentStageId], [currentStageId]);
+  const examExp = useMemo(() => EXPLANATIONS_BY_MODE.examprep[currentStageId], [currentStageId]);
+
   const stageColor = STAGE_COLORS[currentStageId] || '#58C4DD';
 
-  const showFormula = (mode === 'all' || mode === 'formula') && explanation.focusFormula;
-  const showGlossary = (mode === 'all' || mode === 'glossary') && explanation.focusFormula;
+  const showFormula = (mode === 'all' || mode === 'formula') && mathExp?.focusFormula;
+  const showGlossary = (mode === 'all' || mode === 'glossary') && mathExp?.focusFormula;
   const showSubtitles = (mode === 'all' || mode === 'subtitles');
 
   return (
     <div className="relative w-full pointer-events-none" style={{ minWidth: 0 }}>
-      {/* Horizontal Formula Banner — rendered at the top of Left Column */}
+      {/* Horizontal Formula Banner — used only if explicitly requested as standalone */}
       {showFormula && (
         <AnimatePresence mode="wait">
           <motion.div
             key={`formula-${currentStageId}`}
-            initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -4 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="w-full pointer-events-auto flex items-center justify-center"
           >
-            <div className="flex items-center gap-4 py-1.5 px-5 bg-white/[0.01] border border-white/5 rounded-lg max-w-4xl w-full justify-center shadow-lg backdrop-blur-sm">
-              <span className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] font-bold shrink-0">Stage Formula</span>
-              <div className="w-[1px] h-4 bg-white/10 shrink-0" />
-              <div className="flex-1 min-w-0 flex justify-center text-[#58C4DD]">
-                <MathFormula formula={explanation.focusFormula!} />
+            <div className="flex items-center gap-2 py-0.5 px-2 bg-white/[0.01] border border-white/5 rounded max-w-2xl w-full justify-center shadow shadow-black/20 backdrop-blur-sm">
+              <span className="text-[7px] font-mono text-white/30 uppercase tracking-[0.2em] font-bold shrink-0">Stage Formula</span>
+              <div className="w-[1px] h-2 bg-white/10 shrink-0" />
+              <div className="flex-1 min-w-0 flex justify-center text-[#58C4DD] scale-75 origin-center">
+                <MathFormula formula={mathExp.focusFormula!} />
               </div>
             </div>
           </motion.div>
@@ -130,32 +117,32 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
         <AnimatePresence mode="wait">
           <motion.div
             key={`glossary-${currentStageId}`}
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -5 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -3 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             className="w-full pointer-events-auto"
           >
             <div
-              className="bg-[#1c1c1c] rounded-sm border border-white/5 flex flex-col gap-3 w-full min-w-0 formula-card p-4 shadow-xl"
+              className="bg-black/35 rounded border border-white/5 flex flex-col gap-1.5 w-full min-w-0 p-2 shadow-md"
             >
-              <div className="text-[9px] font-mono text-white/40 uppercase tracking-widest text-center border-b border-white/5 pb-2 mb-1 font-bold">Glossary</div>
-              <div className="flex flex-col gap-1.5 w-full">
+              <div className="text-[7.5px] font-mono text-white/40 uppercase tracking-widest text-center border-b border-white/5 pb-0.5 mb-0.5 font-bold">Glossary</div>
+              <div className="flex flex-col gap-0.5 w-full">
                 {GLOSSARY_MAP[currentStageId].map((item, idx) => (
-                  <div key={idx} className="flex items-start justify-between text-[9px] font-mono gap-2 hover:bg-white/[0.02] p-1 rounded transition-colors group">
-                    <span className="text-[#58C4DD] font-bold shrink-0">{item.symbol}</span>
-                    <div className="flex flex-col items-end text-right">
-                      <span className="text-white/60 font-semibold uppercase text-[8px] tracking-wider">{item.label}</span>
-                      <span className="text-white/30 text-[8px] leading-tight mt-0.5 group-hover:text-white/50 transition-colors">{item.desc}</span>
+                  <div key={idx} className="flex items-start justify-between text-[7px] font-mono gap-1 hover:bg-white/[0.01] p-0.5 rounded transition-colors group">
+                    <span className="text-[#58C4DD] font-bold shrink-0 text-[7.5px]">{item.symbol}</span>
+                    <div className="flex flex-col items-end text-right min-w-0">
+                      <span className="text-white/60 font-semibold uppercase text-[6.5px] tracking-wider truncate max-w-[110px]">{item.label}</span>
+                      <span className="text-white/30 text-[6.5px] leading-tight mt-0.5 group-hover:text-white/50 transition-colors">{item.desc}</span>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {explanation.keyTakeaway && (
-                <div className="flex flex-col items-center gap-2 w-full mt-1 border-t border-white/5 pt-3">
-                  <p className="text-[9px] font-mono text-center leading-relaxed uppercase tracking-widest text-white/35 font-bold" style={{ maxWidth: '200px' }}>
-                    {explanation.keyTakeaway}
+              {mathExp?.keyTakeaway && (
+                <div className="flex flex-col items-center gap-1 w-full mt-0.5 border-t border-white/5 pt-1.5">
+                  <p className="text-[7px] font-mono text-center leading-normal uppercase tracking-wider text-white/20 font-bold" style={{ maxWidth: '180px' }}>
+                    {mathExp.keyTakeaway}
                   </p>
                 </div>
               )}
@@ -164,44 +151,56 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
         </AnimatePresence>
       )}
 
-      {/* Subtitle text */}
+      {/* Subtitles: The Unified 3-Column Learning Panel */}
       {showSubtitles && (
         <div className="w-full flex justify-center pointer-events-none" style={{ minWidth: 0 }}>
           <AnimatePresence mode="wait">
             <motion.div
-              key={`subtitle-box-${currentStageId}`}
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+              key={`unified-learning-box-${currentStageId}`}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -5 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -3 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="w-full"
-              style={{ maxWidth: '680px' }}
             >
-              <div
-                className="border-l-2 border-white/5 text-center pointer-events-auto"
-                style={{
-                  borderLeftColor: stageColor,
-                  padding: '6px 16px',
-                }}
-              >
-                {shouldReduceMotion ? (
-                  <p className="text-sm text-[#FFFEF0]/70 leading-snug font-serif italic">
-                    {explanation.body}
+              <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-5 text-left pointer-events-auto">
+                {/* Column 1: Concept */}
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className="w-1 h-1 rounded-full animate-pulse" style={{ backgroundColor: stageColor }} />
+                    <span className="text-[7.5px] font-mono font-bold uppercase tracking-wider text-white/40">Visual Concept</span>
+                  </div>
+                  <p className="text-[9.5px] font-sans leading-relaxed text-white/60">
+                    {beginnerExp?.body}
                   </p>
-                ) : (
-                  <motion.p
-                    variants={subtitleContainerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="text-sm text-[#FFFEF0]/70 leading-snug font-serif italic flex flex-wrap gap-x-1.5 justify-center"
-                  >
-                    {words.map((word, i) => (
-                      <motion.span key={`${currentStageId}-w-${i}`} variants={wordVariants}>
-                        {word}
-                      </motion.span>
-                    ))}
-                  </motion.p>
-                )}
+                </div>
+
+                {/* Column 2: Math Model */}
+                <div className="flex flex-col gap-0.5 min-w-0 border-l border-white/5 pl-4">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className="w-1 h-1 rounded-full animate-pulse" style={{ backgroundColor: '#58C4DD' }} />
+                    <span className="text-[7.5px] font-mono font-bold uppercase tracking-wider text-white/40">Mathematical Model</span>
+                  </div>
+                  <p className="text-[9.5px] font-sans leading-relaxed text-white/60">
+                    {mathExp?.body}
+                  </p>
+                  {mathExp?.focusFormula && (
+                    <div className="mt-1 flex items-center justify-start text-[#58C4DD] scale-[0.75] origin-left">
+                      <MathFormula formula={mathExp.focusFormula} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Column 3: Technical Specs */}
+                <div className="flex flex-col gap-0.5 min-w-0 border-l border-white/5 pl-4">
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <span className="w-1 h-1 rounded-full animate-pulse" style={{ backgroundColor: '#83C167' }} />
+                    <span className="text-[7.5px] font-mono font-bold uppercase tracking-wider text-white/40">Technical Specs</span>
+                  </div>
+                  <p className="text-[9.5px] font-sans leading-relaxed text-white/60">
+                    {examExp?.body}
+                  </p>
+                </div>
               </div>
             </motion.div>
           </AnimatePresence>

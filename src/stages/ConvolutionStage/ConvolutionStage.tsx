@@ -11,8 +11,8 @@ import {
 import { remap } from '../../animations/mathUtils';
 
 const KERNEL_PRESETS = {
-  vertical:   { label: 'Vertical edge',   values: [-1, 2, -1, -1, 2, -1, -1, 2, -1] },
-  horizontal: { label: 'Horizontal edge', values: [-1, -1, -1, 2, 2, 2, -1, -1, -1] },
+  vertical:   { label: 'Vertical Edge',   values: [-1, 2, -1, -1, 2, -1, -1, 2, -1] },
+  horizontal: { label: 'Horizontal Edge', values: [-1, -1, -1, 2, 2, 2, -1, -1, -1] },
   sharpen:    { label: 'Sharpen',         values: [0, -1, 0, -1, 5, -1, 0, -1, 0] },
 } as const;
 
@@ -21,55 +21,93 @@ type KernelPreset = keyof typeof KERNEL_PRESETS;
 export const ConvolutionStage: React.FC = () => {
   const preprocessedData = useLabStore(state => state.preprocessedData);
   const hyperparams = useLabStore(state => state.hyperparams);
-  const inputCanvasRef  = useRef<HTMLCanvasElement | null>(null);
-  const outputCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const lastDrawnStepRef = useRef(-1);
-
-  const [kernelPreset, setKernelPreset] = useState<KernelPreset>('vertical');
+  const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   
-  const activeKernel = useMemo(() => {
-    const base = KERNEL_PRESETS[kernelPreset].values;
-    // Adapt kernel to size
+  const verticalCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const horizontalCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const sharpenCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const lastDrawnVertical = useRef(-1);
+  const lastDrawnHorizontal = useRef(-1);
+  const lastDrawnSharpen = useRef(-1);
+
+  const [focusedPreset, setFocusedPreset] = useState<KernelPreset>('vertical');
+
+  // Generate Kernels for each preset
+  const verticalKernel = useMemo(() => {
+    const base = KERNEL_PRESETS.vertical.values;
     const size = hyperparams.kernelSize;
     const values = new Float32Array(size * size).fill(0.1);
-    // Copy base into center if possible, or just repeat
-    for (let i = 0; i < Math.min(base.length, values.length); i++) {
-      values[i] = base[i];
-    }
+    for (let i = 0; i < Math.min(base.length, values.length); i++) values[i] = base[i];
     return values;
-  }, [kernelPreset, hyperparams.kernelSize]);
+  }, [hyperparams.kernelSize]);
+
+  const horizontalKernel = useMemo(() => {
+    const base = KERNEL_PRESETS.horizontal.values;
+    const size = hyperparams.kernelSize;
+    const values = new Float32Array(size * size).fill(0.1);
+    for (let i = 0; i < Math.min(base.length, values.length); i++) values[i] = base[i];
+    return values;
+  }, [hyperparams.kernelSize]);
+
+  const sharpenKernel = useMemo(() => {
+    const base = KERNEL_PRESETS.sharpen.values;
+    const size = hyperparams.kernelSize;
+    const values = new Float32Array(size * size).fill(0.1);
+    for (let i = 0; i < Math.min(base.length, values.length); i++) values[i] = base[i];
+    return values;
+  }, [hyperparams.kernelSize]);
+
+  const activeKernel = useMemo(() => {
+    if (focusedPreset === 'vertical') return verticalKernel;
+    if (focusedPreset === 'horizontal') return horizontalKernel;
+    return sharpenKernel;
+  }, [focusedPreset, verticalKernel, horizontalKernel, sharpenKernel]);
 
   const outputDim = Math.floor((28 + 2 * hyperparams.padding - hyperparams.kernelSize) / hyperparams.stride) + 1;
   const totalSteps = outputDim * outputDim;
   const { stepIndex } = useTimeline(totalSteps, true);
 
-  const outputMap = useMemo(() => {
+  // Compute three parallel output maps
+  const outputMapVertical = useMemo(() => {
     if (!preprocessedData) return new Float32Array(totalSteps);
-    return computeConv2D(
-      preprocessedData, 
-      28, 
-      activeKernel, 
-      hyperparams.kernelSize, 
-      hyperparams.stride, 
-      hyperparams.padding, 
-      REPRESENTATIVE_BIAS
-    );
-  }, [activeKernel, preprocessedData, hyperparams, totalSteps]);
+    return computeConv2D(preprocessedData, 28, verticalKernel, hyperparams.kernelSize, hyperparams.stride, hyperparams.padding, REPRESENTATIVE_BIAS);
+  }, [verticalKernel, preprocessedData, hyperparams, totalSteps]);
+
+  const outputMapHorizontal = useMemo(() => {
+    if (!preprocessedData) return new Float32Array(totalSteps);
+    return computeConv2D(preprocessedData, 28, horizontalKernel, hyperparams.kernelSize, hyperparams.stride, hyperparams.padding, REPRESENTATIVE_BIAS);
+  }, [horizontalKernel, preprocessedData, hyperparams, totalSteps]);
+
+  const outputMapSharpen = useMemo(() => {
+    if (!preprocessedData) return new Float32Array(totalSteps);
+    return computeConv2D(preprocessedData, 28, sharpenKernel, hyperparams.kernelSize, hyperparams.stride, hyperparams.padding, REPRESENTATIVE_BIAS);
+  }, [sharpenKernel, preprocessedData, hyperparams, totalSteps]);
+
+  const activeOutputMap = useMemo(() => {
+    if (focusedPreset === 'vertical') return outputMapVertical;
+    if (focusedPreset === 'horizontal') return outputMapHorizontal;
+    return outputMapSharpen;
+  }, [focusedPreset, outputMapVertical, outputMapHorizontal, outputMapSharpen]);
+
+  const getMinMax = (map: Float32Array) => {
+    let min = Infinity, max = -Infinity;
+    for (let i = 0; i < map.length; i++) {
+      if (map[i] < min) min = map[i];
+      if (map[i] > max) max = map[i];
+    }
+    if (min === max) { min = 0; max = 1; }
+    return { min, max };
+  };
+
+  const verticalRange = useMemo(() => getMinMax(outputMapVertical), [outputMapVertical]);
+  const horizontalRange = useMemo(() => getMinMax(outputMapHorizontal), [outputMapHorizontal]);
+  const sharpenRange = useMemo(() => getMinMax(outputMapSharpen), [outputMapSharpen]);
 
   const { row, col } = useMemo(() => ({
     row: Math.floor(stepIndex / outputDim),
     col: stepIndex % outputDim,
   }), [stepIndex, outputDim]);
-
-  const { outMin, outMax } = useMemo(() => {
-    let min = Infinity, max = -Infinity;
-    for (let i = 0; i < outputMap.length; i++) {
-      if (outputMap[i] < min) min = outputMap[i];
-      if (outputMap[i] > max) max = outputMap[i];
-    }
-    if (min === max) { min = 0; max = 1; }
-    return { outMin: min, outMax: max };
-  }, [outputMap]);
 
   const zoomProgress = remap(stepIndex % outputDim, 0, outputDim - 1, 0, 1);
 
@@ -91,39 +129,57 @@ export const ConvolutionStage: React.FC = () => {
     }
   }, [preprocessedData]);
 
+  // Reset canvases on filter/dimension change
   useEffect(() => {
-    const canvas = outputCanvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    lastDrawnStepRef.current = -1;
-  }, [outputMap, outMin, outMax]);
+    [verticalCanvasRef, horizontalCanvasRef, sharpenCanvasRef].forEach((ref) => {
+      const canvas = ref.current;
+      const ctx = canvas?.getContext('2d');
+      if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+    lastDrawnVertical.current = -1;
+    lastDrawnHorizontal.current = -1;
+    lastDrawnSharpen.current = -1;
+  }, [outputMapVertical, outputMapHorizontal, outputMapSharpen]);
 
-  useEffect(() => {
-    const canvas = outputCanvasRef.current;
+  // Helper to draw output pixels
+  const drawOutput = (
+    canvasRef: React.RefObject<HTMLCanvasElement | null>,
+    lastDrawnRef: React.MutableRefObject<number>,
+    map: Float32Array,
+    range: { min: number; max: number }
+  ) => {
+    const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    const cellSize = 10;
-    let start = lastDrawnStepRef.current + 1;
-    if (stepIndex < lastDrawnStepRef.current) {
+    const cellSize = 4; // Compact cell size for 104x104 canvases
+    let start = lastDrawnRef.current + 1;
+    if (stepIndex < lastDrawnRef.current) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       start = 0;
     }
     for (let i = start; i <= stepIndex; i++) {
       const r = Math.floor(i / outputDim);
       const c = i % outputDim;
-      const val = outputMap[i];
-      const norm = (val - outMin) / (outMax - outMin || 1);
+      const val = map[i];
+      const norm = (val - range.min) / (range.max - range.min || 1);
       const { r: cr, g: cg, b: cb } = getAuroraColor(norm);
       ctx.fillStyle = `rgb(${cr},${cg},${cb})`;
       ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
     }
-    lastDrawnStepRef.current = stepIndex;
-  }, [stepIndex, outputMap, outMin, outMax, outputDim]);
+    lastDrawnRef.current = stepIndex;
+  };
+
+  // Run draws for all three in parallel
+  useEffect(() => {
+    drawOutput(verticalCanvasRef, lastDrawnVertical, outputMapVertical, verticalRange);
+    drawOutput(horizontalCanvasRef, lastDrawnHorizontal, outputMapHorizontal, horizontalRange);
+    drawOutput(sharpenCanvasRef, lastDrawnSharpen, outputMapSharpen, sharpenRange);
+  }, [stepIndex, outputMapVertical, outputMapHorizontal, outputMapSharpen, verticalRange, horizontalRange, sharpenRange, outputDim]);
 
   if (!preprocessedData) return null;
 
-  // Clamp bubble position so it never overflows the 280×280 canvas
+  // Math bubble details
   const CANVAS_PX = 280;
   const CELL = 10;
   const BUBBLE_W = 110;
@@ -137,78 +193,102 @@ export const ConvolutionStage: React.FC = () => {
   const bubbleTop  = rawTop < BUBBLE_H + 8 ? rawTop + frameWidth + 4 : rawTop - BUBBLE_H - 4;
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full max-w-5xl px-4 py-2">
-      {/* Kernel Selection */}
-      <div className="flex flex-col sm:flex-row items-center justify-end gap-3 w-full border-b border-white/5 pb-2">
-        <div className="flex gap-1.5 p-1 bg-black/20 rounded-lg">
-          {(Object.keys(KERNEL_PRESETS) as KernelPreset[]).map((preset) => (
-            <button
-              key={preset}
-              className={`px-4 py-2 rounded-md text-[10px] font-mono tracking-widest uppercase transition-all ${
-                kernelPreset === preset
-                  ? 'bg-[#1c1c1c] text-[#F5CD47] shadow-lg border border-white/5'
-                  : 'text-white/30 hover:text-white/60'
-              }`}
-              onClick={() => setKernelPreset(preset)}
-              type="button"
-            >
-              {KERNEL_PRESETS[preset].label}
-            </button>
-          ))}
-        </div>
+    <div className="flex flex-col items-center gap-6 w-full max-w-6xl px-4 py-2">
+      {/* Title / Description */}
+      <div className="flex flex-col items-center gap-1 text-center select-none w-full">
+        <h4 className="text-xs font-mono text-aurora-teal uppercase tracking-widest">Parallel Filtering Simulation</h4>
+        <p className="text-[10px] text-white/40 max-w-md mt-0.5 leading-normal">
+          One convolutional layer runs multiple kernels in parallel. Click any output feature map below to focus and inspect its mathematical calculation.
+        </p>
       </div>
 
       {/* Main layout */}
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full py-2">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
-          {/* Input canvas */}
-          <div className="flex flex-col items-center gap-4">
-            <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input Plane</span>
-            <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
-              <canvas ref={inputCanvasRef} width={280} height={280}
-                className="block h-[280px] w-[280px] bg-black"
-              />
-              <KernelFrame stepIndex={stepIndex} />
-              {/* Math bubble */}
-              <div
-                className="absolute pointer-events-none z-30 bg-[#1c1c1c] border border-white/10 rounded-sm px-3 py-1.5 font-serif italic text-[11px] text-[#F5CD47] shadow-2xl flex items-center gap-2"
-                style={{
-                  left: `${bubbleLeft}px`,
-                  top:  `${bubbleTop}px`,
-                }}
-              >
-                <span className="opacity-60 text-white">Σ(x·w) =</span>
-                <span className="font-bold">{outputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-center text-[#F5CD47]/30" aria-hidden>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-[8px] font-mono mt-2 text-white/20 uppercase tracking-[0.4em]">Convolve</span>
-          </div>
-
-          {/* Output canvas */}
-          <div className="flex flex-col items-center gap-4">
-            <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Output Plane</span>
-            <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl">
-              <canvas ref={outputCanvasRef} width={outputDim * 10} height={outputDim * 10}
-                className="block h-[260px] w-[260px] bg-black"
-              />
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-10 w-full py-2">
+        {/* Left Column: Input plane */}
+        <div className="flex flex-col items-center gap-3">
+          <span className="text-[9px] font-mono text-white/30 uppercase tracking-[0.3em]">Input Plane</span>
+          <div className="relative p-1 border border-white/5 bg-[#161616] shadow-2xl rounded-lg">
+            <canvas ref={inputCanvasRef} width={280} height={280}
+              className="block h-[280px] w-[280px] bg-black rounded-md"
+            />
+            <KernelFrame stepIndex={stepIndex} />
+            {/* Math bubble */}
+            <div
+              className="absolute pointer-events-none z-30 bg-[#1c1c1c]/95 border border-white/10 rounded px-2 py-1 font-serif italic text-[10px] text-[#F5CD47] shadow-2xl flex items-center gap-1.5"
+              style={{
+                left: `${bubbleLeft}px`,
+                top:  `${bubbleTop}px`,
+              }}
+            >
+              <span className="opacity-60 text-white font-sans text-[8px]">Σ(x·w)=</span>
+              <span className="font-bold">{activeOutputMap[stepIndex]?.toFixed(2) || '0.00'}</span>
             </div>
           </div>
         </div>
 
-        {/* 3b1b zoom panel */}
-        <div className="lg:pl-4 lg:border-l lg:border-white/5">
+        {/* Convolve arrow (hide on small screens) */}
+        <div className="hidden lg:flex flex-col items-center justify-center text-[#F5CD47]/20" aria-hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="text-[7px] font-mono mt-1 text-white/20 uppercase tracking-[0.4em]">Convolve</span>
+        </div>
+
+        {/* Middle Column: Three Parallel Output Canvases */}
+        <div className="flex flex-row lg:flex-col gap-4 items-center justify-center">
+          {(Object.keys(KERNEL_PRESETS) as KernelPreset[]).map((preset) => {
+            const isFocused = focusedPreset === preset;
+            const canvasRef = 
+              preset === 'vertical' ? verticalCanvasRef :
+              preset === 'horizontal' ? horizontalCanvasRef :
+              sharpenCanvasRef;
+            
+            return (
+              <button
+                key={preset}
+                onClick={() => setFocusedPreset(preset)}
+                className={`flex flex-col items-center gap-2 p-2 rounded-xl transition-all duration-300 border relative ${
+                  isFocused
+                    ? 'border-[#F5CD47] bg-[#F5CD47]/5 shadow-[0_0_20px_rgba(245,205,71,0.15)] scale-105'
+                    : 'border-white/5 bg-black/20 hover:border-white/15'
+                }`}
+                type="button"
+                title={`Click to inspect ${KERNEL_PRESETS[preset].label}`}
+              >
+                {/* Active Indicator Dot */}
+                {isFocused && (
+                  <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#F5CD47] animate-pulse" />
+                )}
+
+                <span className={`text-[8px] font-mono uppercase tracking-widest font-bold ${isFocused ? 'text-[#F5CD47]' : 'text-white/40'}`}>
+                  {KERNEL_PRESETS[preset].label}
+                </span>
+
+                <div className="p-0.5 bg-black rounded border border-white/5">
+                  {/* outputDim * 4 is 104px */}
+                  <canvas
+                    ref={canvasRef}
+                    width={outputDim * 4}
+                    height={outputDim * 4}
+                    className="block h-[104px] w-[104px] bg-black rounded"
+                  />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right Column: 3b1b zoom panel */}
+        <div className="lg:pl-6 lg:border-l lg:border-white/5">
+          <div className="mb-2 text-[9px] font-mono text-white/30 uppercase text-center lg:text-left tracking-wider">
+            focused: <span className="text-[#F5CD47] font-bold">{KERNEL_PRESETS[focusedPreset].label}</span>
+          </div>
           <KernelZoomPanel
             row={row}
             col={col}
             inputData={preprocessedData}
             kernel={activeKernel}
-            outputValue={outputMap[stepIndex]}
+            outputValue={activeOutputMap[stepIndex] ?? 0}
             progress={zoomProgress}
           />
         </div>

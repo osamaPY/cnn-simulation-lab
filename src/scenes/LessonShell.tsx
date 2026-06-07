@@ -111,25 +111,18 @@ export const LessonShell: React.FC = () => {
                   className="flex flex-col bg-[#161616]"
                   style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}
                 >
-                  {/* Top Formula Banner — horizontal design for wide screens */}
-                  {preprocessedData && (
-                    <div className="flex-shrink-0 border-b border-white/5 bg-[#161616] py-1.5 px-6 flex items-center justify-center pointer-events-auto">
-                      <ExplanationPanel mode="formula" />
-                    </div>
-                  )}
-
                   {/* Stage viewer — takes available space */}
                   <div
                     className="flex items-center justify-center stage-viewer-wrapper"
-                    style={{ flex: 1, minHeight: 0, overflow: 'hidden', padding: '12px' }}
+                    style={{ flex: 1, minHeight: 0, overflow: 'hidden', padding: '4px' }}
                   >
                     <StageViewer />
                   </div>
 
-                  {/* Subtitle / explanation text — fixed height, no overflow */}
+                  {/* Unified Learning Cockpit: Concept, Math, and Technical specs */}
                   <div
-                    className="flex-shrink-0 flex items-center justify-center bg-black/20 border-t border-white/5 subtitle-explanation-wrapper"
-                    style={{ minHeight: '72px', maxHeight: '110px', padding: '10px 24px', zIndex: 30 }}
+                    className="flex-shrink-0 flex items-center justify-center bg-black/25 border-t border-white/5 subtitle-explanation-wrapper"
+                    style={{ minHeight: '84px', padding: '8px 16px', zIndex: 30, overflowY: 'auto' }}
                   >
                     <ExplanationPanel mode="subtitles" />
                   </div>
@@ -138,14 +131,14 @@ export const LessonShell: React.FC = () => {
                 {/* Right sidebar: glossary + hyperparams */}
                 <div
                   className="flex-col border-l border-white/5 bg-[#161616] hidden md:flex right-sidebar-wrapper"
-                  style={{ width: '280px', minWidth: '280px', maxWidth: '280px', overflowY: 'auto', overflowX: 'hidden', padding: '20px', gap: '24px' }}
+                  style={{ width: '180px', minWidth: '180px', maxWidth: '180px', overflowY: 'auto', overflowX: 'hidden', padding: '8px 6px', gap: '8px' }}
                 >
                   {preprocessedData && (
                     <>
                       <div className="w-full pointer-events-auto flex-shrink-0">
                         <ExplanationPanel mode="glossary" />
                       </div>
-                      <div className="w-full border-t border-white/5 flex-shrink-0" style={{ paddingTop: '20px' }}>
+                      <div className="w-full border-t border-white/5 flex-shrink-0" style={{ paddingTop: '10px' }}>
                         <HyperparamControls />
                       </div>
                     </>
@@ -156,7 +149,7 @@ export const LessonShell: React.FC = () => {
               {/* Player controls — always at bottom, never overflows */}
               <div
                 className="flex-shrink-0 w-full bg-[#1c1c1c] border-t border-white/5 player-controls-wrapper"
-                style={{ padding: '12px 32px 16px', zIndex: 40 }}
+                style={{ padding: '4px 16px 6px', zIndex: 40 }}
               >
                 <PlayerControls />
               </div>
