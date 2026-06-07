@@ -79,16 +79,16 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
               animate={{ opacity: 1, y: 0 }}
               exit={shouldReduceMotion ? undefined : { opacity: 0, y: -5 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-3xl w-full"
+              className="max-w-2xl w-full"
             >
               <div
-                className="bg-[#161616]/40 backdrop-blur-sm p-6 border-l-[3px] border-white/10 text-center mx-4 pointer-events-auto"
+                className="p-2 border-l-2 border-white/5 text-center mx-4 pointer-events-auto"
                 style={{
                   borderLeftColor: stageColor,
                 }}
               >
                 {shouldReduceMotion ? (
-                  <p className="text-base md:text-lg text-[#FFFEF0]/90 leading-relaxed font-serif italic">
+                  <p className="text-sm md:text-base text-[#FFFEF0]/70 leading-relaxed font-serif italic">
                     {explanation.body}
                   </p>
                 ) : (
@@ -96,7 +96,7 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
                     variants={subtitleContainerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="text-base md:text-lg text-[#FFFEF0]/90 leading-relaxed font-serif italic flex flex-wrap gap-x-1.5 justify-center"
+                    className="text-sm md:text-base text-[#FFFEF0]/70 leading-relaxed font-serif italic flex flex-wrap gap-x-1.5 justify-center"
                   >
                     {words.map((word, i) => (
                       <motion.span key={`${currentStageId}-w-${i}`} variants={wordVariants}>

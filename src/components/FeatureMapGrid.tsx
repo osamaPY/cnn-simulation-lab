@@ -76,8 +76,8 @@ const FeatureMapStack = ({ records, selectedLayer }: { records: ActivationRecord
   const dim = shape.length === 4 ? shape[1] : 0;
   
   return (
-    <div className="relative h-[450px] w-full flex items-center justify-center perspective-[1200px]">
-      <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-90">
+    <div className="relative h-[550px] w-full flex items-center justify-center perspective-[1200px]">
+      <div className="relative preserve-3d rotate-x-[60deg] rotate-z-[-45deg] scale-100">
         {Array.from({ length: Math.min(numChannels, 12) }).map((_, i) => {
           // Sample a small grid from the actual feature map
           const channelData = new Float32Array(dim * dim);
@@ -176,7 +176,7 @@ export const FeatureMapGrid: React.FC = () => {
   );
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="w-full flex flex-col gap-10">
       {/* Selector Tabs for Layers */}
       <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-border-subtle pb-3">
         <div className="flex flex-wrap gap-1.5">
@@ -262,9 +262,9 @@ export const FeatureMapGrid: React.FC = () => {
         <FeatureMapStack records={activations} selectedLayer={selectedActivationLayer!} />
       ) : (
         // For Conv2D / MaxPool channels grid
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-6">
           {/* Channels Grid */}
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
             <AnimatePresence mode="popLayout">
               {visibleChannelIndices.map((chIdx) => (
                 <motion.div

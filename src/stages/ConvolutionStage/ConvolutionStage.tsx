@@ -156,8 +156,8 @@ export const ConvolutionStage: React.FC = () => {
       </div>
 
       {/* Main layout */}
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-12 w-full py-4">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-16">
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-20 w-full py-8">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-24">
           {/* Input canvas */}
           <div className="flex flex-col items-center gap-4">
             <span className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em]">Input Plane</span>

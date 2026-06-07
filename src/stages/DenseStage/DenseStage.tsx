@@ -148,9 +148,9 @@ export const DenseStage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[800px] items-center px-4">
+    <div className="flex flex-col gap-10 w-full max-w-[900px] items-center px-8 py-4">
       {/* Top Controls */}
-      <div className="flex justify-start w-full items-center">
+      <div className="flex justify-start w-full items-center mb-2">
         <button
           onClick={() => setTopKOnly(!topKOnly)}
           className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${

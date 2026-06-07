@@ -135,7 +135,7 @@ export function StageViewer() {
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center p-4 sm:p-6 pointer-events-auto overflow-hidden" id="stage-viewer">
+    <div className="relative w-full h-full flex flex-col items-center justify-center p-8 sm:p-16 pointer-events-auto overflow-hidden" id="stage-viewer">
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           className="w-full h-full flex flex-col items-center justify-center"

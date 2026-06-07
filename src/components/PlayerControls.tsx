@@ -40,6 +40,8 @@ export const PlayerControls: React.FC = () => {
   const progressPercent = ((currentStageId - 1) / (CNN_STAGES.length - 1)) * 100;
   const activeColor = STAGE_COLORS[currentStageId] || '#58C4DD';
   const activeStage = CNN_STAGES.find(s => s.id === currentStageId);
+  const isLastStage = currentStageId === CNN_STAGES.length;
+  const clearAll = useLabStore(state => state.clearAll);
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-[1000px] mx-auto pointer-events-auto select-none px-6">
@@ -122,20 +124,42 @@ export const PlayerControls: React.FC = () => {
           </motion.button>
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStageId}
-            className="flex items-center gap-3"
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            transition={{ duration: 0.4 }}
-          >
-            <span className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em]">Stage {currentStageId.toString().padStart(2, '0')}</span>
-            <div className="w-[1px] h-3 bg-white/10" />
-            <span className="text-[10px] font-serif italic text-white/70">{activeStage?.name}</span>
-          </motion.div>
-        </AnimatePresence>
+        <div className="flex items-center gap-4">
+          <AnimatePresence mode="wait">
+            {isLastStage ? (
+              <motion.div
+                key="finish-prompt"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                className="flex items-center gap-4"
+              >
+                <span className="text-[10px] font-mono text-aurora-purple/60 uppercase tracking-widest animate-pulse">
+                  Course Complete!
+                </span>
+                <button
+                  onClick={clearAll}
+                  className="px-4 py-1.5 rounded-md bg-aurora-purple/20 border border-aurora-purple/40 text-aurora-purple text-[10px] font-mono uppercase tracking-[0.2em] hover:bg-aurora-purple/40 transition-all shadow-[0_0_20px_rgba(156,39,176,0.1)]"
+                >
+                  Try another number
+                </button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={currentStageId}
+                className="flex items-center gap-3"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.4 }}
+              >
+                <span className="text-[10px] font-mono text-white/30 uppercase tracking-[0.3em]">Stage {currentStageId.toString().padStart(2, '0')}</span>
+                <div className="w-[1px] h-3 bg-white/10" />
+                <span className="text-[10px] font-serif italic text-white/70">{activeStage?.name}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
