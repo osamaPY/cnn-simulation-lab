@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLabStore } from '../hooks/useLabStore';
 import { CNN_STAGES } from '../types/cnn';
@@ -15,8 +15,6 @@ export const PlayerControls: React.FC = () => {
   const preprocessedData = useLabStore((state) => state.preprocessedData);
   const clearAll = useLabStore(state => state.clearAll);
   const setShowDetails = useLabStore(state => state.setShowDetails);
-
-  const [kbHint, setKbHint] = useState(false);
 
   const canGoNext = Boolean(preprocessedData) && currentStageId < CNN_STAGES.length;
   const canGoBack = Boolean(preprocessedData) && currentStageId > 1;
