@@ -19,9 +19,13 @@ export const Header: React.FC = () => {
   const activeStage = CNN_STAGES.find(s => s.id === currentStageId);
 
   return (
-    <header className="relative w-full border-b border-white/5 bg-[#161616] z-10 py-3 px-4 md:px-6">
-      <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-4">
-        <div className="flex items-center gap-4 flex-shrink-0">
+    <header
+      className="relative w-full border-b border-white/5 bg-[#161616] z-10"
+      style={{ padding: '10px 16px', flexShrink: 0 }}
+    >
+      <div className="flex w-full items-center justify-between gap-4" style={{ minWidth: 0 }}>
+        {/* Brand */}
+        <div className="flex items-center gap-4" style={{ flexShrink: 0 }}>
           <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: activeColor }} />
           <div className="flex flex-col">
             <h1 className="text-[10px] font-bold tracking-[0.2em] uppercase text-white/90 leading-none font-sans">CNN Visual Lab</h1>
@@ -41,7 +45,11 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        <div className="hidden lg:flex items-center gap-2 flex-1 justify-center overflow-x-auto">
+        {/* Stage dots — flex, overflow hidden so they never push the layout */}
+        <div
+          className="hidden lg:flex items-center gap-1 flex-1 justify-center"
+          style={{ overflow: 'hidden', minWidth: 0 }}
+        >
           {CNN_STAGES.map(stage => {
             const isActive = stage.id === currentStageId;
             const isUnlocked = Boolean(preprocessedData) || stage.id === 1;
@@ -54,7 +62,7 @@ export const Header: React.FC = () => {
                 disabled={!isUnlocked}
                 title={stage.name}
                 type="button"
-                className="relative flex flex-col items-center gap-1.5 px-2 py-1 rounded transition-all group"
+                className="relative flex flex-col items-center gap-1.5 px-1.5 py-1 rounded transition-all group flex-shrink-0"
                 style={{ cursor: isUnlocked ? 'pointer' : 'not-allowed' }}
               >
                 <div
@@ -76,7 +84,8 @@ export const Header: React.FC = () => {
           })}
         </div>
 
-        <div className="flex items-center gap-5 flex-shrink-0">
+        {/* Model status */}
+        <div className="flex items-center gap-5" style={{ flexShrink: 0 }}>
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded border border-white/5 bg-white/2">
             {modelStatus === 'loading' && (
               <>

@@ -39,28 +39,27 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
   const showSubtitles = (mode === 'all' || mode === 'subtitles');
 
   return (
-    <div className="relative w-full pointer-events-none">
+    <div className="relative w-full pointer-events-none" style={{ minWidth: 0 }}>
+      {/* Formula panel — rendered inline (not absolute) inside the sidebar */}
       {showFormula && (
         <AnimatePresence mode="wait">
           <motion.div
             key={`formula-${currentStageId}`}
-            initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, x: -10 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -5 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-0 right-0 pointer-events-auto origin-top-right z-55"
+            className="w-full pointer-events-auto"
           >
             <div
-              className="bg-[#1c1c1c] rounded-sm p-8 border border-white/5 flex flex-col items-center gap-4"
-              style={{
-                boxShadow: '0 30px 80px rgba(0,0,0,0.6)',
-              }}
+              className="bg-[#1c1c1c] rounded-sm border border-white/5 flex flex-col items-center gap-3"
+              style={{ padding: '16px 12px' }}
             >
               <MathFormula formula={explanation.focusFormula!} />
               {explanation.keyTakeaway && (
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-2 w-full">
                   <div className="w-8 h-[1px] bg-white/10" />
-                  <p className="text-[10px] font-mono text-center max-w-[200px] leading-relaxed uppercase tracking-widest text-white/30">
+                  <p className="text-[10px] font-mono text-center leading-relaxed uppercase tracking-widest text-white/30" style={{ maxWidth: '200px' }}>
                     {explanation.keyTakeaway}
                   </p>
                 </div>
@@ -70,8 +69,9 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
         </AnimatePresence>
       )}
 
+      {/* Subtitle text */}
       {showSubtitles && (
-        <div className="w-full flex justify-center pointer-events-none">
+        <div className="w-full flex justify-center pointer-events-none" style={{ minWidth: 0 }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={`subtitle-box-${currentStageId}`}
@@ -79,16 +79,18 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
               animate={{ opacity: 1, y: 0 }}
               exit={shouldReduceMotion ? undefined : { opacity: 0, y: -5 }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="max-w-2xl w-full"
+              className="w-full"
+              style={{ maxWidth: '680px' }}
             >
               <div
-                className="p-2 border-l-2 border-white/5 text-center mx-4 pointer-events-auto"
+                className="border-l-2 border-white/5 text-center pointer-events-auto"
                 style={{
                   borderLeftColor: stageColor,
+                  padding: '6px 16px',
                 }}
               >
                 {shouldReduceMotion ? (
-                  <p className="text-sm md:text-base text-[#FFFEF0]/70 leading-relaxed font-serif italic">
+                  <p className="text-sm text-[#FFFEF0]/70 leading-snug font-serif italic">
                     {explanation.body}
                   </p>
                 ) : (
@@ -96,7 +98,7 @@ export const ExplanationPanel: React.FC<{ mode?: 'all' | 'formula' | 'subtitles'
                     variants={subtitleContainerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="text-sm md:text-base text-[#FFFEF0]/70 leading-relaxed font-serif italic flex flex-wrap gap-x-1.5 justify-center"
+                    className="text-sm text-[#FFFEF0]/70 leading-snug font-serif italic flex flex-wrap gap-x-1.5 justify-center"
                   >
                     {words.map((word, i) => (
                       <motion.span key={`${currentStageId}-w-${i}`} variants={wordVariants}>

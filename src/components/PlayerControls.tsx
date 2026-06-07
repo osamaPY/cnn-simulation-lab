@@ -44,14 +44,16 @@ export const PlayerControls: React.FC = () => {
   const clearAll = useLabStore(state => state.clearAll);
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[1000px] mx-auto pointer-events-auto select-none px-6">
-      <div className="relative flex items-center w-full h-1">
+    <div
+      className="flex flex-col gap-3 w-full mx-auto pointer-events-auto select-none"
+      style={{ maxWidth: '1000px', padding: '0 16px' }}
+    >
+      {/* Progress bar */}
+      <div className="relative flex items-center w-full" style={{ height: '4px' }}>
         <div className="absolute inset-0 bg-white/5 rounded-full" />
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full pointer-events-none"
-          style={{
-            background: activeColor,
-          }}
+          style={{ background: activeColor }}
           animate={{ width: `${progressPercent}%` }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         />
@@ -89,15 +91,14 @@ export const PlayerControls: React.FC = () => {
         })}
       </div>
 
+      {/* Controls row */}
       <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-5">
           <motion.button
             onClick={() => canGoBack && setCurrentStageId(currentStageId - 1)}
             disabled={!canGoBack}
             className={`text-[11px] font-mono tracking-widest transition-all ${
-              canGoBack
-                ? 'text-white/40 hover:text-white cursor-pointer'
-                : 'text-white/5 cursor-not-allowed'
+              canGoBack ? 'text-white/40 hover:text-white cursor-pointer' : 'text-white/5 cursor-not-allowed'
             }`}
             type="button"
           >
@@ -114,9 +115,7 @@ export const PlayerControls: React.FC = () => {
             onClick={() => canGoNext && setCurrentStageId(currentStageId + 1)}
             disabled={!canGoNext}
             className={`text-[11px] font-mono tracking-widest transition-all ${
-              canGoNext
-                ? 'text-white/60 hover:text-white cursor-pointer'
-                : 'text-white/5 cursor-not-allowed'
+              canGoNext ? 'text-white/60 hover:text-white cursor-pointer' : 'text-white/5 cursor-not-allowed'
             }`}
             type="button"
           >

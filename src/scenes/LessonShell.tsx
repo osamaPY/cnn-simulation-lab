@@ -19,7 +19,7 @@ function DrawScreen() {
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
       <div
-        className="flex flex-col items-center gap-10 p-12 bg-[#1c1c1c] rounded-lg border border-white/5 shadow-2xl pointer-events-auto relative z-10"
+        className="flex flex-col items-center gap-8 p-10 bg-[#1c1c1c] rounded-lg border border-white/5 shadow-2xl pointer-events-auto relative z-10"
       >
         <div className="text-center">
           <motion.p
@@ -77,11 +77,15 @@ export const LessonShell: React.FC = () => {
   const currentStageId   = useLabStore(state => state.currentStageId);
 
   return (
-    <div className="relative h-screen w-screen flex flex-col bg-[#161616] text-[#FFFEF0] overflow-hidden font-sans">
+    <div
+      className="relative flex flex-col bg-[#161616] text-[#FFFEF0] font-sans"
+      style={{ height: '100dvh', minWidth: '960px', overflow: 'hidden' }}
+    >
       <Header />
 
       <main
-        className="flex-1 relative flex flex-col overflow-hidden"
+        className="flex-1 relative flex flex-col"
+        style={{ minHeight: 0, overflow: 'hidden' }}
         role="main"
       >
         <AnimatePresence mode="wait" initial={false}>
@@ -90,30 +94,51 @@ export const LessonShell: React.FC = () => {
           ) : (
             <motion.div
               key="sim"
-              className="flex-1 flex flex-col min-h-0 overflow-hidden relative bg-[#1c1c1c]"
+              className="flex flex-col bg-[#1c1c1c]"
+              style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="flex-1 min-h-0 relative flex flex-col md:grid md:grid-cols-[1fr_320px] overflow-hidden">
-                <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden bg-[#161616]">
-                  <div className="flex-[4] min-h-0 flex items-center justify-center overflow-hidden p-4">
+              {/* Main content area: canvas left, sidebar right */}
+              <div
+                className="flex"
+                style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}
+              >
+                {/* Left column: stage viewer + subtitle explanation */}
+                <div
+                  className="flex flex-col bg-[#161616]"
+                  style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}
+                >
+                  {/* Stage viewer — takes available space */}
+                  <div
+                    className="flex items-center justify-center"
+                    style={{ flex: 1, minHeight: 0, overflow: 'hidden', padding: '12px' }}
+                  >
                     <StageViewer />
                   </div>
-                  
-                  <div className="flex-shrink-0 flex items-center justify-center p-8 bg-black/20 border-t border-white/5 z-30">
+
+                  {/* Subtitle / explanation text — fixed height, no overflow */}
+                  <div
+                    className="flex-shrink-0 flex items-center justify-center bg-black/20 border-t border-white/5"
+                    style={{ minHeight: '72px', maxHeight: '110px', padding: '10px 24px', zIndex: 30 }}
+                  >
                     <ExplanationPanel mode="subtitles" />
                   </div>
                 </div>
-                
-                <div className="hidden md:flex flex-col border-l border-white/5 bg-[#161616] p-6 overflow-y-auto gap-8 shadow-2xl">
+
+                {/* Right sidebar: formula + hyperparams */}
+                <div
+                  className="flex-col border-l border-white/5 bg-[#161616] hidden md:flex"
+                  style={{ width: '280px', minWidth: '280px', maxWidth: '280px', overflowY: 'auto', overflowX: 'hidden', padding: '20px', gap: '24px' }}
+                >
                   {preprocessedData && (
                     <>
-                      <div className="w-full pointer-events-auto">
+                      <div className="w-full pointer-events-auto flex-shrink-0">
                         <ExplanationPanel mode="formula" />
                       </div>
-                      <div className="w-full pt-6 border-t border-white/5">
+                      <div className="w-full border-t border-white/5 flex-shrink-0" style={{ paddingTop: '20px' }}>
                         <HyperparamControls />
                       </div>
                     </>
@@ -121,7 +146,11 @@ export const LessonShell: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex-shrink-0 w-full pt-4 pb-10 px-8 bg-[#1c1c1c] border-t border-white/5 z-40">
+              {/* Player controls — always at bottom, never overflows */}
+              <div
+                className="flex-shrink-0 w-full bg-[#1c1c1c] border-t border-white/5"
+                style={{ padding: '12px 32px 16px', zIndex: 40 }}
+              >
                 <PlayerControls />
               </div>
             </motion.div>
