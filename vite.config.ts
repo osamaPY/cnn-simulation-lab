@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ mode }) => ({
-  base: mode === 'github-pages' ? '/cnn_simulation/' : '/',
+  base: mode === 'github-pages' ? '/cnn-simulation-lab/' : '/',
   plugins: [react()],
   build: {
     rollupOptions: {
