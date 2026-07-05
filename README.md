@@ -51,7 +51,7 @@ For deeper details, see the docs in `docs/` and the research scripts in `researc
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/osamaPY/cnn_simulation.git
+git clone https://github.com/osamaPY/cnn-simulation-lab.git
 cd cnn_simulation
 npm install
 
