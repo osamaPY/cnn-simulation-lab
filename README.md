@@ -1,8 +1,8 @@
-# CNN Simulation Lab – How Machines "See"
+# CNN Simulation Lab: How Machines "See"
 
 [**Live demo**](https://cnn-simulation-psi.vercel.app)
 
-A browser-based interactive lab to demystify Convolutional Neural Networks (CNNs). Draw a digit, then follow how a real CNN transforms your pixels into feature maps, activations, and final class probabilities – all running client-side with TensorFlow.js.
+A browser-based interactive lab to demystify Convolutional Neural Networks (CNNs). Draw a digit, then follow how a real CNN transforms your pixels into feature maps, activations, and final class probabilities: all running client-side with TensorFlow.js.
 
 ---
 
@@ -31,17 +31,17 @@ A browser-based interactive lab to demystify Convolutional Neural Networks (CNNs
 
 High-level flow:
 
-1. **Canvas input** – User draws a digit using mouse or touch.
-2. **Preprocessing** – The drawing is:
+1. **Canvas input**: User draws a digit using mouse or touch.
+2. **Preprocessing**: The drawing is:
    - Converted to grayscale.
    - Cropped to the ink bounding box.
    - Resized to fit a 20×20 region.
    - Placed into a 28×28 canvas.
    - Centered by center-of-mass.
    - Normalized to values in [0, 1].
-3. **Model inference** – A small CNN (Conv2D → MaxPool → Conv2D → MaxPool → Flatten → Dense → Dense softmax) is loaded from `public/model/model.json` and run client-side.
-4. **Activation extraction** – A multi-output model exposes intermediate activations from convolution, pooling, and dense layers.
-5. **Stage UI** – The UI guides the user through each CNN stage and renders activations, explanations, and probabilities.
+3. **Model inference**: A small CNN (Conv2D → MaxPool → Conv2D → MaxPool → Flatten → Dense → Dense softmax) is loaded from `public/model/model.json` and run client-side.
+4. **Activation extraction**: A multi-output model exposes intermediate activations from convolution, pooling, and dense layers.
+5. **Stage UI**: The UI guides the user through each CNN stage and renders activations, explanations, and probabilities.
 
 For deeper details, see the docs in `docs/` and the research scripts in `research/`.
 
